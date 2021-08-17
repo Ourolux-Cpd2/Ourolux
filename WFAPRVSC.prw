@@ -1,11 +1,11 @@
 #INCLUDE "PROTHEUS.CH"
 #INCLUDE "AP5MAIL.CH"
 
-/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±±  WFAPRVSC ?Autor: Claudino Pereira Domingues           ?Data 12/05/14 ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±± Descricao ?Envia WorkFlow de Aprovacao de Solicitacao de Compras.      ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?*/
+/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±  WFAPRVSC ³ Autor: Claudino Pereira Domingues           ³ Data 12/05/14 ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±± Descricao ³ Envia WorkFlow de Aprovacao de Solicitacao de Compras.      ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±*/
 
 User Function WFAPRVSC()
     Local _nRec      := 0
@@ -60,7 +60,7 @@ User Function WFAPRVSC()
 		
 		_cCodProc := "WFAPROV"
 		_cHtmlMod := "\workflow\wfsc01.htm"
-		_cAssunt  := "Aprovação da Solicitação de Compras n?" + TRB->C1_NUM +;
+		_cAssunt  := "Aprovação da Solicitação de Compras nº " + TRB->C1_NUM +;
 		             " - Emp: " + Alltrim(SM0->M0_NOME) + " - Fil: " + Alltrim(SM0->M0_FILIAL) +;
 		             " - Aprovadores: " + _cAprovs
 		
@@ -104,6 +104,14 @@ User Function WFAPRVSC()
 		    CONOUT("(WFINICIO-KILL|SCAPRO)Processo:" + oProcess:fProcessID + " - Task: " + oProcess:fTaskID + " - SC: " + _cNumSc + " - Encerrado!")
         
 			WFKillProcess( Alltrim(TRB->C1_WFID) )	
+
+			_cQryWFID := " UPDATE " + RetSqlName("SC1")
+			_cQryWFID += " SET C1_WFID = '" + oProcess:fProcessID + "." + oProcess:fTaskID + "' "
+			_cQryWFID += " WHERE D_E_L_E_T_ = '' AND C1_FILIAL = '" + cFilAnt + "' AND " 
+			_cQryWFID += " C1_NUM = '" + TRB->C1_NUM + "' "
+		
+			TcSqlExec(_cQryWFID)
+			TcRefresh(RetSqlName("SC1"))
 		
 		EndIf
 		
@@ -171,11 +179,11 @@ User Function WFAPRVSC()
 
 Return
 
-/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±±  WFSCRET  ?Autor: Claudino Pereira Domingues           ?Data 12/05/14 ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±± Descricao ?Retorno Workflow de Aprovacao de Solicitacao de Compras.    ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?*/
+/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±  WFSCRET  ³ Autor: Claudino Pereira Domingues           ³ Data 12/05/14 ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±± Descricao ³ Retorno Workflow de Aprovacao de Solicitacao de Compras.    ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±*/
 
 User Function WFSCRET(oProcess)
     
@@ -228,6 +236,11 @@ User Function WFSCRET(oProcess)
 		EndIf
 		cNomeCom := Alltrim(SCRET->Y1_NOME)
 		cNomeApr := Alltrim(SCRET->C1_NOMAPRO)
+	else
+		oProcess:Finish()
+		oProcess:Free()
+		oProcess := Nil
+		Return
 	EndIf
 
 	If _cAprov == "SIM" // Verifica se foi aprovado
@@ -255,11 +268,11 @@ User Function WFSCRET(oProcess)
 	
 Return
 
-/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±±  WFSCTIME ?Autor: Claudino Pereira Domingues           ?Data 20/05/14 ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?
-±± Descricao ?Aviso de TIMEOUT para Aprovador.                            ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±?*/
+/*±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±  WFSCTIME ³ Autor: Claudino Pereira Domingues           ³ Data 20/05/14 ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±± Descricao ³ Aviso de TIMEOUT para Aprovador.                            ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±*/
 
 User Function WFSCTIME(_nVezes,oProcess)
     	
@@ -289,7 +302,7 @@ User Function WFSCTIME(_nVezes,oProcess)
 	// Caso seja aprovacao por item, devera ser feito tratamento.
 	If APROV->C1_APROV == "B"  
 	
-		_cAssunt  := "Reenvio Aprovação da Solicitação de Compras n?" + _cNumSc
+		_cAssunt  := "Reenvio Aprovação da Solicitação de Compras nº " + _cNumSc
 		_cHtmlMod := "\workflow\wflink.htm"
 		
 		oProcess:NewTask( _cAssunt , _cHtmlMod )
