@@ -1,0 +1,1533 @@
+#Include "Protheus.Ch"
+
+
+#DEFINE  STR0001  "Meta de Vendas X Realizado"
+#DEFINE  STR0002  "Este relatorio emite a relacao de faturamento. Podera ser"
+#DEFINE  STR0003  "emitido por ordem de Cliente ou por Valor (Ranking).     "
+#DEFINE  STR0004  "Se no TES estiver gera duplicata (N), nao sera computado."
+#DEFINE  STR0005  "Zebrado"
+#DEFINE  STR0006  "Administracao"
+#DEFINE  STR0007  "META VENDAS X REALIZADO  (GERENTE + SUPERVISOR + VENDEDOR) - "
+#DEFINE  STR0008  "META VENDAS X REALIZADO  (RANKING) - "
+#DEFINE  STR0009  "CODIGO   NOME DO VENDEDOR                                FATURAMENTO          VALOR DA                 VALOR  RANKING"
+#DEFINE  STR0010  "                                                         SEM ICM/IPI         MERCADORIA                TOTAL         "
+#DEFINE  STR0011  "Selecionando Registros..."
+#DEFINE  STR0012  "CANCELADO PELO OPERADOR"
+#DEFINE  STR0013  "Venda Sem Vendedor"
+#DEFINE  STR0014  "T O T A L --->"
+#DEFINE  STR0015  "Meta de Vendas X Realizado"
+#DEFINE  STR0016  "Este relatorio emite a relacao de faturamento. Podera ser"
+#DEFINE  STR0017  "emitido por ordem de Cliente ou por Valor (Ranking).     "
+#DEFINE  STR0018  "Se no TES estiver gera duplicata (N), nao sera computado."
+#DEFINE  STR0019  "Faturamento S/ ICM/IPI"
+#DEFINE  STR0020  "Valor Mercadoria"
+#DEFINE  STR0021  "Valor Total"
+#DEFINE  STR0022  "Ranking"
+#DEFINE  STR0023  "(Ordem de Gerente + Supervisor + Vendedor)"
+#DEFINE  STR0024  "(Ordem de Ranking)"
+#DEFINE  STR0025  "Vendas sem Vendedor"
+#DEFINE  STR0026  "Vendedores"
+#DEFINE  STR0027  "Notas de Saida"
+#DEFINE  STR0028  "Devolucoes"
+#DEFINE  STR0029  "Faturamento sem impostos"
+
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ RMAT580  ³ Autor ³ Marco Bianchi         ³ Data ³ 26/06/06 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Estatistica de Venda por Ordem de Vendedor                 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ SIGAFAT - R4                                               ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+User Function RMAT580()
+
+Local aCampos	:= {}
+Local aArea		:= GetArea()
+Local aAreaSM0	:= SM0->(GetArea())
+Local oReport
+
+oReport := ReportDef()
+oReport:PrintDialog()
+
+Return
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ReportDef ³ Autor ³ Marco Bianchi         ³ Data ³ 26/06/06 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³A funcao estatica ReportDef devera ser criada para todos os ³±±
+±±³          ³relatorios que poderao ser agendados pelo usuario.          ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³ExpO1: Objeto do relatório                                  ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³Nenhum                                                      ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³   DATA   ³ Programador   ³Manutencao efetuada                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³          ³               ³                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Static Function ReportDef()
+
+Local oReport
+Local oFatVend
+Local oSintetico
+
+/* PROJETO_P12 - Roberto Souza
+
+Static STR0001 := "Meta de Vendas X Realizado"
+Static STR0002 := "Este relatorio emite a relacao de faturamento. Podera ser"
+Static STR0003 := "emitido por ordem de Cliente ou por Valor (Ranking).     "
+Static STR0004 := "Se no TES estiver gera duplicata (N), nao sera computado."
+Static STR0005 := "Zebrado"
+Static STR0006 := "Administracao"
+Static STR0007 := "META VENDAS X REALIZADO  (GERENTE + SUPERVISOR + VENDEDOR) - "
+Static STR0008 := "META VENDAS X REALIZADO  (RANKING) - "
+Static STR0009 := "CODIGO   NOME DO VENDEDOR                                FATURAMENTO          VALOR DA                 VALOR  RANKING"
+Static STR0010 := "                                                         SEM ICM/IPI         MERCADORIA                TOTAL         "
+Static STR0011 := "Selecionando Registros..."
+Static STR0012 := "CANCELADO PELO OPERADOR"
+Static STR0013 := "Venda Sem Vendedor"
+Static STR0014 := "T O T A L --->"
+Static STR0015 := "Meta de Vendas X Realizado"
+Static STR0016 := "Este relatorio emite a relacao de faturamento. Podera ser"
+Static STR0017 := "emitido por ordem de Cliente ou por Valor (Ranking).     "
+Static STR0018 := "Se no TES estiver gera duplicata (N), nao sera computado."
+Static STR0019 := "Faturamento S/ ICM/IPI"
+Static STR0020 := "Valor Mercadoria"
+Static STR0021 := "Valor Total"
+Static STR0022 := "Ranking"
+Static STR0023 := "(Ordem de Gerente + Supervisor + Vendedor)"
+Static STR0024 := "(Ordem de Ranking)"
+Static STR0025 := "Vendas sem Vendedor"
+Static STR0026 := "Vendedores"
+Static STR0027 := "Notas de Saida"
+Static STR0028 := "Devolucoes"
+Static STR0029 := "Faturamento sem impostos"
+*/
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao do componente de impressao                                      ³
+//³                                                                        ³
+//³TReport():New                                                           ³
+//³ExpC1 : Nome do relatorio                                               ³
+//³ExpC2 : Titulo                                                          ³
+//³ExpC3 : Pergunte                                                        ³
+//³ExpB4 : Bloco de codigo que sera executado na confirmacao da impressao  ³
+//³ExpC5 : Descricao                                                       ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+oReport := TReport():New("RMAT580",STR0015,"RMT580", {|oReport| ReportPrint(oReport,oFatVend,oSintetico)},STR0016 + " " + STR0017 + " " + STR0018)
+oReport:SetTotalInLine(.F.)
+oReport:SetLandscape(.T.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Verifica as perguntas selecionadas                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+AjustaSx1()
+Pergunte(oReport:uParam,.F.)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao da secao utilizada pelo relatorio                               ³
+//³                                                                        ³
+//³TRSection():New                                                         ³
+//³ExpO1 : Objeto TReport que a secao pertence                             ³
+//³ExpC2 : Descricao da seçao                                              ³
+//³ExpA3 : Array com as tabelas utilizadas pela secao. A primeira tabela   ³
+//³        sera considerada como principal para a seção.                   ³
+//³ExpA4 : Array com as Ordens do relatório                                ³
+//³ExpL5 : Carrega campos do SX3 como celulas                              ³
+//³        Default : False                                                 ³
+//³ExpL6 : Carrega ordens do Sindex                                        ³
+//³        Default : False                                                 ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Criacao da celulas da secao do relatorio                                ³
+//³                                                                        ³
+//³TRCell():New                                                            ³
+//³ExpO1 : Objeto TSection que a secao pertence                            ³
+//³ExpC2 : Nome da celula do relatório. O SX3 será consultado              ³
+//³ExpC3 : Nome da tabela de referencia da celula                          ³
+//³ExpC4 : Titulo da celula                                                ³
+//³        Default : X3Titulo()                                            ³
+//³ExpC5 : Picture                                                         ³
+//³        Default : X3_PICTURE                                            ³
+//³ExpC6 : Tamanho                                                         ³
+//³        Default : X3_TAMANHO                                            ³
+//³ExpL7 : ITforme se o tamanho esta em pixel                              ³
+//³        Default : False                                                 ³
+//³ExpB8 : Bloco de código para impressao.                                 ³
+//³        Default : ExpC2                                                 ³
+//³                                                                        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+oFatVend	:= TRSection():New(oReport,STR0026,{"SA3","TRB"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)
+oSintetico	:= TRSection():New(oReport,"Sintetico",{"SA3","TRB"},/*{Array com as ordens do relatório}*/,/*Campos do SX3*/,/*Campos do SIX*/)
+
+TRCell():New(oFatVend,"CVEND"		,		,RetTitle("A3_COD")			,PesqPict("SA3","A3_COD")		,TamSx3("A3_COD")		[1]	,/*lPixel*/,/*{|| cVend }*/							)	// "Codigo do Vendedor"
+TRCell():New(oFatVend,"CNOME"		,		,RetTitle("A3_NOME")		,PesqPict("SA3","A3_NOME")		,TamSx3("A3_NOME")		[1]	,/*lPixel*/,/*{|| cNome }*/							)	// "Nome do Vendedor"
+TRCell():New(oFatVend,"TB_VALOR2"	,"TRB"	,STR0020					,PesqPict("SF2","F2_VALBRUT")	,TamSx3("F2_VALBRUT")	[1]	,/*lPixel*/,/*{|| code-block de impressao }*/		)   // "Valor da Mercadoria"
+TRCell():New(oFatVend,"NRANK"		,		,STR0022					,"@E 9999"						,4							,/*lPixel*/,/*{|| nRank }*/							)   // "Ranking"
+TRCell():New(oFatVend,"NMETA"		,		,"Meta Vendas"				,PesqPict("SCT","CT_VALOR")		,TamSx3("CT_VALOR")		[1]	,/*lPixel*/,/*{|| nMeta }*/							)	// "Meta de Vendas"
+TRCell():New(oFatVend,"NFALTA"		,		,"Falta p/Meta"				,PesqPict("SCT","CT_VALOR")		,TamSx3("CT_VALOR")		[1]	,/*lPixel*/,/*{|| nFalta }*/						)	// "Falta p/Meta"
+TRCell():New(oFatVend,"NPMETA"		,		,"% Realiz."				,"@E 999.99"					,6							,/*lPixel*/,/*{|| nPMeta }*/						)	// "% Realizado"
+TRCell():New(oFatVend,"CSUPER"		,		,RetTitle("A3_SUPER")		,PesqPict("SA3","A3_NREDUZ")	,32							,/*lPixel*/,/*{|| cSuper }*/						)	// "Nome do Supervisor"
+TRCell():New(oFatVend,"CGEREN"		,		,RetTitle("A3_GEREN")		,PesqPict("SA3","A3_NREDUZ")	,32							,/*lPixel*/,/*{|| cGeren }*/						)	// "Nome do Gerente"
+
+TRCell():New(oSintetico,"CGEREN"	,		,RetTitle("A3_GEREN")		,PesqPict("SA3","A3_NREDUZ")	,32							,/*lPixel*/,/*{|| cGeren }*/						)	// "Nome do Gerente"
+TRCell():New(oSintetico,"CSUPER"	,		,RetTitle("A3_SUPER")		,PesqPict("SA3","A3_NREDUZ")	,32							,/*lPixel*/,/*{|| cSuper }*/						)	// "Nome do Supervisor"
+TRCell():New(oSintetico,"VENDAS"	,		,STR0020					,PesqPict("SF2","F2_VALBRUT")	,TamSx3("F2_VALBRUT")	[1]	,/*lPixel*/,/*{|| code-block de impressao }*/		)   // "Valor da Mercadoria"
+TRCell():New(oSintetico,"NMETA"		,		,"Meta Vendas"				,PesqPict("SCT","CT_VALOR")		,TamSx3("CT_VALOR")		[1]	,/*lPixel*/,/*{|| nMeta }*/							)	// "Meta de Vendas"
+TRCell():New(oSintetico,"NTPMETA"	,		,"% Realiz."				,"@E 999.99"					,6							,/*lPixel*/,/*{|| nTPMeta }*/						)	// "% Realizado"
+
+// Alinhamento das colunas de valor a direita
+oFatVend:Cell("TB_VALOR2"):SetHeaderAlign("RIGHT")
+oFatVend:Cell("NMETA"    ):SetHeaderAlign("RIGHT")
+oFatVend:Cell("NFALTA"   ):SetHeaderAlign("RIGHT")
+oFatVend:Cell("NPMETA"   ):SetHeaderAlign("RIGHT")
+
+oSintetico:Cell("VENDAS"   ):SetHeaderAlign("RIGHT")
+oSintetico:Cell("NMETA"    ):SetHeaderAlign("RIGHT")
+oSintetico:Cell("NTPMETA"  ):SetHeaderAlign("RIGHT")
+
+oFatVend:SetTotalInLine(.F.)
+oSintetico:SetTotalInLine(.F.)
+
+// Esta Secao serve apenas para receber as Querys, pois como o relatorio e baseado na tabela TRB, as Querys
+// sao fechadas, estes Alias nao sao reconhecidos pelo objeto oFatVend pois nao esta no array de tabelas
+//oTemp := TRSection():New(oReport,STR0027,{"SD2","SF2","SF4","SD1","SF1","TRB"},,/*Campos do SX3*/,/*Campos do SIX*/)
+oTemp1 := TRSection():New(oReport,STR0027,{"SF2","SD2","SF4","TRB"},,/*Campos do SX3*/,/*Campos do SIX*/)
+oTemp2 := TRSection():New(oReport,STR0028,{"SF1","SD1","TRB"},,/*Campos do SX3*/,/*Campos do SIX*/)
+
+oReport:Section(3):SeteditCell(.F.)
+oReport:Section(4):SeteditCell(.F.)
+
+Return(oReport)
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ReportPrin³ Autor ³Marco Bianchi          ³ Data ³ 26/06/06 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±³Descri‡…o ³A funcao estatica ReportDef devera ser criada para todos os ³±±
+±±³          ³relatorios que poderao ser agendados pelo usuario.          ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³Nenhum                                                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Parametros³ExpO1: Objeto Report do Relatório                           ³±±
+±±³          ³                                                            ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³   DATA   ³ Programador   ³Manutencao efetuada                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³          ³               ³                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function ReportPrint(oReport,oFatVend,oSintetico)
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Declaracao de Variaveis                                      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+Local cEstoq 	:= If( (MV_PAR09 == 1),"S",If( (MV_PAR09 == 2),"N","SN" ) )
+Local cDupli 	:= If( (MV_PAR08 == 1),"S",If( (MV_PAR08 == 2),"N","SN" ) )
+Local lSelFil   := (MV_PAR14 = 2)
+Local aCampos 	:= {}
+Local aTam	 	:= {}
+Local nAg1		:= 0,nAg2:=0,nAg3:=0
+Local nMoeda	:= ""
+Local cMoeda	:= ""
+Local nContador,nTOTAL,nVALICM,nVALIPI
+Local nVendedor	:= Fa440CntVen()
+Local cVendedor	:= ""
+Local aVend    	:= {}
+Local aImpostos	:= {}
+Local nImpos	:= 0.00
+Local lContinua	:= .F.
+Local nMoedNF	:=	1
+Local nTaxa		:=	0
+Local cAddField	:=	""
+Local cName     :=  ""
+Local nCampo	:=	0
+Local cCampo	:=	""
+Local cSD2Old	:=	""
+Local cSD1Old	:=	""
+Local aStru		:=	{}
+Local nY        := 	0
+Local lFiltro   := .T.
+Local lMR580FIL := ExistBlock("MR580FIL")
+Local dtMoedaDev:= CtoD("")
+Local nRank	 	:= 0
+Local cVend    	:= ""
+Local cNome    	:= ""
+Local cSuper   	:= ""
+Local cGeren   	:= ""
+Local nMeta		:= 0
+Local nFalta	:= 0
+Local nPMeta	:= 0
+Local nTPMeta	:= 0
+Local cFilSA3   := ""
+Local nAdic     := 0
+Local cMeta		:= MV_PAR12
+Local nX := 0
+Local nTotVenda	:= 0
+Local nTotMeta	:= 0
+Local nGerVenda	:= 0
+Local nGerMeta	:= 0
+Local nVendas	:= 0
+
+//Variaveis para Montagem de ListBox de itens a serem impressos
+Local oDLG1Marc
+Local oFnt
+Local aBotoes     := {}
+Local lopc        :=.F.
+local cvirgula    := ""
+
+Local oOK	      := LoadBitmap( GetResources(), "LBOK" )
+Local oNO	      := LoadBitmap( GetResources(), "LBNO" ) 
+
+Local i := 0
+Local nOpcx := 0
+Private aDados    := {}                                  
+
+Private aEmprSel	:= {}
+Private cCadastro	:= "Selecione as Filiais Para Impressao do Relatório"
+
+//Monta dados para exibir a tela de mark
+//Estrutura do aDados
+dbSelectArea("SM0")
+SM0->(DbGotop())
+While !SM0->(Eof())
+
+	AADD(aDados, {If(lSelFil .Or. ( SM0->M0_CODIGO = cEmpAnt .And. SM0->M0_CODFIL = cFilAnt ),.T.,.F.), SM0->M0_CODIGO, SM0->M0_CODFIL, SM0->M0_FILIAL, SM0->M0_NOME, SM0->M0_NOMECOM })    	
+	SM0->(DbSkip())    
+	
+EndDo
+DbSelectArea("SM0")
+SM0->(DbSeek(cEmpAnt + cFilAnt))
+
+If lSelFil
+	Define FONT oFnt  NAME "Arial" Size 08,10
+	Define FONT oFnt2 NAME "Arial" Size 10,16 BOLD
+	
+	Define MsDialog oDLG1Marc Title cCadastro Of oMainWnd Pixel From 0,0 To 550,950
+	
+	@ 12,01 To 090,475 Of oDLG1Marc Pixel
+	
+	@ 20,  5  Say   "Selecione as empresas/filiais:"         	Size  150,09 	Of oDLG1Marc Pixel
+	
+	@ 035,01 ListBox oLbx Fields ;
+	Colsizes 0,25,60,25,60 Size 475,235 Of oDLG1Marc Pixel On DBlClick ( aDados[oLbx:nAt,1] := !aDados[oLbx:nAt,1] , oLbx:Refresh(.F.) )
+	
+	oLbx:aHeaders := { " "     ,;
+	"Cod Empresa" ,;
+	"Cod Filial",;
+	"Nome Filial",;
+	"Nome Empresa",;
+	"Razao Social"}
+	
+	oLbx:SetArray(aDados)
+	
+	oLbx:bLine  := { || {If(aDados[oLbx:nAt,1],oOK,oNO)	,;
+	aDados[oLbx:nAt,2]   					    ,;
+	aDados[oLbx:nAt,3]							,;
+	aDados[oLbx:nAt,4]							,;
+	aDados[oLbx:nAt,5]							,;
+	aDados[oLbx:nAt,6]							}}
+	
+	Activate MsDialog oDLG1Marc Center On Init EnchoiceBar(oDLG1Marc,{|| oDLG1Marc:End(), nOpcx := 1 },{|| oDLG1Marc:End() },,aBotoes)
+	
+	If nOpcx <> 1
+		Return()
+	EndIf
+
+EndIf
+	
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Montar array com as empresas / filiais selecionadas³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+For i:= 1 to len(aDados)
+	If aDados[i][1]
+		nPos := aScan( aEmprSel , { |x| x[1] == aDados[i][2] } )
+		IF nPos == 0
+			Aadd( aEmprSel , { aDados[i][2] , {{ aDados[i][3] }} } )
+		Else
+			Aadd( aEmprSel[nPos,2] , { aDados[i][3] } )
+		EndIF
+	EndIF
+Next i
+
+Private cCampImp
+Private aTamVal:= { 16, 2 }
+Private nDecs:=msdecimais(mv_par06)
+Private lAnalitico:= (MV_PAR13 = 1)	 //1 = Analitico - 2 = Sintetico
+
+If lMR580FIL
+	aFilUsrSF1 := ExecBlock("MR580FIL",.F.,.F.,aReturn[7])
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ SetBlock: faz com que as variaveis locais possam ser         ³
+//³ utilizadas em outras funcoes nao precisando declara-las      ³
+//³ como private											  	 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+oReport:Section(1):Cell("CVEND"  ):SetBlock({|| cVend  })
+oReport:Section(1):Cell("CNOME"  ):SetBlock({|| cNome  })
+oReport:Section(1):Cell("NRANK"  ):SetBlock({|| nRank  })
+oReport:Section(1):Cell("NMETA"  ):SetBlock({|| nMeta  })
+oReport:Section(1):Cell("NFALTA" ):SetBlock({|| nFalta })
+oReport:Section(1):Cell("NPMETA" ):SetBlock({|| nPMeta })
+oReport:Section(1):Cell("CSUPER" ):SetBlock({|| cSuper })
+oReport:Section(1):Cell("CGEREN" ):SetBlock({|| cGeren })
+
+If ! lAnalitico
+	oSintetico:SetHeaderPage()
+Endif
+
+oReport:Section(2):Cell("CGEREN" ):SetBlock({|| cGeren   })
+oReport:Section(2):Cell("CSUPER" ):SetBlock({|| cSuper   })
+oReport:Section(2):Cell("VENDAS" ):SetBlock({|| nVendas  })
+oReport:Section(2):Cell("NMETA"  ):SetBlock({|| nMeta    })
+oReport:Section(2):Cell("NTPMETA"):SetBlock({|| nTPMeta  })
+
+If ! lAnalitico
+	oBreak  := TRBreak():New(oSintetico, oSintetico:Cell("CGEREN"),"Total Gerente")
+//	oBreak:OnBreak( { || nVendas := nGerVenda, nMeta := nGerMeta, nTPMeta := nVendas / nMeta * 100} )
+EndIf
+
+// Totalizadores
+
+If lAnalitico
+	TRFunction():New(oFatVend:Cell("TB_VALOR2"),/* cID */,"SUM"    ,/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,/*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+	TRFunction():New(oFatVend:Cell("NMETA")    ,/* cID */,"SUM"    ,/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,/*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+	TRFunction():New(oFatVend:Cell("NFALTA")   ,/* cID */,"SUM"    ,/*oBreak*/,/*cTitle*/,/*cPicture*/,/*uFormula*/,/*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+	TRFunction():New(oFatVend:Cell("NPMETA")   ,/* cID */,"ONPRINT",/*oBreak*/,/*cTitle*/,/*cPicture*/,{||nTotVenda / nTotMeta * 100},.F.,.T.)
+Else
+	TRFunction():New(oSintetico:Cell("VENDAS")    ,/* cID */,"SUM"		,oBreak  ,/*cTitle*/,/*cPicture*/,/*uFormula*/                  ,.f./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+	TRFunction():New(oSintetico:Cell("NMETA")     ,/* cID */,"SUM"		,oBreak  ,/*cTitle*/,/*cPicture*/,/*uFormula*/                  ,.f./*lEndSection*/,.T./*lEndReport*/,/*lEndPage*/)
+	TRFunction():New(oSintetico:Cell("NTPMETA")   ,/* cID */,"ONPRINT" ,oBreak  ,/*cTitle*/,/*cPicture*/,{||nVendas / nMeta * 100}	,.f.               ,.T.              ,)
+EndIf
+	
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Altera o Titulo do Relatorio de acordo com Moeda escolhida 	 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+oReport:SetTitle(oReport:Title() + " " + If(mv_par13 = 2, "(Sintético por Gerente / Supervisor)", IIF(mv_par05 == 1,STR0023,STR0024)) + " - "  + GetMv("MV_MOEDA"+STR(mv_par06,1)) )		// "Faturamento por Vendedor"###"(Ordem Decrescente por Vendedor)"###"(Por Ranking)"
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Cria array para gerar arquivo de trabalho                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+aTam:=TamSX3("F2_VEND1")
+AADD(aCampos,{ "TB_VEND"   ,"C",aTam[1],aTam[2] } )
+AADD(aCampos,{ "TB_GEREN"  ,"C",aTam[1],aTam[2] } )
+AADD(aCampos,{ "TB_SUPER"  ,"C",aTam[1],aTam[2] } )
+aTam:=TamSX3("F2_EMISSAO")
+AADD(aCampos,{ "TB_EMISSAO","D",aTam[1],aTam[2] } )
+aTam:=TamSX3("F2_VALFAT")
+AADD(aCampos,{ "TB_VALOR1 ","N",aTam[1],aTam[2] } )
+aTam:=TamSX3("F2_VALFAT")
+AADD(aCampos,{ "TB_VALOR2 ","N",aTam[1],aTam[2] } )
+aTam:=TamSX3("F2_VALFAT")
+AADD(aCampos,{ "TB_VALOR3 ","N",aTam[1],aTam[2] } )
+aTam:=TamSX3("F2_DOC")
+AADD(aCampos,{ "TB_DOC    ","C",aTam[1],aTam[2] } )
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Cria arquivo de trabalho                                     ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+cNomArq 	:= CriaTrab(aCampos,.T.)
+dbUseArea( .T.,, cNomArq,"TRB", .T. , .F. )
+cNomArq1 := Subs(cNomArq,1,7)+"A"
+IndRegua("TRB",cNomArq1,"TB_VEND",,,STR0011)		//"Selecionando Registros..."
+aTamVal 	:= TamSX3("F2_VALFAT")
+cNomArq2 := Subs(cNomArq,1,7)+"B"
+IndRegua("TRB",cNomArq2,"(STRZERO(TB_VALOR3,aTamVal[1],aTamVal[2]))",,,STR0011)		//"Selecionando Registros..."
+cNomArq3 := Subs(cNomArq,1,7)+"C"
+IndRegua("TRB",cNomArq3,"TB_GEREN+TB_SUPER",,,STR0011)		//"Selecionando Registros..."
+cNomArq4 := Subs(cNomArq,1,7)+"D"
+IndRegua("TRB",cNomArq4,"TB_GEREN+TB_SUPER+TB_VEND",,,STR0011)		//"Selecionando Registros..."
+dbClearIndex()
+dbSetIndex(cNomArq1+OrdBagExt())
+dbSetIndex(cNomArq2+OrdBagExt())
+dbSetIndex(cNomArq3+OrdBagExt())
+dbSetIndex(cNomArq4+OrdBagExt())
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Geracao do Arquivo para Impressao                                      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Transforma parametros Range em expressao SQL                           ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+MakeSqlExpr(oReport:uParam)
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Filtragem do relatório                                                 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Abre tabelas e indices a serem utilizados                              ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SD2")			// Itens de Venda da NF
+dbSetOrder(5)				// Filial,Emissao,NumSeq
+dbSelectArea("SD1")			// Itens da Nota de Entrada
+dbSetOrder(6)				// Filial,Data de Digitacao,NumSeq
+
+cAliasSD2	:=	GetNextAlias()
+cWhereAux 	:= ""
+cVendedor 	:= "1"
+cAddField   := "%"
+
+cVendNao	:= Alltrim(MV_PAR15)
+cUsuAut := GetMV("MV_XFILUSR",,"000000")					// Administrador
+cVendFiltro := FormatIn(AchaVend(__cUserID),"/")
+
+For nCampo 	:= 1 To nVendedor
+	cCampo	:= "F2_VEND"+cVendedor
+	If SF2->(FieldPos(cCampo)) > 0
+
+//		If __cUserID $ cUsuAut
+//			cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "') or "
+//		Else			
+//			cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "' and " + cCampo + " IN " + cVendFiltro+ ") or "
+// 		EndIf
+
+		cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "') or "
+		cAddField += ", " + cCampo
+	EndIf
+	cVendedor := Soma1(cVendedor,1)
+Next nCampo
+cAddField += "%"
+If Empty(cWhereAux)
+	cWhere += "% NOT ("+IsRemito(2,"D2_TIPODOC")+")%"
+Else
+	cWhereAux := Left(cWhereAux,Len(cWhereAux)-4)
+	cWhere := "%(" + cWhereAux + " ) AND NOT ("+IsRemito(2,"D2_TIPODOC")+")%"
+EndIf
+
+oReport:Section(3):BeginQuery()
+
+cQuery := ""
+
+For nX := 1 to Len(aEmprSel)
+	
+	cAddField	:= StrTran(cAddField,"%","")
+	cWhere		:= StrTran(cWhere,"%","")
+	
+	cVarEmp := "cEmp"		+ StrZero(nX,2)
+	cVarFil := "cFil"		+ StrZero(nX,2)
+	&cVarEmp := aEmprSel[nX,1]
+	&cVarFil := ""
+	For nY := 1 to Len(aEmprSel[nX,2])
+		&cVarFil += aEmprSel[nX,2,nY,1] + "/"
+	Next
+	&cVarFil := FormatIn(Left(&cVarFil,Len(&cVarFil)-1),"/")
+	
+	cQuery += "SELECT '" + &cVarEmp + "' AS EMP, D2_TIPODOC, D2_FILIAL, D2_EMISSAO, D2_TIPO, D2_DOC, D2_SERIE, D2_CLIENTE, D2_LOJA, D2_NUMSEQ, D2_TES, D2_VALICM, D2_VALIPI, D2_TOTAL, "
+	cQuery += "F2_EMISSAO, F2_TIPO, F2_DOC, F2_FRETE, F2_SEGURO, F2_DESPESA, F2_FRETAUT, F2_ICMSRET, "
+	cQuery += "F2_TXMOEDA, F2_MOEDA" + cAddField + " "
+	cQuery += "FROM SD2" + &cVarEmp + "0 SD2, SF4" + &cVarEmp + "0 SF4, SF2" + &cVarEmp + "0 SF2 "
+	cQuery += "WHERE D2_FILIAL IN " + &cVarFil + " "
+	cQuery += "AND D2_EMISSAO BETWEEN '" + DTOS(mv_par01) + "' AND '" + DTOS(mv_par02) + "' "
+	cQuery += "AND D2_TIPO NOT IN ('D', 'B') "
+	cQuery += "AND D2_DOC     = F2_DOC "
+	cQuery += "AND D2_SERIE   = F2_SERIE "
+	cQuery += "AND D2_CLIENTE = F2_CLIENTE "
+	cQuery += "AND D2_LOJA    = F2_LOJA "
+	cQuery += "AND F4_FILIAL  = ' ' "
+	cQuery += "AND F4_CODIGO  = D2_TES "
+	cQuery += "AND SD2.D_E_L_E_T_ = ' ' "
+	cQuery += "AND SF2.D_E_L_E_T_ = ' ' "
+	cQuery += "AND SF4.D_E_L_E_T_ = ' ' "
+	cQuery += "AND F2_FILIAL IN " + &cVarFil + " "
+	cQuery += "AND " + cWhere + " "
+	If nX <> Len(aEmprSel)
+		cQuery += "UNION ALL "
+	Else
+		cQuery += "ORDER BY D2_FILIAL,D2_EMISSAO,D2_NUMSEQ "
+	EndIf
+	
+Next nX
+
+cQuery := ChangeQuery(cQuery)
+
+DbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),cAliasSD2,.T.,.T.)
+
+DbSelectArea(cAliasSD2)
+
+/*/
+BeginSql Alias cAliasSD2
+	SELECT  SD2.*, F2_EMISSAO, F2_TIPO, F2_DOC, F2_FRETE, F2_SEGURO, F2_DESPESA, F2_FRETAUT, F2_ICMSRET,
+	F2_TXMOEDA, F2_MOEDA %Exp:cAddField%
+	FROM %Table:SD2% SD2, %Table:SF4% SF4, %Table:SF2% SF2
+	WHERE D2_FILIAL  = %xFilial:SD2%
+	AND D2_EMISSAO between %Exp:DTOS(mv_par01)% AND %Exp:DTOS(mv_par02)%
+	AND D2_TIPO NOT IN ('D', 'B')
+	AND F2_FILIAL  = %xFilial:SF2%
+	AND D2_DOC     = F2_DOC
+	AND D2_SERIE   = F2_SERIE
+	AND D2_CLIENTE = F2_CLIENTE
+	AND D2_LOJA    = F2_LOJA
+	AND F4_FILIAL  = %xFilial:SF4%
+	AND F4_CODIGO  = D2_TES
+	AND SD2.%notdel%
+	AND SF2.%notdel%
+	AND SF4.%notdel%
+	AND %Exp:cWhere%
+	ORDER BY D2_FILIAL,D2_EMISSAO,D2_NUMSEQ
+EndSql
+/*/
+
+oReport:Section(3):EndQuery()
+
+oReport:SetMeter( (cAliasSD2)->(LastRec() ))
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Processa Faturamento                                                    ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+While !Eof()
+	
+	oReport:IncMeter()
+	nTOTAL  :=0
+	nVALICM :=0
+	nVALIPI :=0
+	
+	nTaxa	:=	IIf((cAliasSD2)->(FieldPos("F2_TXMOEDA"))>0,(cAliasSD2)->F2_TXMOEDA,0)
+	nMoedNF	:=	IIf((cAliasSD2)->(FieldPos("F2_MOEDA"))>0,(cAliasSD2)->F2_MOEDA,0)
+	
+	If AvalTes((cAliasSD2)->D2_TES,cEstoq,cDupli,(cAliasSD2)->EMP)
+		If cPaisLoc	==	"BRA"
+			nVALICM += xMoeda((cAliasSD2)->D2_VALICM,1,mv_par06,(cAliasSD2)->D2_EMISSAO,nDecs+1)
+			nVALIPI += xMoeda((cAliasSD2)->D2_VALIPI,1,mv_par06,(cAliasSD2)->D2_EMISSAO,nDecs+1)
+		Endif
+		nTotal	+=	xMoeda((cAliasSD2)->D2_TOTAL,nMoedNF,mv_par06,(cAliasSD2)->D2_EMISSAO,nDecs+1,nTaxa)
+		
+		If ( nTotal <> 0 )
+			cVendedor := "1"
+			For nContador := 1 To nVendedor
+				dbSelectArea("TRB")
+				dbSetOrder(1)
+				cVend := (cAliasSD2)->(FieldGet(FieldPos("F2_VEND"+cVendedor)))
+				cVendedor := Soma1(cVendedor,1)
+				If cVend >= mv_par03 .And. cVend <= mv_par04
+					//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+					//³Se vendedor em branco, considera apenas 1 vez        ³
+					//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+					If Empty(cVend) .and. nContador > 1
+						Loop
+					Endif
+					
+					If ( aScan(aVend,cVend)==0 )
+						Aadd(aVend,cVend)
+					EndIf
+
+					SA3->(DbSeek(xFilial("SA3")+cVend))
+
+					If (dbSeek( cVend ))
+						RecLock("TRB",.F.)
+					Else
+						RecLock("TRB",.T.)
+					EndIF
+					Replace TB_VEND    With cVend
+
+					If ! Empty(SA3->A3_SUPER)
+						Replace TB_SUPER   With SA3->A3_SUPER
+					EndIf
+					
+					If ! Empty(SA3->A3_GEREN)
+						Replace TB_GEREN   With SA3->A3_GEREN
+					EndIf
+
+					Replace TB_EMISSAO With StoD((cAliasSD2)->F2_EMISSAO)
+					Replace TB_VALOR2  With TB_VALOR2+IIF((cAliasSD2)->F2_TIPO == "P",0,nTOTAL)
+					If ( cPaisLoc=="BRA" )
+						Replace TB_VALOR1  With TB_VALOR1+(nTOTAL-nVALICM)
+						Replace TB_VALOR3  With TB_VALOR3+IIF((cAliasSD2)->F2_TIPO == "P",0,nTotal)+nVALIPI
+					Else
+						Replace TB_VALOR1  With TB_VALOR1+nTOTAL
+						Replace TB_VALOR3  With TB_VALOR3+IIF((cAliasSD2)->F2_TIPO == "P",0,nTotal)
+						//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+						//³ Pesquiso pelas caracteristicas de cada imposto               ³
+						//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+						aImpostos:=TesImpInf((cAliasSD2)->D2_TES)
+						For nY:=1 to Len(aImpostos)
+							cCampImp:=(cAliasSD2)+"->"+(aImpostos[nY][2])
+							nImpos	:=	xMoeda(&cCampImp.,nMoedNF,mv_par06,(cAliasSD2)->D2_EMISSAO,nDecs+1,nTaxa)
+							If ( aImpostos[nY][3]=="1" )
+								Replace TB_VALOR3  With TB_VALOR3 + nImpos
+							ElseIf ( aImpostos[nY][3]=="2" )
+								Replace TB_VALOR1  With TB_VALOR1 - nImpos
+							EndIf
+						Next
+					EndIf
+					Replace TB_DOC	    With (cAliasSD2)->F2_DOC
+					MsUnlock()
+				Endif
+			Next nContador
+		EndIf
+	EndIf
+	
+	dbSelectArea(cAliasSD2)
+	cSD2Old	:= (cAliasSD2)->D2_DOC+(cAliasSD2)->D2_SERIE+(cAliasSD2)->D2_CLIENTE+(cAliasSD2)->D2_LOJA
+	
+	// Considera Adicionais
+	nAdic := 0
+	If mv_par11 == 2
+		nAdic := xMoeda((cAliasSD2)->F2_FRETE+(cAliasSD2)->F2_SEGURO+(cAliasSD2)->F2_DESPESA,nMoedNF,mv_par06,StoD((cAliasSD2)->F2_EMISSAO),nDecs+1,nTaxa)
+	EndIf
+	nValor3  := xMoeda((cAliasSD2)->F2_FRETAUT+(cAliasSD2)->F2_ICMSRET,nMoedNF,mv_par06,StoD((cAliasSD2)->F2_EMISSAO),nDecs+1,nTaxa)
+	
+	dbSkip()
+	If Eof() .Or. ( (cAliasSD2)->D2_DOC+(cAliasSD2)->D2_SERIE+(cAliasSD2)->D2_CLIENTE+(cAliasSD2)->D2_LOJA!= cSD2Old )
+		For nContador := 1 To Len(aVend)
+			dbSelectArea("TRB")
+			dbSetOrder(1)
+			dbSeek(aVend[nContador])
+			RecLock("TRB",.F.)
+			TRB->TB_VALOR3	+= nValor3+nAdic
+			MsUnLock()
+		Next nContador
+		aVend := {}
+	EndIf
+	dbSelectArea(cAliasSD2)
+EndDo
+dbCloseArea()
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Processa Devolucao                                                      ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+If ( MV_PAR07 == 1 )
+	
+	cAliasSD1:= GetNextAlias()
+	
+	cWhereAux 	:= ""
+	cVendedor 	:= "1"
+
+	cWhere += "%"
+	cAddField := "%"
+	For nCampo := 1 To nVendedor
+		cCampo := "F2_VEND"+cVendedor
+		If SF2->(FieldPos(cCampo)) > 0
+
+//			If __cUserID $ cUsuAut
+//				cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "') or "
+//			Else			
+//				cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "' and " + cCampo + " IN " + cVendFiltro+ ") or "
+// 			EndIf
+
+   			cWhereAux += "(" + cCampo + " between '" + mv_par03 + "' and '" + mv_par04 + "') or "
+			cAddField += ", "  + cCampo
+		EndIf
+		cVendedor := Soma1(cVendedor,1)
+	Next nCampo
+
+	If Empty(cWhereAux)
+		cWhere += "% NOT ("+IsRemito(2,"D1_TIPODOC")+")%"
+	Else
+		cWhereAux := Left(cWhereAux,Len(cWhereAux)-4)
+		cWhere := "%(" + cWhereAux + " ) AND NOT ("+IsRemito(2,"D1_TIPODOC")+")%"
+	EndIf
+	
+	
+	If SF1->(FieldPos("F1_FRETINC")) > 0
+		cAddField += ", F1_FRETINC"
+	EndIf
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³Esta Rotina adiciona a cQuery os campos retornados na string de filtro do  |
+	//³ponto de entrada MR580FIL.                                                 |
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	If lMR580FIL
+		aStru := SF1->(dbStruct())
+		If !Empty(aFilUsrSF1[1])
+			For nX := 1 To SF1->(FCount())
+				cName := SF1->(FieldName(nX))
+				If AllTrim( cName ) $ aFilUsrSF1[1]
+					If aStru[nX,2] <> "M"
+						If !cName $ cAddField
+							cAddField += ","+cName
+						Endif
+					EndIf
+				EndIf
+			Next nX
+		Endif
+	EndIf
+	cAddField += "%"
+	
+	oReport:Section(4):BeginQuery()
+
+	cQuery := ""
+	
+	For nX := 1 to Len(aEmprSel)
+		
+		cAddField	:= StrTran(cAddField,"%","")
+		cWhere		:= StrTran(cWhere,"%","")
+		
+		cVarEmp := "cEmp"		+ StrZero(nX,2)
+		cVarFil := "cFil"		+ StrZero(nX,2)
+		&cVarEmp := aEmprSel[nX,1]
+		&cVarFil := ""
+		For nY := 1 to Len(aEmprSel[nX,2])
+			&cVarFil += aEmprSel[nX,2,nY,1] + "/"
+		Next
+		&cVarFil := FormatIn(Left(&cVarFil,Len(&cVarFil)-1),"/")
+
+		cQuery += "SELECT '" + &cVarEmp + "' AS EMP, D1_FILIAL, D1_DTDIGIT, D1_TIPO, D1_TES, D1_NFORI, D1_SERIORI, D1_LOJA, D1_DOC, "
+		cQuery += "D1_SERIE, D1_FORNECE, D1_LOJA, D1_NUMSEQ, D1_ORIGLAN, D1_VALICM, D1_VALIPI, D1_TOTAL, D1_VALDESC, D1_TIPODOC, "
+		cQuery += "F1_EMISSAO, F1_DOC, F1_SERIE, F1_FORNECE, F1_LOJA, F1_FRETE, F1_DESPESA, F1_SEGURO, F1_ICMSRET, "
+		cQuery += "F1_DTDIGIT, F2_EMISSAO, F2_CLIENTE, F2_LOJA, F1_TXMOEDA, F1_MOEDA " + cAddField + " "
+		cQuery += "FROM SD1" + &cVarEmp + "0 SD1, SF4" + &cVarEmp + "0 SF4, SF2" + &cVarEmp + "0 SF2, SF1" + &cVarEmp + "0 SF1 "
+		cQuery += "WHERE D1_FILIAL IN " + &cVarFil + " "
+		cQuery += "AND D1_DTDIGIT BETWEEN '" + DTOS(mv_par01) + "' AND '" + DTOS(mv_par02) + "' "
+		cQuery += "AND D1_TIPO = 'D' "
+		cQuery += "AND F4_FILIAL  = ' ' "
+		cQuery += "AND F4_CODIGO  = D1_TES " 
+		cQuery += "AND F2_FILIAL IN " + &cVarFil + " "
+		cQuery += "AND F2_DOC     = D1_NFORI "
+		cQuery += "AND F2_SERIE   = D1_SERIORI "
+		cQuery += "AND F2_LOJA    = D1_LOJA "
+		cQuery += "AND F1_FILIAL IN " + &cVarFil + " "
+		cQuery += "AND F1_DOC     = D1_DOC "
+		cQuery += "AND F1_SERIE   = D1_SERIE "
+		cQuery += "AND F1_FORNECE = D1_FORNECE "
+		cQuery += "AND F1_LOJA    = D1_LOJA "
+		cQuery += "AND SD1.D_E_L_E_T_ = ' ' "
+		cQuery += "AND SF4.D_E_L_E_T_ = ' ' "
+		cQuery += "AND SF2.D_E_L_E_T_ = ' ' "
+		cQuery += "AND SF1.D_E_L_E_T_ = ' ' "
+		cQuery += "AND " + cWhere + " "
+		If nX <> Len(aEmprSel)
+			cQuery += "UNION ALL "
+		Else
+				cQuery += "ORDER BY D1_FILIAL,D1_DTDIGIT,D1_NUMSEQ "
+		EndIf
+		
+	Next nX
+	
+	cQuery := ChangeQuery(cQuery)
+	
+	DbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),cAliasSD1,.T.,.T.)
+	
+	DbSelectArea(cAliasSD1)
+
+/*/
+	BeginSql Alias cAliasSD1
+		
+		SELECT SD1.*, F1_EMISSAO, F1_DOC, F1_SERIE, F1_FORNECE, F1_LOJA, F1_FRETE, F1_DESPESA, F1_SEGURO, F1_ICMSRET,
+		F1_DTDIGIT, F2_EMISSAO, F2_CLIENTE, F2_LOJA, F1_TXMOEDA, F1_MOEDA %Exp:cAddField%
+		FROM %Table:SD1% SD1, %Table:SF4% SF4, %Table:SF2% SF2, %Table:SF1% SF1
+		WHERE D1_FILIAL  = %xFilial:SD1%
+		AND D1_DTDIGIT between %Exp:DTOS(mv_par01)% AND %Exp:DTOS(mv_par02)%
+		AND D1_TIPO = 'D'
+		AND F4_FILIAL  = %xFilial:SF4%
+		AND F4_CODIGO  = D1_TES
+		AND F2_FILIAL  = %xFilial:SF2%
+		AND F2_DOC     = D1_NFORI
+		AND F2_SERIE   = D1_SERIORI
+		AND F2_LOJA    = D1_LOJA
+		AND F1_FILIAL  = %xFilial:SF1%
+		AND F1_DOC     = D1_DOC
+		AND F1_SERIE   = D1_SERIE
+		AND F1_FORNECE = D1_FORNECE
+		AND F1_LOJA    = D1_LOJA
+		AND SD1.%notdel%
+		AND SF4.%notdel%
+		AND SF2.%notdel%
+		AND SF1.%notdel%
+		AND %Exp:cWhere%
+		ORDER BY D1_FILIAL,D1_DTDIGIT,D1_NUMSEQ
+	EndSql
+/*/
+
+	oReport:Section(4):EndQuery()
+	
+	While !Eof()
+		oReport:IncMeter()
+		nTOTAL :=0
+		nVALICM:=0
+		nVALIPI:=0
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³Se a origem for loja, ignora o filtro e mostra o registro               ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		If (cAliasSD1)->D1_ORIGLAN <> "LO"
+			If (cAliasSD1)->F2_CLIENTE <> (cAliasSD1)->D1_FORNECE .And. (cAliasSD1)->F2_LOJA <> (cAliasSD1)->D1_LOJA
+				(cAliasSD1)->(DbSkip())
+				Loop
+			EndIf
+		EndIf
+		
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³Processa o ponto de entrada com o filtro do usuario para devolucoes.    ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		If lMR580FIL
+			lFiltro := .T.
+			dbSelectArea("SF1")
+			dbSetOrder(1)
+			MsSeek(xFilial("SF1")+(cAliasSD1)->D1_DOC+(cAliasSD1)->D1_SERIE+(cAliasSD1)->D1_FORNECE+(cAliasSD1)->D1_LOJA)
+			If !Empty(aFilUsrSF1[1]).And.!&(aFilUsrSF1[1])
+				dbSelectArea(cAliasSD1)
+				lFiltro := .F.
+			Endif
+		EndIf
+		
+		If lFiltro
+			If MV_PAR10 == 1 .Or. Empty((cAliasSD1)->F2_EMISSAO)
+				DtMoedaDev  := (cAliasSD1)->F1_DTDIGIT
+			Else
+				DtMoedaDev  := (cAliasSD1)->F2_EMISSAO
+			EndIf
+			
+			If cPaisLoc == "BRA"
+				If AvalTes((cAliasSD1)->D1_TES,cEstoq,cDupli,(cAliasSD1)->EMP)
+					
+					nVALICM := xMoeda((cAliasSD1)->D1_VALICM,1,mv_par06,DtMoedaDev,nDecs+1)
+					nVALIPI := xMoeda((cAliasSD1)->D1_VALIPI,1,mv_par06,DtMoedaDev ,nDecs+1)
+					nTOTAL  := xMoeda(((cAliasSD1)->D1_TOTAL - (cAliasSD1)->D1_VALDESC),1,mv_par06,DtMoedaDev,nDecs+1)
+					cVendedor := "1"
+					For nContador := 1 TO nVendedor
+						dbSelectArea("TRB")
+						dbSetOrder(1)
+						cVend := (cAliasSD1)->(FieldGet((cAliasSD1)->(FieldPos("F2_VEND"+cVendedor))))
+						cVendedor := Soma1(cVendedor,1)
+						If cVend >= MV_PAR03 .And. cVend <= MV_PAR04
+							If Empty(cVend) .and. nContador > 1
+								Loop
+							EndIf
+							If ( aScan(aVend,cVend) == 0 )
+								AADD(aVend,cVend)
+							EndIf
+							If nTOTAL > 0
+
+								SA3->(DbSeek(xFilial("SA3")+cVend))
+
+								If (dbSeek( cVend ))
+									RecLock("TRB",.F.)
+								Else
+									RecLock("TRB",.T.)
+								EndIf
+
+								Replace TB_VEND    With cVend
+
+								If ! Empty(SA3->A3_SUPER)
+									Replace TB_SUPER   With SA3->A3_SUPER
+								EndIf
+								
+								If ! Empty(SA3->A3_GEREN)
+									Replace TB_GEREN   With SA3->A3_GEREN
+								EndIf
+
+								Replace TB_EMISSAO With STOD((cAliasSD1)->F1_EMISSAO)
+								Replace TB_VALOR2  With TB_VALOR2-nTOTAL
+								Replace TB_VALOR1  With TB_VALOR1-(nTOTAL-nVALICM)
+								Replace TB_VALOR3  With TB_VALOR3-nTOTAL-nVALIPI
+								Replace TB_DOC	    With (cAliasSD1)->F1_DOC
+								MsUnlock()
+							EndIf
+						Endif
+					Next nContador
+				EndIf
+			Else
+				If AvalTes((cAliasSD1)->D1_TES,cEstoq,cDupli,(cAliasSD1)->EMP)
+					nTaxa	:=	IIf((cAliasSD1)->(FieldPos("F1_TXMOEDA"))>0,(cAliasSD1)->F1_TXMOEDA,0)
+					nMoedNF	:=	IIF((cAliasSD1)->(FieldPos("F1_MOEDA"))>0,(cAliasSD1)->F1_MOEDA,1)
+					nTOTAL	:= xMoeda(((cAliasSD1)->D1_TOTAL - (cAliasSD1)->D1_VALDESC),nMoedNF,mv_par06,DtMoedaDev,nDecs+1,nTaxa)
+					cVendedor := "1"
+					For nContador := 1 TO 1
+						dbSelectArea("TRB")
+						dbSetOrder(1)
+						cVend := (cAliasSD1)->(FieldGet((cAliasSD1)->(FieldPos("F1_VEND"+cVendedor))))
+						cVendedor := Soma1(cVendedor,1)
+						If cVend >= MV_PAR03 .And. cVend <= MV_PAR04
+							If Empty(cVend) .and. nContador > 1
+								Loop
+							EndIf
+							If ( aScan(aVend,cVend) == 0 )
+								AADD(aVend,cVend)
+							EndIf
+							If nTOTAL > 0
+								If (dbSeek( cVend ))
+									RecLock("TRB",.F.)
+								Else
+									RecLock("TRB",.T.)
+								EndIf
+								Replace TB_VEND    With cVend
+								Replace TB_EMISSAO With STOD((cAliasSD1)->F1_EMISSAO)
+								Replace TB_VALOR2  With TB_VALOR2-nTOTAL
+								Replace TB_VALOR1  With TB_VALOR1-nTOTAL
+								Replace TB_VALOR3  With TB_VALOR3-nTotal
+								//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+								//³ Pesquiso pelas caracteristicas de cada imposto               ³
+								//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+								aImpostos:=TesImpInf((cAliasSD1)->D1_TES)
+								For nY:=1 to Len(aImpostos)
+									cCampImp:= (cAliasSD1)+"->"+(aImpostos[nY][2])
+									nImpos	:=	xMoeda(&cCampImp.,nMoedNF,mv_par06,DtMoedaDev,nDecs+1,nTaxa)
+									If ( aImpostos[nY][3]=="1" )
+										Replace TB_VALOR3  With TB_VALOR3 - nImpos
+									ElseIf ( aImpostos[nY][3]=="2" )
+										Replace TB_VALOR1  With TB_VALOR1 + nImpos
+									EndIf
+								Next nY
+								Replace TB_DOC	    With (cAliasSD1)->F1_DOC
+							Endif
+							MsUnlock()
+						EndIf
+					Next nContador
+				Endif
+			Endif
+			dbSelectArea(cAliasSD1)
+			cSD1Old := (cAliasSD1)->D1_DOC+(cAliasSD1)->D1_SERIE+(cAliasSD1)->D1_FORNECE+(cAliasSD1)->D1_LOJA
+			If ( cPaisLoc=="BRA")
+				// Considera Adicionais
+				If mv_par11 == 2
+					nAdic := xMoeda((cAliasSD1)->F1_FRETE+(cAliasSD1)->F1_DESPESA+(cAliasSD1)->F1_SEGURO,1,mv_par06,DtMoedaDev,nDecs+1)
+				EndIf
+				nValor3	:= xMoeda((cAliasSD1)->F1_ICMSRET,1,mv_par06,DtMoedaDev,nDecs+1)
+			Else
+				nValor3	:= xMoeda(IIf((cAliasSD1)->(FieldPos("F1_FRETINC"))>0.And.(cAliasSD1)->F1_FRETINC<> "S",;
+				(cAliasSD1)->F1_FRETE,0);
+				+(cAliasSD1)->F1_DESPESA,nMoedNF,mv_par06,DtMoedaDev,nDecs+1,nTaxa)
+			EndIf
+		EndIf
+		
+		dbSelectArea(cAliasSD1)
+		dbSkip()
+		
+		If lFiltro
+			If Eof() .Or. ( (cAliasSD1)->D1_DOC+(cAliasSD1)->D1_SERIE+(cAliasSD1)->D1_FORNECE+(cAliasSD1)->D1_LOJA != cSD1Old)
+				FOR nContador := 1 TO Len(aVend)
+					dbSelectArea("TRB")
+					dbSetOrder(1)
+					cVend := aVend[nContador]
+					dbSeek( cVend )
+					RecLock("TRB",.F.)
+					Replace TB_VALOR3  With TB_VALOR3-nValor3
+					nValor3	:= 0
+					MsUnlock()
+				Next nContador
+				aVend:={}
+			EndIf
+		EndIf
+		dbSelectArea(cAliasSD1)
+	EndDo
+	dbCloseArea()
+EndIf
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Impressao do Relatorio                                                 ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("TRB")
+
+If ! lAnalitico
+	dbSetOrder(3)
+Else	
+	If ( MV_PAR05 = 2 )
+		dbSetOrder(2)
+	Else
+		dbSetOrder(4)
+	EndIF
+EndIF
+	
+//If len(oReport:Section(MV_PAR13):GetAdvplExp("SA3")) > 0
+//	cFilSA3 := oReport:Section(MV_PAR13):GetAdvplExp("SA3")
+//EndIf
+
+If len(oReport:Section(MV_PAR13):GetAdvplExp("TRB")) > 0
+	cFilSA3 := oReport:Section(MV_PAR13):GetAdvplExp("TRB")
+EndIf
+
+oReport:Section(1):Init()
+oReport:Section(2):Init()
+oReport:SetMeter(LastRec())
+
+If lAnalitico               			// Analitico
+
+	If mv_par05 = 1						// Vendedor
+
+		dbGoTop()
+		While !Eof()
+
+			oReport:IncMeter()
+			cVend := TRB->TB_VEND
+
+			If  ! (__cUserID $ cUsuAut)
+				If ! (cVend $ cVendFiltro)
+					dbSelectArea("TRB")
+					dbSkip()
+					Loop
+				EndIf
+			EndIf
+
+			If cVend $ cVendNao
+				dbSelectArea("TRB")
+				dbSkip()
+				Loop
+			EndIf
+							
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Verifica filtro de usuario                                   ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			dbSelectArea("SA3")
+			dbSeek(xFilial()+cVend)
+			If !Empty(cFilSA3) .And. !(&cFilSA3)
+				dbSelectArea("TRB")
+				dbSkip()
+				Loop
+			EndIf
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Verifica se ‚ venda sem vendedor                             ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If !Empty( cVend )
+				cNome := SA3->A3_NOME
+			Else
+				cVend :=  "******"
+				cNome :=  STR0025			// "Vendas sem Vendedor"
+			EndIf
+	
+			cSuper  := ""
+			cGeren  := ""
+			
+			If ! Empty(SA3->A3_SUPER)
+				nRecno  := SA3->(Recno())
+				cSuper := SA3->A3_SUPER + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_SUPER,"A3_NREDUZ")
+				SA3->(DbGoto(nRecno))
+			EndIf
+			
+			If ! Empty(SA3->A3_GEREN)
+				nRecno  := SA3->(Recno())
+				cGeren := SA3->A3_GEREN + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"A3_NREDUZ")
+				SA3->(DbGoto(nRecno))
+			EndIf
+	
+			dbSelectArea("TRB")
+			
+			nMeta := AchaMeta(cMeta, cVend)
+			nFalta := TRB->TB_VALOR2 - nMeta
+			nPMeta := TRB->TB_VALOR2 / nMeta * 100
+			
+			oReport:Section(1):Cell("NRANK"):Hide()
+			oReport:section(1):PrintLine()
+
+			nTotVenda	+= TRB->TB_VALOR2
+			nTotMeta	+= nMeta
+	
+			dbSkip()
+		EndDo
+
+	Else				// Ranking
+
+		dbGoBottom()
+		While !Bof()
+			
+			oReport:IncMeter()
+			cVend := TRB->TB_VEND
+
+			If  ! (__cUserID $ cUsuAut)
+				If ! (cVend $ cVendFiltro)
+					dbSelectArea("TRB")
+					dbSkip(-1)
+					Loop
+				EndIf
+			EndIf
+
+			If cVend $ cVendNao
+				dbSelectArea("TRB")
+				dbSkip(-1)
+				Loop
+			EndIf
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Verifica filtro de usuario                                   ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			dbSelectArea("SA3")
+			dbSeek(xFilial()+cVend)
+			If !Empty(cFilSA3) .And. !(&cFilSA3)
+				dbSelectArea("TRB")
+				dbSkip(-1)
+				Loop
+			EndIf
+			
+			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+			//³ Verifica se ‚ venda sem vendedor                             ³
+			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+			If !Empty( cVend )
+				cNome := SA3->A3_NOME
+			Else
+				cVend :=  "******"
+				cNome :=  STR0025			// "Vendas sem Vendedor"
+			EndIf
+	
+			cSuper  := ""
+			cGeren  := ""
+			
+			If ! Empty(SA3->A3_SUPER)
+				nRecno  := SA3->(Recno())
+				cSuper := SA3->A3_SUPER + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_SUPER,"A3_NREDUZ")
+				SA3->(DbGoto(nRecno))
+			EndIf
+			
+			If ! Empty(SA3->A3_GEREN)
+				nRecno  := SA3->(Recno())
+				cGeren := SA3->A3_GEREN + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"A3_NREDUZ")
+				SA3->(DbGoto(nRecno))
+			EndIf
+	
+			dbSelectArea("TRB")
+			
+			nMeta := AchaMeta(cMeta, cVend)
+			nFalta := TRB->TB_VALOR2 - nMeta
+			nPMeta := TRB->TB_VALOR2 / nMeta * 100
+			
+			nRank++
+			oReport:Section(1):Cell("NRANK"):Show()
+			oReport:section(1):PrintLine()
+
+			nTotVenda	+= TRB->TB_VALOR2
+			nTotMeta	+= nMeta
+	
+			dbSkip(-1)
+		EndDo
+
+	EndIf
+
+Else			// Sintetico
+
+	nTotVenda := 0
+	nTotMeta  := 0
+
+	dbGotop()
+	While !Eof()
+
+		If  ! (__cUserID $ cUsuAut)
+			If ! (TRB->TB_VEND $ cVendFiltro)
+				dbSelectArea("TRB")
+				dbSkip()
+				Loop
+			EndIf
+		EndIf
+
+		If TRB->TB_VEND $ cVendNao
+			dbSelectArea("TRB")
+			dbSkip()
+			Loop
+		EndIf
+
+		nGerVenda := 0
+		nGerMeta  := 0
+
+		cQuebra := TRB->TB_GEREN
+		Do While TRB->TB_GEREN = cQuebra .And. ! Eof()
+
+			If  ! (__cUserID $ cUsuAut)
+				If ! (TRB->TB_VEND $ cVendFiltro)
+					dbSelectArea("TRB")
+					dbSkip()
+					Loop
+				EndIf
+			EndIf
+	
+			If TRB->TB_VEND $ cVendNao
+				dbSelectArea("TRB")
+				dbSkip()
+				Loop
+			EndIf
+
+			cChave := TRB->TB_GEREN + TRB->TB_SUPER
+
+			nSupVenda := 0
+			nSupMeta  := 0
+
+			Do While TRB->TB_GEREN + TRB->TB_SUPER = cChave .And. ! Eof()
+	
+				cVend := TRB->TB_VEND
+
+				If TRB->TB_VEND $ cVendNao
+					dbSelectArea("TRB")
+					dbSkip()
+					Loop
+				EndIf
+					
+				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+				//³ Verifica filtro de usuario                                   ³
+				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+				dbSelectArea("SA3")
+				dbSeek(xFilial()+cVend)
+				If !Empty(cFilSA3) .And. !(&cFilSA3)
+					dbSelectArea("TRB")
+					dbSkip()
+					Loop
+				EndIf
+				
+				//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+				//³ Verifica se ‚ venda sem vendedor                             ³
+				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+				If !Empty( cVend )
+					cNome := SA3->A3_NOME
+				Else
+					cVend :=  "******"
+					cNome :=  STR0025			// "Vendas sem Vendedor"
+				EndIf
+
+				cSuper  := ""
+				cGeren  := ""
+				
+				If ! Empty(SA3->A3_SUPER)
+					nRecno  := SA3->(Recno())
+					cSuper := SA3->A3_SUPER + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_SUPER,"A3_NREDUZ")
+					SA3->(DbGoto(nRecno))
+				EndIf
+				
+				If ! Empty(SA3->A3_GEREN)
+					nRecno  := SA3->(Recno())
+					cGeren := SA3->A3_GEREN + "-" + Posicione("SA3",1,xFilial("SA3")+SA3->A3_GEREN,"A3_NREDUZ")
+					SA3->(DbGoto(nRecno))
+				EndIf
+
+				dbSelectArea("TRB")
+				
+				nMeta := AchaMeta(cMeta, cVend)
+//				nPMeta := TRB->TB_VALOR2 / nMeta * 100
+
+				nSupVenda	+= TRB->TB_VALOR2
+				nGerVenda	+= TRB->TB_VALOR2
+				nTotVenda	+= TRB->TB_VALOR2
+
+				nSupMeta	+= nMeta
+				nGerMeta	+= nMeta
+				nTotMeta	+= nMeta
+
+				dbSkip()
+			EndDo
+	
+			oReport:IncMeter()
+
+			nVendas := nSupVenda		
+			nMeta	:= nSupMeta
+			nTPMeta := nSupVenda / nSupMeta * 100
+					
+			oReport:Section(2):PrintLine()
+
+		EndDo       
+
+		nVendas := nGerVenda		
+		nMeta	:= nGerMeta
+		nTPMeta := nGerVenda / nGerMeta * 100
+
+		oBreak:Print()
+
+	EndDo       
+
+	nVendas := nTotVenda		
+	nMeta	:= nTotMeta
+	nTPMeta := nTotVenda / nTotMeta * 100
+
+EndIf
+
+//oReport:Section(MV_PAR13):PageBreak()
+
+dbSelectArea( "TRB" )
+dbCloseArea()
+fErase(cNomArq+GetDBExtension())
+fErase(cNomArq1+OrdBagExt())
+fErase(cNomArq2+OrdBagExt())
+fErase(cNomArq3+OrdBagExt())
+fErase(cNomArq4+OrdBagExt())
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³ Restaura a integridade dos dados                             ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+dbSelectArea("SF2")
+dbClearFilter()
+dbSetOrder(1)
+
+Return
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Funcao    ³AjustaSX1 ³ Autor ³Marco Bianchi          ³ Data ³10/11/2006³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³Acerta o arquivo de perguntas                               ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Retorno   ³Nenhum                                                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³   DATA   ³ Programador   ³Manutencao Efetuada                         ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³          ³               ³                                            ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+
+Static Function AjustaSx1()
+Local aArea := GetArea()
+Local aHelpP11	:= {}
+Local aHelpE11	:= {}
+Local aHelpS11	:= {}
+
+Aadd( aHelpP11, "Desconsidera os valores de frete, seguro" )
+Aadd( aHelpP11, "e despesa no valor total.       " )
+
+Aadd( aHelpE11, "Do not consider the freight, insurance  " )
+Aadd( aHelpE11, " and expenses value on the total val.   " )
+
+Aadd( aHelpS11, "No considera los valores de flete,seguro" )
+Aadd( aHelpS11, " y gastos en el valor total."  )
+
+PutSx1("MTR580","11","Desconsidera Adicionais ?"  ,"No considera Adicionales?    ","Do not consider Additional?","mv_che","N",1,0,2,"C","","","","","mv_par11","Sim"            ,"Si"             ,"Yes"          ,"","Nao"            ,"No"                  ,"No"                         ,"","","","","","","","","",aHelpP11,aHelpE11,aHelpS11)
+PutSX1Help("P.MTR58011.",aHelpP11,aHelpE11,aHelpS11)
+
+RestArea(aArea)
+
+Return
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ AchaVend ³ Autor ³ Richard N. Cabral     ³ Data ³ 24/03/12 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Acha vendedores dos gerentes e supervidores                ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ SIGAFAT - R4                                               ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+
+Static Function AchaVend(cUsuLog)
+
+Local aArea, aAreaSA3, cVendFiltro
+
+aArea		:= GetArea()
+aAreaSA3	:= SA3->(GetArea())
+
+cVendFiltro := ""
+
+//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+//³Acha se usuario e vendedor        ³
+//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+SA3->(DbSetOrder(7))
+If SA3->(DbSeek(xFilial("SA3") + cUsuLog))
+	cVendPesq	:= SA3->A3_COD
+	cVendFiltro	:= cVendPesq + "/"
+
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³Acha vendedores abaixo do Gerente ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	SA3->(DbSetOrder(4))
+	SA3->(DbSeek(xFilial("SA3") + cVendPesq))
+	
+	Do While SA3->A3_FILIAL + SA3->A3_GEREN = xFilial("SA3") + cVendPesq .And. ! SA3->(Eof())
+		If At(SA3->A3_COD,cVendFiltro) = 0
+			cVendFiltro += SA3->A3_COD + "/"
+		EndIf
+		SA3->(DbSkip())
+	EndDo
+	
+	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+	//³Acha vendedores abaixo do Supervisor ³
+	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+	SA3->(DbSetOrder(5))
+	SA3->(DbSeek(xFilial("SA3") + cVendPesq))
+	
+	Do While SA3->A3_FILIAL + SA3->A3_SUPER = xFilial("SA3") + cVendPesq .And. ! SA3->(Eof())
+		If At(SA3->A3_COD,cVendFiltro) = 0
+			cVendFiltro += SA3->A3_COD + "/"
+		EndIf
+		SA3->(DbSkip())
+	EndDo
+	
+EndIf
+SA3->(DbSetOrder(1))
+
+SA3->(RestArea(aAreaSA3))
+RestArea(aArea)
+
+cVendFiltro := Left(cVendFiltro,Len(cVendFiltro)-1)
+
+Return cVendFiltro
+
+
+/*
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
+±±³Programa  ³ AchaMeta ³ Autor ³ Richard N. Cabral     ³ Data ³ 24/03/12 ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Descri‡…o ³ Acha meta do vendedor                                      ³±±
+±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
+±±³Uso       ³ SIGAFAT - R4                                               ³±±
+±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+*/
+Static Function AchaMeta(cMeta, cVend)
+
+Local nMeta		:= 0
+Local aArea		:= GetArea()
+Local aAreaSCT	:= SCT->(GetArea())
+
+SCT->(DbSetOrder(1))
+SCT->(DbSeek(xFilial("SCT") + cMeta))
+
+Do While SCT->CT_FILIAL + SCT->CT_DOC = xFilial("SCT") + cMeta .And. ! SCT->(Eof())
+	If SCT->CT_VEND = cVend
+		nMeta := SCT->CT_VALOR
+	EndIf
+	SCT->(DbSkip())
+EndDo
+
+SCT->(RestArea(aAreaSCT))
+RestArea(aArea)
+
+Return nMeta     
+
+
+User Function RMAT580Ex()
+oDlg:End()
+Return
+
+
+
+Static Function AvalTes(cTes,cEstoq,cDupli,cEmp)
+Local cQuery := ""
+Local lRet := .T.
+
+cQuery := "SELECT F4_DUPLIC, F4_ESTOQUE FROM SF4" + cEmp + "0 SF4 WHERE F4_CODIGO = '" + cTes + "'"
+DbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),"TRBTES",.T.,.T.)
+DbSelectArea("TRBTES")
+TRBTES->(DbGotop())  
+If !TRBTES->(Eof())
+	If cDupli == "S" .and. TRBTES->F4_DUPLIC <> 'S'
+		lRet := .F.
+	ElseIf	cDupli == "N" .and. TRBTES->F4_DUPLIC <> 'N'
+		lRet := .F.
+	EndIf	
+		 
+	If cEstoq == "S" .and. TRBTES->F4_ESTOQUE <> 'S'
+		lRet := .F.
+	ElseIf	cEstoq == "N" .and. TRBTES->F4_ESTOQUE <> 'N'
+		lRet := .F.
+	EndIf	    
+Else
+	lRet := .F.	
+EndIf                 
+DbSelectArea("TRBTES")
+TRBTES->(DbCloseArea())
+
+Return(lRet)
