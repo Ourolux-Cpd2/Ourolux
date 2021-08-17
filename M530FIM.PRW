@@ -14,9 +14,10 @@
 ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
 /*/
 USER FUNCTION M530FIM()
-cUpse2 := " UPDATE SE2010 SET D_E_L_E_T_='*', E2_PREFIXO='"+SUBSTR(TIME(),5,1)+SUBSTR(TIME(),7,2)+"', E2_HIST='PROV COMISS - "+DTOS(DDATABASE)+"' WHERE "
-cUpse2 += " E2_TIPO in('DP','TX') AND E2_PREFIXO='"+SE2->E2_PREFIXO+"' AND E2_NUM='"+SE2->E2_NUM+"' AND "
-cUpse2 += " E2_EMISSAO='"+DTOS(DDATABASE)+"' " 
+cUpse2 := " UPDATE SE2010 SET D_E_L_E_T_='*' WHERE "
+cUpse2 += " E2_TIPO in('DP','TX') AND E2_PREFIXO='"+cPREFIXO+"' AND 
+cUpse2 += " E2_EMISSAO='"+DTOS(DDATABASE)+"' AND "
+cUpse2 += " D_E_L_E_T_ = '' " 
 TCSQLExec( cUpse2 )
 
 /*

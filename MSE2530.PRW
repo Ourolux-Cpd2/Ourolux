@@ -21,15 +21,8 @@ User Function MSE2530()
 	Local aITEMPC  := {}
 	Local aCABPC   := {}   
 	Local aAREA	   := GETAREA()
-	
 	Local aAreaSE2 := SE2->( GETAREA() )
-	Local _cPref   := SE2->E2_PREFIXO
-	Local _cNumTit := SE2->E2_NUM
-	Local _cTipo   := SE2->E2_TIPO
-	Local _cForn   := SE2->E2_FORNECE
-	Local _cLoja   := SE2->E2_LOJA
 	Local _CndPgt  := "C99"	//Criar Cond.Pagto - TIPO = "3", com Regra 1,1,15,28 (Pagto até dia 15 e depois dia 28)
-
 	Private lMSERROAUTO	:= .F.      
 	
 	cOBS     := SE2->E2_FORNECE+"/"+SE2->E2_NUM+"/"+ALLTRIM(SE2->E2_NOMFOR) //"900809 - J. M. PRIMUS 2005 REP"
@@ -44,14 +37,16 @@ User Function MSE2530()
 	DBSelectArea("SE2")
 	SE2->(DBSetOrder(1))
 
-/*
-MUDEI PARA ROTINA - M530FIM
-cUpse2 := " UPDATE SE2010 SET D_E_L_E_T_='*', E2_PREFIXO='EXP', E2_HIST='PROV COMISS - "+DTOS(DDATABASE)+"' WHERE "
-cUpse2 += " E2_TIPO in('DP','TX') AND E2_PREFIXO='"+SE2->E2_PREFIXO+"' AND E2_NUM='"+SE2->E2_NUM+"' AND "
-cUpse2 += " E2_EMISSAO='"+DTOS(DDATABASE)+"' AND E2_FORNECE IN('UNIAO','"+SE2->E2_FORNECE+"') "
-TCSQLExec( cUpse2 )
-*/
+	//cUpse2 := " UPDATE SE2010 SET D_E_L_E_T_='*' WHERE "
+	//cUpse2 += " E2_FILIAL = '"+SE2->E2_FILIAL+"' AND "
+	//cUpse2 += " E2_PREFIXO ='"+SE2->E2_PREFIXO+"' AND "
+	//cUpse2 += " E2_NUM='"+SE2->E2_NUM+"' AND "
+	//cUpse2 += " E2_TIPO in('DP','TX')  AND "
+	//cUpse2 += " E2_FORNECE IN('UNIAO','"+SE2->E2_FORNECE+"') AND "
+	//cUpse2 += " E2_EMISSAO='"+DTOS(DDATABASE)+"' " 
 
+	//TCSQLExec( cUpse2 )
+	
 	aITEMPC	:=	{{"C7_ITEM"		,"0001"			,NIL},;
 				{"C7_PRODUTO"	,"COMISSAO"     ,NIL},;
 				{"C7_UM"		,"UN"		    ,NIL},;   
