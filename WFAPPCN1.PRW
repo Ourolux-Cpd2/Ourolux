@@ -5,23 +5,19 @@
 #INCLUDE "Tbiconn.ch"
 #INCLUDE "Tbicode.ch"
 
-#DEFINE COMP_DATE  "20200206" 
+#DEFINE COMP_DATE  "20210817" 
 
+//--------------------------------------------------------------------
+/*/{Protheus.doc} WFAPPCN1
+schedule para envio de email dos pedidos de compra nivel 1 
+@author Rodrigo Nunes
+@since 17/08/2021
+@version 1.0 
+@type function
 /*/
-___________________________________________________________________________
-|  Programa:            | Autor: ETHOSX              | Data :  22/12/20     |
-|                       | MARCOS FONTANELLI          |                      |
-|_______________________|____________________________|______________________|
-|  Descricao | schedule para envio de email dos pedidos de compra nivel 2   |
-|____________|_____________________________________________________________ |
-|  Uso       | OUROLUX.                                                     |
-|____________|_____________________________________________________________ |
-/*/
-                                  
-//  U_WFAPPC(.F.) // EXECUTA PELO PROTHEUS  
-//  U_WFAPPC(.T.) // EXECUTA VIA SCHEDULE  
+//--------------------------------------------------------------------
 
-User Function WFAPPC()   
+User Function WFAPPCN1()   
 
 Local Enter                		
 Local aArea    
@@ -37,7 +33,7 @@ local nHist
 Local lSched := .T. //Força inciar como schedule 
 
 conout(" ")
-conout("Iniciado processo WFAPPC " + DtoC(Date()) + " - " + Time())
+conout("Iniciado processo WFAPPCN1 " + DtoC(Date()) + " - " + Time())
 conout(" ")
 
 if lSched
@@ -59,19 +55,19 @@ cFS_DIAPRPC:= SUPERGETMV('FS_DIAPRPC',.T.,"60")
 
 nHist      := GetMv("FS_NHISTPC", .F., 6 )
 
-cLogName   := "WFAPPC"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+cLogName   := "WFAPPCN1"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
             
 cQuery	:= " SELECT DISTINCT CR_USER "
 cQuery	+= Enter + "   FROM ( "
 cQuery	+= Enter + "		SELECT * FROM "+RetSqlName("SCR")+" SCR1 "
 cQuery	+= Enter + "		 WHERE SCR1.CR_FILIAL <> '99' "
-cQuery	+= Enter + "		   AND SCR1.CR_NIVEL = '02' "
+cQuery	+= Enter + "		   AND SCR1.CR_NIVEL = '01' "
 cQuery	+= Enter + "		   AND SCR1.CR_STATUS = '02' "
 cQuery	+= Enter + "		   AND SCR1.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 ) "
 cQuery	+= Enter + "		   AND SCR1.CR_NUM  IN (SELECT CR_NUM FROM "+RetSqlName("SCR")+" SCR2 "
 cQuery	+= Enter + "								 WHERE SCR2.CR_FILIAL = SCR1.CR_FILIAL "
-cQuery	+= Enter + "								   AND SCR2.CR_NIVEL = '01'  "
-cQuery	+= Enter + "								   AND SCR2.CR_STATUS = '03' "
+cQuery	+= Enter + "								   AND SCR2.CR_NIVEL = '02'  "
+cQuery	+= Enter + "								   AND SCR2.CR_STATUS = '01' "
 cQuery	+= Enter + "								   AND SCR2.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 ) "
 cQuery	+= Enter + "								   AND SCR2.D_E_L_E_T_ <> '*') "
 cQuery	+= Enter + "		   AND SCR1.D_E_L_E_T_ <> '*' "
@@ -79,7 +75,7 @@ cQuery	+= Enter + "		) TMP1 "
 cQuery	+= Enter + " WHERE "
 cQuery	+= Enter + "    TMP1.CR_NUM  NOT IN (SELECT CR_NUM FROM "+RetSqlName("SCR")+" SCR3 "
 cQuery	+= Enter + "						  WHERE SCR3.CR_FILIAL = TMP1.CR_FILIAL "
-cQuery	+= Enter + "						    AND SCR3.CR_NIVEL = '02' "
+cQuery	+= Enter + "						    AND SCR3.CR_NIVEL = '01' "
 cQuery	+= Enter + "						    AND SCR3.CR_STATUS <> '02' "
 cQuery	+= Enter + "						    AND SCR3.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 ) "
 cQuery	+= Enter + "						    AND SCR3.D_E_L_E_T_ <> '*') "   
@@ -249,13 +245,13 @@ while !(cAlias1)->(EOF())
 	cQuery	+= Enter + "   FROM ( "
 	cQuery	+= Enter + "		SELECT * FROM "+RetSqlName("SCR")+" SCR1 "
 	cQuery	+= Enter + "		 WHERE SCR1.CR_FILIAL <> '99' "
-	cQuery	+= Enter + "		   AND SCR1.CR_NIVEL = '02' "
+	cQuery	+= Enter + "		   AND SCR1.CR_NIVEL = '01' "
 	cQuery	+= Enter + "		   AND SCR1.CR_STATUS = '02' "
 	cQuery	+= Enter + "		   AND SCR1.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 )
 	cQuery	+= Enter + "		   AND SCR1.CR_NUM  IN (SELECT CR_NUM FROM "+RetSqlName("SCR")+" SCR2 "
 	cQuery	+= Enter + "								 WHERE SCR2.CR_FILIAL = SCR1.CR_FILIAL "
-	cQuery	+= Enter + "								   AND SCR2.CR_NIVEL = '01'  "
-	cQuery	+= Enter + "								   AND SCR2.CR_STATUS = '03' " 
+	cQuery	+= Enter + "								   AND SCR2.CR_NIVEL = '02'  "
+	cQuery	+= Enter + "								   AND SCR2.CR_STATUS = '01' " 
 	cQuery	+= Enter + "								   AND SCR2.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 )
 	cQuery	+= Enter + "								   AND SCR2.D_E_L_E_T_ <> '*') "
 	cQuery	+= Enter + "		   AND SCR1.D_E_L_E_T_ <> '*' "
@@ -263,7 +259,7 @@ while !(cAlias1)->(EOF())
 	cQuery	+= Enter + " WHERE "
 	cQuery	+= Enter + "    TMP1.CR_NUM  NOT IN (SELECT CR_NUM FROM "+RetSqlName("SCR")+" SCR3 "
 	cQuery	+= Enter + "						  WHERE SCR3.CR_FILIAL = TMP1.CR_FILIAL "
-	cQuery	+= Enter + "						    AND SCR3.CR_NIVEL = '02' "
+	cQuery	+= Enter + "						    AND SCR3.CR_NIVEL = '01' "
 	cQuery	+= Enter + "						    AND SCR3.CR_STATUS <> '02' "
 	cQuery	+= Enter + "						    AND SCR3.CR_EMISSAO > CONVERT( VARCHAR, (GETDATE()-"+cFS_DIAPRPC+") , 112 )
 	cQuery	+= Enter + "						    AND SCR3.D_E_L_E_T_ <> '*') "   
@@ -278,7 +274,7 @@ while !(cAlias1)->(EOF())
 	cQuery	+= Enter + "  	TMP1.CR_USER = '"+(cAlias1)->CR_USER+"' " 
 	cQuery	+= Enter + " ORDER BY CR_FILIAL, CR_NUM "
 
-	cLogName := "WFAPPC2_"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+	cLogName := "WFAPPCN1_2"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
 	MemoWrite("\INTRJ\" + cLogName,cQuery)
 
 	TcQuery cQuery New Alias (cAlias2)
@@ -322,8 +318,8 @@ while !(cAlias1)->(EOF())
 		cHtml+= Enter + '                <td class="ajustatd aligncenter">'
 
 		cHtml+= Enter + '                    <div ng-show="main.resposta('+"'"+(cAlias3)->C7_NUM+"'"+')== '+"''"+' ||  main.show('+"'"+(cAlias3)->C7_NUM+"'"+') " >'
-		cHtml+= Enter + '                        <button class="button" ng-click="main.zeramsg('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"SIM"+"','"+(cAlias3)->C7_NUM+"' )"+';main.aprova('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"SIM"+"','"+(cAlias3)->C7_NUM+"','02' )"+'">Aprovar</button>'
-		cHtml+= Enter + '                        <button class="button" ng-click="main.aprova('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"NAO"+"','"+(cAlias3)->C7_NUM+"','02' )"+'">Bloquear</button>'
+		cHtml+= Enter + '                        <button class="button" ng-click="main.zeramsg('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"SIM"+"','"+(cAlias3)->C7_NUM+"' )"+';main.aprova('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"SIM"+"','"+(cAlias3)->C7_NUM+"','01' )"+'">Aprovar</button>'
+		cHtml+= Enter + '                        <button class="button" ng-click="main.aprova('+"'"+(cAlias3)->C7_FILIAL+"'"+','+"'"+(cAlias3)->C7_NUM+"'"+','+"'"+(cAlias1)->CR_USER+"'"+','+"'"+"NAO"+"','"+(cAlias3)->C7_NUM+"','01' )"+'">Bloquear</button>'
 		cHtml+= Enter + '                    </div>' 
 		cHtml+= Enter + '                </td>'
 		cHtml+= Enter + '                <td ><label id="'+(cAlias3)->C7_NUM+'"></label></td>'
@@ -606,7 +602,7 @@ while !(cAlias1)->(EOF())
     cMensagem += ' <p align="left">Para abrir a relação de Pedidos de Compra, <a href="'+_cHostWF+cAnexo2+'"> Click AQUI </a></p>'
     cMensagem += ' </body> '
 
-	cPara := "cpd2@ourolux.com.br"
+	//cPara := "cpd2@ourolux.com.br"
 	
 	SEND MAIL FROM cUserFrom TO cPara CC "" SUBJECT cAssunto BODY cMensagem RESULT lResult  // ATTACHMENT cAnexo1 
 
@@ -631,7 +627,7 @@ if lSched
 endif                 
 
 conout(" ")
-conout("Finalizado processo WFAPPC " + DtoC(Date()) + " - " + Time())
+conout("Finalizado processo WFAPPCN1 " + DtoC(Date()) + " - " + Time())
 conout(" ")   
 
 RestArea(aArea)

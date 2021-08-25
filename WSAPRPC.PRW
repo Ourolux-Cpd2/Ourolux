@@ -26,12 +26,12 @@ ___________________________________________________________________________
 { 'CR_STATUS== "04"', 'BR_PRETO'},;   //Pedido Bloqueado pelo usuario
 { 'CR_STATUS== "05"', 'BR_CINZA'} }   //Pedido Bloqueado por outro usuario.
 
-// http://187.94.63.180:10611/rest/WSAPRPC/SIM/01/000001/000001/MOTIVO
+// http://187.94.63.180:10611/rest/WSAPRPC/SIM/01/000001/000001/MOTIVO/NIVEL
 */                    
 
 WSRESTFUL WSAPRPC DESCRIPTION "Aprova?o de Pedido Compra V2"
 
-WSMETHOD GET  DESCRIPTION "WSAPRPC" WSSYNTAX "Parametro || /aprovado/filial/pedido/aprovador/motivo"
+WSMETHOD GET  DESCRIPTION "WSAPRPC" WSSYNTAX "Parametro || /aprovado/filial/pedido/aprovador/motivo/nivel"
 
 END WSRESTFUL
                                                  
@@ -50,6 +50,7 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 		ws_pedido    := ::aURLParms[3]
 		ws_aprovador := ::aURLParms[4]
 		ws_motivo    := ::aURLParms[5]
+		ws_nivel     := ::aURLParms[6]
 		
 		cQuery    := ""
 		cDespNFa  := SuperGetMV("ES_DESNFA",.F.,"")
@@ -74,41 +75,45 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 		conout("Pedido: "+ws_pedido)
 		conout("Aprovador: "+ws_aprovador)
 		conout("Motivo: "+ws_motivo)
+		conout("Nivel: "+ws_nivel)
 		conout("---------------------------------------------------------------------------")
 	    
-		conout("WSAPRPC - BUSCA DE PRODUTO PARA VERIFICAR SE EXECUTA SEMAFORO")
-		
-		cQuery := " SELECT C7_PRODUTO, C7_XHAWB FROM " + RetSqlName("SC7")
-		cQuery += " WHERE C7_FILIAL = '" +ws_filial+ "' "
-		cQuery += " AND C7_NUM = '" +ws_pedido+ "' "
-		cQuery += " AND D_E_L_E_T_ = '' "
-		
-		If Select("C7XX") > 0 
-			C7XX->(dbCloseArea())
-		EndIf
-		
-		conout("WSAPRPC - Query SEMAFORO")
-		conout(cQuery)
+		If ws_nivel == "02"
 
-		DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'C7XX', .T., .F.)
+			conout("WSAPRPC - BUSCA DE PRODUTO PARA VERIFICAR SE EXECUTA SEMAFORO")
+			
+			cQuery := " SELECT C7_PRODUTO, C7_XHAWB FROM " + RetSqlName("SC7")
+			cQuery += " WHERE C7_FILIAL = '" +ws_filial+ "' "
+			cQuery += " AND C7_NUM = '" +ws_pedido+ "' "
+			cQuery += " AND D_E_L_E_T_ = '' "
+			
+			If Select("C7XX") > 0 
+				C7XX->(dbCloseArea())
+			EndIf
+			
+			conout("WSAPRPC - Query SEMAFORO")
+			conout(cQuery)
 
-		If C7XX->(!EOF())
-			conout("WSAPRPC SEMAFORO- Produto: " + C7XX->C7_PRODUTO)
-			conout("WSAPRPC SEMAFORO- Despesa: " + SubStr(Alltrim(C7XX->C7_PRODUTO),4,3))
-			conout("WSAPRPC SEMAFORO- Origem: " + SubStr(Alltrim(C7XX->C7_PRODUTO),1,3))
-			conout("WSAPRPC SEMAFORO- ES_DESNFA: " + cDespNFa)
-			conout("WSAPRPC SEMAFORO- ES_DESNNF: " + cDespNNF)
+			DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'C7XX', .T., .F.)
 
-			If SubStr(Alltrim(C7XX->C7_PRODUTO),4,3) $ cDespNFa .AND. SubStr(Alltrim(C7XX->C7_PRODUTO),1,3) == "EIC"
-				If !(SubStr(Alltrim(C7XX->C7_PRODUTO),4,3) $ cDespNNF)
-					cSemaforo := "U_WSAPRPC"
-					If  !LockByName(cSemaforo) 
-						ConOut( "U_WSAPRPC - Rotina já está em execução, aguarde finalização.")
-						ProcLogAtu("ERRO","WSAPRPC - U_WSAPRPC - Rotina ja esta em execucao, aguarde finalizacao.", "" , "EICDESPESA" )
-						cMENSAGEM := "Processo anterior em execucao, aguarde finalizacao"
-						ws_status := "SAIR"
-					else
-						lSemaf := .T.
+			If C7XX->(!EOF())
+				conout("WSAPRPC SEMAFORO- Produto: " + C7XX->C7_PRODUTO)
+				conout("WSAPRPC SEMAFORO- Despesa: " + SubStr(Alltrim(C7XX->C7_PRODUTO),4,3))
+				conout("WSAPRPC SEMAFORO- Origem: " + SubStr(Alltrim(C7XX->C7_PRODUTO),1,3))
+				conout("WSAPRPC SEMAFORO- ES_DESNFA: " + cDespNFa)
+				conout("WSAPRPC SEMAFORO- ES_DESNNF: " + cDespNNF)
+
+				If SubStr(Alltrim(C7XX->C7_PRODUTO),4,3) $ cDespNFa .AND. SubStr(Alltrim(C7XX->C7_PRODUTO),1,3) == "EIC"
+					If !(SubStr(Alltrim(C7XX->C7_PRODUTO),4,3) $ cDespNNF)
+						cSemaforo := "U_WSAPRPC"
+						If  !LockByName(cSemaforo) 
+							ConOut( "U_WSAPRPC - Rotina já está em execução, aguarde finalização.")
+							ProcLogAtu("ERRO","WSAPRPC - U_WSAPRPC - Rotina ja esta em execucao, aguarde finalizacao.", "" , "EICDESPESA" )
+							cMENSAGEM := "Processo anterior em execucao, aguarde finalizacao"
+							ws_status := "SAIR"
+						else
+							lSemaf := .T.
+						EndIf
 					EndIf
 				EndIf
 			EndIf
@@ -192,7 +197,11 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 						cQryUPD	+= " ,CR_LIBAPRO =  '" + alltrim(ws_aprovador)     + "' "
 						cQryUPD	+= " WHERE 	CR_FILIAL    = '" + alltrim(ws_filial) + "' "
 						cQryUPD	+= "		AND CR_NUM 	 = '" + alltrim(ws_pedido) + "' "
-						cQryUPD	+= "		AND CR_NIVEL = '02' "
+						If ws_nivel == "01"
+							cQryUPD	+= "		AND CR_NIVEL = '01' "
+						ElseIf ws_nivel == "02"
+							cQryUPD	+= "		AND CR_NIVEL = '02' "
+						EndIf
 						cQryUPD	+= " 		AND CR_STATUS = '02' "
 						cQryUPD	+= " 		AND D_E_L_E_T_ <> '*' "
 										
@@ -203,13 +212,14 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 						TCSQLExec( cQryUPD )
 					
 						lLiberou := .T.
+						cMENSAGEM := "Liberado"
 						conout("lLiberou:")
 						conout(lLiberou)
 					
 					EndIf
 					//Fim MOA - 19/07/2019
 					
-					if lLiberou
+					if lLiberou .AND. ws_nivel == "02"
 						
 						dbSelectArea("SC7")
 						SC7->(dbSetOrder(1))
@@ -330,7 +340,9 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 							EndIf
 						EndIf
 					else
-						cMENSAGEM := "Pedido não Liberado"
+						If ws_nivel == "02"
+							cMENSAGEM := "Pedido não Liberado"
+						EndIf
 					endif
 	
 	        
@@ -424,7 +436,11 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 					cQryUPD	+= " ,CR_LIBAPRO =  '" + alltrim(ws_aprovador)     + "' "
 					cQryUPD	+= " WHERE 	CR_FILIAL    = '" + alltrim(ws_filial) + "' "
 					cQryUPD	+= "		AND CR_NUM 	 = '" + alltrim(ws_pedido) + "' "
-					cQryUPD	+= "		AND CR_NIVEL = '02' "
+					If ws_nivel == "01"
+						cQryUPD	+= "		AND CR_NIVEL = '01' "
+					ElseIf ws_nivel == "02"
+						cQryUPD	+= "		AND CR_NIVEL = '02' "
+				 	EndIf
 					cQryUPD	+= " 		AND CR_STATUS = '02' "
 					cQryUPD	+= " 		AND D_E_L_E_T_ <> '*' "
 									
@@ -478,7 +494,7 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 		cRETORNO := '{"status":"ok","msg":"'+cMENSAGEM+'","pedido":"'+ws_pedido+'"}'
 		::SetResponse( cRETORNO )
 
-		if lEnviar
+		if lEnviar .AND. ws_nivel == "02"
 		   U_WFMAIL(ws_status, ws_filial, ws_pedido, ws_aprovador, ws_motivo)
 		endif
 
