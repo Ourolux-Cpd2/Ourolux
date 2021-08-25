@@ -9,6 +9,11 @@ For nlx := 1 To len(aCols)
     If !aCols[nlx][Len(aCols[nlx])]
         nCubTot	+= aCols[nlx][nPosCub]
         nPesAux	+= aCols[nlx][nPosPBru]
+
+        //Calculo para busca de melhor preço de container
+        //Rodrigo Nunes - 20/08/2021
+        U_OURO006(aCols[nlx][nPosCub],aCols[nlx][nPosPBru],nlx)
+
     EndIf
 Next
 
@@ -17,5 +22,6 @@ _xPesBru	:= nPesAux
 
 _xoVolCub:Refresh()
 _xoPesBru:Refresh()
+
 
 Return(.T.) 

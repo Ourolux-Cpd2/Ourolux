@@ -20,6 +20,7 @@ Local nPesBru  := 0
 Local nCubTot  := 0
 Local nxCUBAGE := aScan(aHeader,{|x| AllTrim(x[2])=="C1_XCUBAGE"})
 Local nxPESBRU := aScan(aHeader,{|x| AllTrim(x[2])=="C1_XPESBRU"})
+Local cDeptoSC := SuperGetMv("FS_VLSCIMP",.F.,"")
 
 For nlx := 1 to Len(aCols)
 	If !aCols[nlx][Len(aCols[nlx])]
@@ -37,6 +38,12 @@ _xPesBru	:= nPesBru
 If Empty(_cDepSC1)
 	ApMsgStop("Por favor informar o departamento no cabeçalho da SC", "MT110TOK" )
 	_lRet := .F.
+EndIf
+
+//Rodrigo Nunes
+//Rotina para busca do melhor container
+If _lRet .AND. _cDepSC1 $ cDeptoSC
+	_lRet := U_OURO007(.T.)
 EndIf
 
 Return(_lRet)
