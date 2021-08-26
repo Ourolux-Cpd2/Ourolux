@@ -7,8 +7,8 @@
 #Include "FWMVCDef.CH"
 
 #DEFINE POS_DATA	1
-#DEFINE POS_VLR_MTC	2
-#DEFINE POS_CUSTO	3
+#DEFINE POS_CUSTO	2
+#DEFINE POS_VLR_MTC	3
 #DEFINE RECNO		4
 
 /*
@@ -35,11 +35,11 @@ private aHeadSA     := {}
 private aColsSa     := {}     
 Private oFontA      := TFont():New("Arial",,20,,.F.,,,,.F.,.F.) 
 Private oFontAB     := TFont():New("Arial",,20,,.T.,,,,.F.,.F.) 
-Private aAlterCo	:= {"VALORMTC"}
+Private aAlterCo	:= {"CUSTO"}
 
 Aadd(aHeadSA, {"Data"       , "DATA"	    , ""				, TamSx3("C6_PRODUTO")[1]   , 0                       , "" ,, "D", ""		,,,,})
-Aadd(aHeadSA, {"Custo MT³"  , "VALORMTC"    , "@E 9,999,999.99"	, TamSx3("ZAD_VALMTC")[1]   , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
-Aadd(aHeadSA, {"Total"      , "CUSTO"       , "@E 9,999,999.99" , TamSx3("ZAD_CUSTO")[1]    , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
+Aadd(aHeadSA, {"Custo Total", "CUSTO"       , "@E 9,999,999.99" , TamSx3("ZAD_CUSTO")[1]    , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
+Aadd(aHeadSA, {"Valor MT³"  , "VALORMTC"    , "@E 9,999,999.99"	, TamSx3("ZAD_VALMTC")[1]   , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
 
 DEFINE FONT _oFont NAME 'Arial Black' SIZE 09, 15
 
@@ -55,8 +55,8 @@ oDlg:lEscClose  := .F.
 	//*********************
 	//*Criacao das Linhas. *
 	//*********************
-	_oLayer1:AddLine( 'LIN_1'		, 20, .F.)
-	_oLayer1:AddLine( 'LIN_2'		, 65, .F.)
+	_oLayer1:AddLine( 'LIN_1'		, 40, .F.)
+	_oLayer1:AddLine( 'LIN_2'		, 45, .F.)
 	
 	//*********************
 	//*Criacao das Colunas.*
@@ -104,7 +104,7 @@ oDlg:lEscClose  := .F.
     EndIf
 
     While VALX->(!EOF())
-		AADD(aColsSA,{STOD(VALX->ZAD_DATA), VALX->ZAD_VALMTC, VALX->ZAD_CUSTO,VALX->R_E_C_N_O_,.F.})
+		AADD(aColsSA,{STOD(VALX->ZAD_DATA), VALX->ZAD_CUSTO, VALX->ZAD_VALMTC, VALX->R_E_C_N_O_,.F.})
 		VALX->(dbSkip())
     EndDo
     
@@ -149,11 +149,11 @@ User Function 2TudoOk()
 		
 	For nlx := 1 to len(oListPR:aCols)
 		If oListPR:aCols[nlx][POS_DATA] == dDataBase
-			If oListPR:aCols[nlx][POS_VLR_MTC] <= 0
-				Alert("Por favor preencha o Valor do MT³")
+			If oListPR:aCols[nlx][POS_CUSTO] <= 0
+				Alert("Por favor preencha o Valor do Custo Total")
 				Return nOPRet
-			ElseIf oListPR:aCols[nlx][POS_CUSTO] <= 0
-				Alert("Custo do container zerado, favor verificar o cadastro do container!")
+			ElseIf oListPR:aCols[nlx][POS_VLR_MTC] <= 0
+				Alert("Custo do MT³ zerado, favor verificar o cadastro do container!")
 				Return nOPRet
 			EndIf
 			Exit
@@ -176,7 +176,7 @@ User Function vldCam2()
 	Local cCampAux 	:= ReadVar()
 	Local lRet		:= .T.
     
-	If cCampAux == "M->VALORMTC" 
+	If cCampAux == "M->CUSTO" 
 		If aColsSA[n][POS_DATA] <> dDatabase
             Alert("Não é permitido alterar um valor com a data difente de " + DTOC(dDatabase))
             lRet := .F.
@@ -186,7 +186,7 @@ User Function vldCam2()
                 Alert("Não é permitido valores negativos!!!")
                 lRet := .F.
             Else
-                oListPR:aCols[n][POS_CUSTO] := ZAC->ZAC_MTC * &cCampAux
+				oListPR:aCols[n][POS_VLR_MTC] := &cCampAux / ZAC->ZAC_MTC
             EndIf
         EndIf
 	EndIf

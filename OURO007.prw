@@ -9,12 +9,14 @@
 #DEFINE POS_CTN40RF 6
 #DEFINE POS_CTN20DR 7
 #DEFINE POS_CTN20RF 8
-#DEFINE POS_DATA_M  9
-#DEFINE POS_DATA_R  10
+#DEFINE POS_PARTLOT 9
+#DEFINE POS_DATA_M  10
+#DEFINE POS_DATA_R  11
+
 
 //--------------------------------------------------------------------
 /*/{Protheus.doc} OURO007
-Tela com totalizadores de containers
+Tela com totalizadores de containers.
 @author Rodrigo Nunes
 @since 23/08/2021
 /*/
@@ -33,22 +35,23 @@ User Function OURO007(lFinal)
     Private aCTNTot := {}
     Default lFinal  := .F.
 
-    Aadd(aHeadSA, {"MT³"              , "MTC"     , "@E 9,999,999,999.9999"   , TamSx3("C1_XCUBAGE")[1]   , TamSx3("C1_XCUBAGE")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"PESO"             , "PESOB"   , "@E 999,999,999.999"      , TamSx3("C1_XPESBRU")[1]   , TamSx3("C1_XPESBRU")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"DATA ENTREGA"     , "DTENT"   , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
-    Aadd(aHeadSA, {"CTN40'HC"         , "CTN40HC" , "@E 999.99"               , TamSx3("C1_CTN40HC")[1]   , TamSx3("C1_CTN40HC")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN40'DR"         , "CTN40DR" , "@E 999.99"               , TamSx3("C1_CTN40DR")[1]   , TamSx3("C1_CTN40DR")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN40'RF"         , "CTN40RF" , "@E 999.99"               , TamSx3("C1_CTN40RF")[1]   , TamSx3("C1_CTN40RF")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN20'DR"         , "CTN20DR" , "@E 999.99"               , TamSx3("C1_CTN20DR")[1]   , TamSx3("C1_CTN20DR")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN20'RF"         , "CTN20RF" , "@E 999.99"               , TamSx3("C1_CTN20RF")[1]   , TamSx3("C1_CTN20RF")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"Dt.Cotacao Maior" , "DTCOTM"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
-    Aadd(aHeadSA, {"Dt.Cotacao Resto" , "DTCOTR"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"MT³"                , "MTC"     , "@E 9,999,999,999.9999"   , TamSx3("C1_XCUBAGE")[1]   , TamSx3("C1_XCUBAGE")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"PESO"               , "PESOB"   , "@E 999,999,999.999"      , TamSx3("C1_XPESBRU")[1]   , TamSx3("C1_XPESBRU")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"DATA ENTREGA"       , "DTENT"   , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"CTN40'HC"           , "CTN40HC" , "@E 999.99"               , TamSx3("C1_CTN40HC")[1]   , TamSx3("C1_CTN40HC")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN40'DR"           , "CTN40DR" , "@E 999.99"               , TamSx3("C1_CTN40DR")[1]   , TamSx3("C1_CTN40DR")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN40'RF"           , "CTN40RF" , "@E 999.99"               , TamSx3("C1_CTN40RF")[1]   , TamSx3("C1_CTN40RF")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN20'DR"           , "CTN20DR" , "@E 999.99"               , TamSx3("C1_CTN20DR")[1]   , TamSx3("C1_CTN20DR")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN20'RF"           , "CTN20RF" , "@E 999.99"               , TamSx3("C1_CTN20RF")[1]   , TamSx3("C1_CTN20RF")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"PART LOT"           , "PARTLOT" , "@E 9,999,999,999.9999"   , TamSx3("C1_XCUBAGE")[1]   , TamSx3("C1_XCUBAGE")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"Dt.Cot CTN Fechado" , "DTCOTM"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"Dt.Cot Part Lot"    , "DTCOTR"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
     
     //PEGAR POR DATA DE ENTREGA PARA MONTA A TELA
     For nlx := 1 to len(aCols)
         If !aCols[nlx][len(aCols[nlx])]
             If Empty(aCTNTot) 
-                AADD(aCTNTot,{aCols[nlx][nPCub],aCols[nlx][nPPesB],aCols[nlx][nPDtEnt],0,0,0,0,0,CTOD("  /  /    "),CTOD("  /  /    "),.F.})
+                AADD(aCTNTot,{aCols[nlx][nPCub],aCols[nlx][nPPesB],aCols[nlx][nPDtEnt],0,0,0,0,0,0,CTOD("  /  /    "),CTOD("  /  /    "),.F.})
             Else
                 nPos := aScan(aCTNTot,{|x| x[POS_DATAENT] == aCols[nlx][nPDtEnt]})
 
@@ -56,7 +59,7 @@ User Function OURO007(lFinal)
                     aCTNTot[nPos][POS_MTC]  += aCols[nlx][nPCub]
                     aCTNTot[nPos][POS_PESOB] += aCols[nlx][nPPesB]
                 Else
-                    AADD(aCTNTot,{aCols[nlx][nPCub],aCols[nlx][nPPesB],aCols[nlx][nPDtEnt],0,0,0,0,0,CTOD("  /  /    "),CTOD("  /  /    "),.F.})
+                    AADD(aCTNTot,{aCols[nlx][nPCub],aCols[nlx][nPPesB],aCols[nlx][nPDtEnt],0,0,0,0,0,0,CTOD("  /  /    "),CTOD("  /  /    "),.F.})
                 EndIf
             EndIf
         EndIf
@@ -99,7 +102,7 @@ User Function OURO007(lFinal)
 
     EndIf
 
-    DEFINE MSDIALOG oDlg TITLE  "Totalizadores de Containers" FROM  10, 10 To 400, 1000 PIXEL
+    DEFINE MSDIALOG oDlg TITLE  "Totalizadores de Containers" FROM  10, 10 To 400, 1100 PIXEL
 
         oListPR := MsNewGetDados():New( 017, 006, 120, 243, ,,,"",{},, 999,,"",, oDlg, aHeadSA, aCTNTot)
         
@@ -203,6 +206,10 @@ Static Function OURO07A()
     Local nResto  := 0
     Local nlx     := 0
     Local nly     := 0
+    Local nRestoM := 0
+    Local nRestoP := 0
+    Local nMTUso  := 0
+    Local nPBUso  := 0    
     Default nPos  := 0
 
     For nly := 1 to len(aCTNTot)
@@ -250,9 +257,9 @@ Static Function OURO07A()
 
         While CTNX->(!EOF())
             If lPorMTC
-                AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTot[nly][POS_MTC] / CTNX->ZAC_MTC,2)})
+                AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTot[nly][POS_MTC] / CTNX->ZAC_MTC,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
             Else // lPorPBR
-                AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTot[nly][POS_PESOB] / CALX->ZAC_KG,2)})
+                AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTot[nly][POS_PESOB] / CTNX->ZAC_KG,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
             EndIf
             CTNX->(dbSkip())
         EndDo
@@ -277,10 +284,9 @@ Static Function OURO07A()
 
             If VLRC->(!EOF())
                 If aQtdCTN[nlx][2] > 1
-                    AADD(aCTNVal,{VLRC->ZAD_CODCTN, Int(aQtdCTN[nlx][2]) * VLRC->ZAD_CUSTO, Int(aQtdCTN[nlx][2]), STOD(VLRC->ZAD_DATA)})
-                    nResto := aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2])
+                    AADD(aCTNVal,{VLRC->ZAD_CODCTN, Int(aQtdCTN[nlx][2]) * VLRC->ZAD_CUSTO, Int(aQtdCTN[nlx][2]), STOD(VLRC->ZAD_DATA), aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2]), aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
                 Else
-                    AADD(aCTNVal,{VLRC->ZAD_CODCTN, VLRC->ZAD_CUSTO, aQtdCTN[nlx][2], STOD(VLRC->ZAD_DATA)})
+                    AADD(aCTNVal,{VLRC->ZAD_CODCTN, VLRC->ZAD_CUSTO, aQtdCTN[nlx][2], STOD(VLRC->ZAD_DATA), 0, aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
                 EndIf
             EndIf
         Next
@@ -291,26 +297,83 @@ Static Function OURO07A()
             If aCTNVal[1][1] == "CTN20DR"
                 aCTNTot[nly][POS_CTN20DR] += aCTNVal[1][3]
                 aCTNTot[nly][POS_DATA_M]  := aCTNVal[1][4]
+                nResto := aCTNVal[1][5]
+                nMTUso := aCTNVal[1][6]
+                nPBUso := aCTNVal[1][7]
             ElseIf aCTNVal[1][1] == "CTN20RF"
                 aCTNTot[nly][POS_CTN20RF] += aCTNVal[1][3]
                 aCTNTot[nly][POS_DATA_M]  := aCTNVal[1][4]
+                nResto := aCTNVal[1][5]
+                nMTUso := aCTNVal[1][6]
+                nPBUso := aCTNVal[1][7]
             ElseIf aCTNVal[1][1] == "CTN40DR"
                 aCTNTot[nly][POS_CTN40DR] += aCTNVal[1][3]
                 aCTNTot[nly][POS_DATA_M]  := aCTNVal[1][4]
+                nResto := aCTNVal[1][5]
+                nMTUso := aCTNVal[1][6]
+                nPBUso := aCTNVal[1][7]
             ElseIf aCTNVal[1][1] == "CTN40RF"
                 aCTNTot[nly][POS_CTN40RF] += aCTNVal[1][3]
                 aCTNTot[nly][POS_DATA_M]  := aCTNVal[1][4]
+                nResto := aCTNVal[1][5]
+                nMTUso := aCTNVal[1][6]
+                nPBUso := aCTNVal[1][7]
             ElseIf aCTNVal[1][1] == "CTN40HC"
                 aCTNTot[nly][POS_CTN40HC] += aCTNVal[1][3]
                 aCTNTot[nly][POS_DATA_M]  := aCTNVal[1][4]
+                nResto := aCTNVal[1][5]
+                nMTUso := aCTNVal[1][6]
+                nPBUso := aCTNVal[1][7]
             EndIf
         EndIf
 
         If nResto > 0
-            cQuery := " SELECT TOP(1) ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO FROM " + RetSqlName("ZAD")
-            cQuery += " WHERE ZAD_ATIVO = 'S' "
-            cQuery += " AND D_E_L_E_T_ = '' "
-            cQuery += " ORDER BY ZAD_CUSTO DESC"
+            If aCTNTot[nly][POS_CTN20DR] > 0
+                If lPorMTC
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                ElseIf lPorPBR
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                EndIf
+            ElseIf aCTNTot[nly][POS_CTN20RF] > 0
+                If lPorMTC
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                ElseIf lPorPBR
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                EndIf
+            ElseIf aCTNTot[nly][POS_CTN40DR] > 0
+                If lPorMTC
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                ElseIf lPorPBR
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                EndIf
+            ElseIf aCTNTot[nly][POS_CTN40RF] > 0
+                If lPorMTC
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                ElseIf lPorPBR
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                EndIf
+            ElseIf aCTNTot[nly][POS_CTN40HC] > 0
+                If lPorMTC
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                ElseIf lPorPBR
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                EndIf
+            EndIf
+
+            cQuery := " SELECT TOP(1) ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO "
+            cQuery += " FROM " + RetSqlName("ZAD") + " ZAD "
+            cQuery += " INNER JOIN " + RetSqlName("ZAC") + " ZAC "
+            cQuery += " ON ZAC.ZAC_CTN = ZAD.ZAD_CODCTN "
+            If lPorMTC
+                cQuery += " AND ZAC.ZAC_MTC >= '"+cValtoChar(nRestoM)+"' "
+            ElseIf lPorPBR
+                cQuery += " AND ZAC.ZAC_KG >= '"+cValToChar(nRestoP)+"' "
+            EndIf
+            cQuery += " WHERE ZAD.ZAD_ATIVO = 'S' "
+            cQuery += " AND ZAD.D_E_L_E_T_ = '' "
+            cQuery += " AND ZAC.D_E_L_E_T_ = '' "
+            cQuery += " ORDER BY ZAD_CUSTO DESC "
+
 
             If Select("RESX") > 0
                 RESX->(dbCloseArea())
@@ -322,22 +385,49 @@ Static Function OURO07A()
                 If RESX->ZAD_CODCTN == "CTN20DR"
                     aCTNTot[nly][POS_CTN20DR] += nResto
                     aCTNTot[nly][POS_DATA_R]  := STOD(RESX->ZAD_DATA)
+                    If lPorMTC
+                        aCTNTot[nly][POS_PARTLOT] := nRestoM
+                    ElseIf lPorPBR
+                        aCTNTot[nly][POS_PARTLOT] := nRestoP
+                    EndIf
                 ElseIf RESX->ZAD_CODCTN == "CTN20RF"
                     aCTNTot[nly][POS_CTN20RF] += nResto
                     aCTNTot[nly][POS_DATA_R]  := STOD(RESX->ZAD_DATA)
+                    If lPorMTC
+                        aCTNTot[nly][POS_PARTLOT] := nRestoM
+                    ElseIf lPorPBR
+                        aCTNTot[nly][POS_PARTLOT] := nRestoP
+                    EndIf
                 ElseIf RESX->ZAD_CODCTN == "CTN40DR"
                     aCTNTot[nly][POS_CTN40DR] += nResto
                     aCTNTot[nly][POS_DATA_R]  := STOD(RESX->ZAD_DATA)
+                    If lPorMTC
+                        aCTNTot[nly][POS_PARTLOT] := nRestoM
+                    ElseIf lPorPBR
+                        aCTNTot[nly][POS_PARTLOT] := nRestoP
+                    EndIf
                 ElseIf RESX->ZAD_CODCTN == "CTN40RF"
                     aCTNTot[nly][POS_CTN40RF] += nResto
                     aCTNTot[nly][POS_DATA_R]  := STOD(RESX->ZAD_DATA)
+                    If lPorMTC
+                        aCTNTot[nly][POS_PARTLOT] := nRestoM
+                    ElseIf lPorPBR
+                        aCTNTot[nly][POS_PARTLOT] := nRestoP
+                    EndIf
                 ElseIf RESX->ZAD_CODCTN == "CTN40HC"
                     aCTNTot[nly][POS_CTN40HC] += nResto
                     aCTNTot[nly][POS_DATA_R]  := STOD(RESX->ZAD_DATA)
+                    If lPorMTC
+                        aCTNTot[nly][POS_PARTLOT] := nRestoM
+                    ElseIf lPorPBR
+                        aCTNTot[nly][POS_PARTLOT] := nRestoP
+                    EndIf
                 EndIf
             EndIf
         EndIf
 
+        nRestoP := 0
+        nRestoM := 0
         nResto  := 0
         aCTNVal := {}
         aQtdCTN := {}
@@ -361,16 +451,16 @@ User Function OURO07B()
     Private aCTNTot := {}
     Default lFinal  := .F.
 
-    Aadd(aHeadSA, {"FILIAL"           , "FILIAL"  , ""                        , TamSx3("C1_FILIAL")[1]    , TamSx3("C1_FILIAL")[2]  , "" ,, "C", "",,,,})
-    Aadd(aHeadSA, {"NUMERO SC"        , "NUMSC"   , ""                        , TamSx3("C1_NUM")[1]       , TamSx3("C1_NUM")[2]     , "" ,, "C", "",,,,})
-    Aadd(aHeadSA, {"DATA ENTREGA"     , "DTENT"   , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
-    Aadd(aHeadSA, {"CTN40'HC"         , "CTN40HC" , "@E 999.99"               , TamSx3("C1_CTN40HC")[1]   , TamSx3("C1_CTN40HC")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN40'DR"         , "CTN40DR" , "@E 999.99"               , TamSx3("C1_CTN40DR")[1]   , TamSx3("C1_CTN40DR")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN40'RF"         , "CTN40RF" , "@E 999.99"               , TamSx3("C1_CTN40RF")[1]   , TamSx3("C1_CTN40RF")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN20'DR"         , "CTN20DR" , "@E 999.99"               , TamSx3("C1_CTN20DR")[1]   , TamSx3("C1_CTN20DR")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"CTN20'RF"         , "CTN20RF" , "@E 999.99"               , TamSx3("C1_CTN20RF")[1]   , TamSx3("C1_CTN20RF")[2] , "" ,, "N", "",,,,})
-    Aadd(aHeadSA, {"Dt.Cotacao Maior" , "DTCOTM"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
-    Aadd(aHeadSA, {"Dt.Cotacao Resto" , "DTCOTR"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"FILIAL"             , "FILIAL"  , ""                        , TamSx3("C1_FILIAL")[1]    , TamSx3("C1_FILIAL")[2]  , "" ,, "C", "",,,,})
+    Aadd(aHeadSA, {"NUMERO SC"          , "NUMSC"   , ""                        , TamSx3("C1_NUM")[1]       , TamSx3("C1_NUM")[2]     , "" ,, "C", "",,,,})
+    Aadd(aHeadSA, {"DATA ENTREGA"       , "DTENT"   , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"CTN40'HC"           , "CTN40HC" , "@E 999.99"               , TamSx3("C1_CTN40HC")[1]   , TamSx3("C1_CTN40HC")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN40'DR"           , "CTN40DR" , "@E 999.99"               , TamSx3("C1_CTN40DR")[1]   , TamSx3("C1_CTN40DR")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN40'RF"           , "CTN40RF" , "@E 999.99"               , TamSx3("C1_CTN40RF")[1]   , TamSx3("C1_CTN40RF")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN20'DR"           , "CTN20DR" , "@E 999.99"               , TamSx3("C1_CTN20DR")[1]   , TamSx3("C1_CTN20DR")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"CTN20'RF"           , "CTN20RF" , "@E 999.99"               , TamSx3("C1_CTN20RF")[1]   , TamSx3("C1_CTN20RF")[2] , "" ,, "N", "",,,,})
+    Aadd(aHeadSA, {"Dt.Cot CTN Fechado" , "DTCOTM"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
+    Aadd(aHeadSA, {"Dt.Cot Part Lot"    , "DTCOTR"  , ""                        , TamSx3("C1_DATPRF")[1]    , TamSx3("C1_DATPRF")[2]  , "" ,, "D", "",,,,})
     
     cQuery := " SELECT ZAE_FILIAL, ZAE_NUMSC, ZAE_DTENTR, ZAE_CT40HC, ZAE_CT40DR, ZAE_CT40RF, ZAE_CT20DR, ZAE_CT20RF, ZAE_DTCOTM, ZAE_DTCOTR, R_E_C_N_O_ "
     cQuery += " FROM " + RetSqlName("ZAE")
@@ -388,6 +478,11 @@ User Function OURO07B()
         AADD(aCTNTot,{BUSX->ZAE_FILIAL, BUSX->ZAE_NUMSC, STOD(BUSX->ZAE_DTENTR), BUSX->ZAE_CT40HC, BUSX->ZAE_CT40DR, BUSX->ZAE_CT40RF, BUSX->ZAE_CT20DR, BUSX->ZAE_CT20RF, STOD(BUSX->ZAE_DTCOTM), STOD(BUSX->ZAE_DTCOTR),.F.})
         BUSX->(dbSkip())
     EndDo
+
+    If Empty(aCTNTot)
+        Alert("Não existem conteiners calculados pata esta SC.")
+        Return
+    EndIf
 
     DEFINE MSDIALOG oDlg TITLE  "Totalizadores de Containers" FROM  10, 10 To 400, 1000 PIXEL
 
