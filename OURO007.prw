@@ -330,21 +330,21 @@ Static Function OURO07A()
         If nResto > 0
             If aCTNTot[nly][POS_CTN20DR] > 0
                 If lPorMTC
-                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN20DR] * nMTUso))
                 ElseIf lPorPBR
-                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN20DR] * nPBUso))
                 EndIf
             ElseIf aCTNTot[nly][POS_CTN20RF] > 0
                 If lPorMTC
-                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN20RF] * nMTUso))
                 ElseIf lPorPBR
-                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN20RF] * nPBUso))
                 EndIf
             ElseIf aCTNTot[nly][POS_CTN40DR] > 0
                 If lPorMTC
-                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40DR] * nMTUso))
                 ElseIf lPorPBR
-                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40DR] * nPBUso))
                 EndIf
             ElseIf aCTNTot[nly][POS_CTN40RF] > 0
                 If lPorMTC
@@ -354,9 +354,9 @@ Static Function OURO07A()
                 EndIf
             ElseIf aCTNTot[nly][POS_CTN40HC] > 0
                 If lPorMTC
-                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40RF] * nMTUso))
+                    nRestoM := (aCTNTot[nly][POS_MTC] - (aCTNTot[nly][POS_CTN40HC] * nMTUso))
                 ElseIf lPorPBR
-                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40RF] * nPBUso))
+                    nRestoP := (aCTNTot[nly][POS_PESOB] - (aCTNTot[nly][POS_CTN40HC] * nPBUso))
                 EndIf
             EndIf
 
@@ -423,6 +423,12 @@ Static Function OURO07A()
                         aCTNTot[nly][POS_PARTLOT] := nRestoP
                     EndIf
                 EndIf
+            EndIf
+        Else
+            If lPorMTC
+                 aCTNTot[nly][POS_PARTLOT] := aCTNTot[nly][POS_MTC]
+            ElseIf lPorPBR
+                 aCTNTot[nly][POS_PARTLOT] := aCTNTot[nly][POS_PESOB]
             EndIf
         EndIf
 

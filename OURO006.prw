@@ -1,5 +1,17 @@
 #INCLUDE "PROTHEUS.CH"
 #Include "TOPCONN.CH"
+
+#DEFINE POS_MTC     1
+#DEFINE POS_PESOB   2
+#DEFINE POS_DATAENT 3
+#DEFINE POS_CTN40HC 4
+#DEFINE POS_CTN40DR 5
+#DEFINE POS_CTN40RF 6
+#DEFINE POS_CTN20DR 7
+#DEFINE POS_CTN20RF 8
+#DEFINE POS_PARTLOT 9
+#DEFINE POS_DATA_M  10
+#DEFINE POS_DATA_R  11
 //--------------------------------------------------------------------
 /*/{Protheus.doc} OURO006
 Calculo de container por item
@@ -72,9 +84,9 @@ User Function OURO006(nVolCub,nPesBru,nPos)
 
     While CTNX->(!EOF())
         If lPorMTC
-            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(nVolCub / CTNX->ZAC_MTC,2)})
+            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(nVolCub / CTNX->ZAC_MTC,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
         Else // lPorPBR
-            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(nPesBru / CALX->ZAC_KG,2)})
+            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(nPesBru / CTNX->ZAC_KG,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
         EndIf
         CTNX->(dbSkip())
     EndDo
@@ -99,10 +111,9 @@ User Function OURO006(nVolCub,nPesBru,nPos)
 
         If VLRC->(!EOF())
             If aQtdCTN[nlx][2] > 1
-                AADD(aCTNVal,{VLRC->ZAD_CODCTN,Int(aQtdCTN[nlx][2]) * VLRC->ZAD_CUSTO,Int(aQtdCTN[nlx][2])})
-                nResto := aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2])
+                AADD(aCTNVal,{VLRC->ZAD_CODCTN,Int(aQtdCTN[nlx][2]) * VLRC->ZAD_CUSTO,Int(aQtdCTN[nlx][2]), STOD(VLRC->ZAD_DATA), aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2]), aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
             Else
-                AADD(aCTNVal,{VLRC->ZAD_CODCTN,VLRC->ZAD_CUSTO,aQtdCTN[nlx][2],aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2])})
+                AADD(aCTNVal,{VLRC->ZAD_CODCTN,VLRC->ZAD_CUSTO,aQtdCTN[nlx][2], STOD(VLRC->ZAD_DATA), 0, aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
             EndIf
         EndIf
     Next
@@ -116,24 +127,82 @@ User Function OURO006(nVolCub,nPesBru,nPos)
         aCols[nPos][nP40RF] := 0
         aCols[nPos][nP40HC] := 0
 
+
         If aCTNVal[1][1] == "CTN20DR"
             aCols[nPos][nP20DR] := aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
         ElseIf aCTNVal[1][1] == "CTN20RF"
             aCols[nPos][nP20RF] := aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
         ElseIf aCTNVal[1][1] == "CTN40DR"
             aCols[nPos][nP40DR] := aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
         ElseIf aCTNVal[1][1] == "CTN40RF"
             aCols[nPos][nP40RF] := aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
         ElseIf aCTNVal[1][1] == "CTN40HC"
             aCols[nPos][nP40HC] := aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
         EndIf
     EndIf
 
     If nResto > 0
-        cQuery := " SELECT TOP(1) ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO FROM " + RetSqlName("ZAD")
-        cQuery += " WHERE ZAD_ATIVO = 'S' "
-        cQuery += " AND D_E_L_E_T_ = '' "
-        cQuery += " ORDER BY ZAD_CUSTO DESC"
+        If aCols[nPos][nP20DR] > 0
+            If lPorMTC
+                nRestoM := (nVolCub - (aCols[nPos][nP20DR] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (nPesBru - (aCols[nPos][nP20DR] * nPBUso))
+            EndIf
+        ElseIf aCols[nPos][nP20RF] > 0
+            If lPorMTC
+                nRestoM := (nVolCub - (aCols[nPos][nP20RF] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (nPesBru - (aCols[nPos][nP20RF] * nPBUso))
+            EndIf
+        ElseIf aCols[nPos][nP40DR] > 0
+            If lPorMTC
+                nRestoM := (nVolCub - (aCols[nPos][nP40DR] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (nPesBru - (aCols[nPos][nP40DR] * nPBUso))
+            EndIf
+        ElseIf aCols[nPos][nP40RF] > 0
+            If lPorMTC
+                nRestoM := (nVolCub - (aCols[nPos][nP40RF] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (nPesBru - (aCols[nPos][nP40RF] * nPBUso))
+            EndIf
+        ElseIf aCols[nPos][nP40HC] > 0
+            If lPorMTC
+                nRestoM := (nVolCub - (aCols[nPos][nP40HC] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (nPesBru - (aCols[nPos][nP40HC] * nPBUso))
+            EndIf
+        EndIf
+
+        cQuery := " SELECT TOP(1) ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO "
+        cQuery += " FROM " + RetSqlName("ZAD") + " ZAD "
+        cQuery += " INNER JOIN " + RetSqlName("ZAC") + " ZAC "
+        cQuery += " ON ZAC.ZAC_CTN = ZAD.ZAD_CODCTN "
+        If lPorMTC
+            cQuery += " AND ZAC.ZAC_MTC >= '"+cValtoChar(nRestoM)+"' "
+        ElseIf lPorPBR
+            cQuery += " AND ZAC.ZAC_KG >= '"+cValToChar(nRestoP)+"' "
+        EndIf
+        cQuery += " WHERE ZAD.ZAD_ATIVO = 'S' "
+        cQuery += " AND ZAD.D_E_L_E_T_ = '' "
+        cQuery += " AND ZAC.D_E_L_E_T_ = '' "
+        cQuery += " ORDER BY ZAD_CUSTO DESC "
+
 
         If Select("RESX") > 0
             RESX->(dbCloseArea())
@@ -142,7 +211,7 @@ User Function OURO006(nVolCub,nPesBru,nPos)
         DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'RESX', .T., .F.)
 
         If RESX->(!EOF())
-             If RESX->ZAD_CODCTN == "CTN20DR"
+            If RESX->ZAD_CODCTN == "CTN20DR"
                 aCols[nPos][nP20DR] += nResto
             ElseIf RESX->ZAD_CODCTN == "CTN20RF"
                 aCols[nPos][nP20RF] += nResto
@@ -155,4 +224,12 @@ User Function OURO006(nVolCub,nPesBru,nPos)
             EndIf
         EndIf
     EndIf
+
+    nRestoP := 0
+    nRestoM := 0
+    nResto  := 0
+    aCTNVal := {}
+    aQtdCTN := {}
+    lPorMTC := .F.
+    lPorPBR := .F.
 Return
