@@ -510,7 +510,10 @@ if found()
 								{"C6_VALOR"  , ROUND(SD2->(D2_PRCVEN * D2_QUANT),2), Nil},;
 								{"C6_TES"    , '958'        , Nil},;
 								{"C6_LOCAL"  , SD2->D2_LOCAL, Nil},;
-								{"C6_ENTREG" , dDATABASE    , Nil};
+								{"C6_ENTREG" , dDATABASE    , Nil},;
+								{"C6_NFORI"  , SD2->D2_DOC  , Nil},;
+								{"C6_SERIORI", SD2->D2_SERIE ,Nil},;
+								{"C6_ITEMORI", SD2->D2_ITEM , Nil};
 					};
 					)
 
