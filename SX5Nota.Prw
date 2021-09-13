@@ -58,7 +58,7 @@ elseif FunName() $ "EICDI154"
 			Return(.T.)
 		ElseIf cChaveX5 $ '888' .And. SM0->M0_CODFIL == '05'
 			Return(.T.)
-		ElseIf cChaveX5 $ '009' .And. SM0->M0_CODFIL == '06' // WAR - 06/12/2018
+		ElseIf cChaveX5 $ '099' .And. SM0->M0_CODFIL == '06' // WAR - 06/12/2018
 			Return(.T.)
 		Else
 			Return(.F.)
