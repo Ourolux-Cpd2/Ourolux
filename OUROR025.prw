@@ -31,10 +31,13 @@ Static Function OUROR25()
     Local lFilSC        := .F.
     Local lFilFor       := .F.
     Local lFilPor       := .F.
+    Local lFilETA       := .F.
     Local cSCAtu        := ""
     Local cForAtu       := ""
     Local cPorOAtu      := ""
     Local cPorDAtu      := ""
+    Local cPorETA       := ""
+    Local cCabec        := ""
     Private cCaminho    := ""
     Private aParam      := {}
 
@@ -63,10 +66,9 @@ Static Function OUROR25()
     cQuery += " AND SW0.W0_C1_NUM BETWEEN '"+aParam[1]+"' AND '"+aParam[2]+"' "
     cQuery += " AND SW0.D_E_L_E_T_ = '' "
     cQuery += " WHERE  SW2.W2_XDT_ETA BETWEEN '"+DTOS(aParam[3])+"' AND '"+DTOS(aParam[4])+"' "
-    cQuery += "        AND SW2.W2_FORN BETWEEN '"+aParam[5]+"' AND '"+aParam[7]+"' "
-    cQuery += "        AND SW2.W2_FORLOJ BETWEEN '"+aParam[6]+"' AND '"+aParam[8]+"' "
-    cQuery += "        AND SW2.W2_ORIGEM BETWEEN '"+aParam[9]+"' AND '"+aParam[10]+"' "
-    cQuery += "        AND SW2.W2_DEST BETWEEN '"+aParam[11]+"' AND '"+aParam[12]+"' "    
+    cQuery += "        AND SW2.W2_FORN BETWEEN '"+aParam[5]+"' AND '"+aParam[6]+"' "
+    cQuery += "        AND SW2.W2_ORIGEM BETWEEN '"+aParam[7]+"' AND '"+aParam[8]+"' "
+    cQuery += "        AND SW2.W2_DEST BETWEEN '"+aParam[9]+"' AND '"+aParam[10]+"' "    
     cQuery += "        AND SW2.D_E_L_E_T_ = '' "
     cQuery += " GROUP BY SW0.W0_C1_NUM, "
     cQuery += " 	   SW2.W2_PO_DT, "
@@ -78,12 +80,14 @@ Static Function OUROR25()
     cQuery += "        SW2.W2_MT3, "
     cQuery += "        SW2.W2_XDT_ETA "
     
-    If aParam[13] == 1
+    If aParam[11] == 1
         cQuery += " ORDER BY SW0.W0_C1_NUM, W2_XDT_ETA
-    ElseIf aParam[13] == 2
+    ElseIf aParam[11] == 2
         cQuery += " ORDER BY SW2.W2_FORN, W2_XDT_ETA
-    ElseIf aParam[13] == 3
+    ElseIf aParam[11] == 3
         cQuery += " ORDER BY SW2.W2_ORIGEM, SW2.W2_DEST, W2_XDT_ETA
+    ElseIf aParam[11] == 4
+        cQuery += " ORDER BY W2_XDT_ETA
     EndIf 
     
     If Select("RELX") > 0
@@ -103,9 +107,23 @@ Static Function OUROR25()
         Return(.T.)
     EndIf
     
+    If aParam[11] == 1
+        lFilSC := .T.
+        cCabec := "Ordenacao - Solicitação de Compras"
+    ElseIf aParam[11] == 2
+        lFilFor := .T.
+        cCabec := "Ordenacao - Fornecedor"
+    ElseIf aParam[11] == 3
+        lFilPor := .T.
+        cCabec := "Ordenacao - Porto Origem / Destino"
+    ElseIf aParam[11] == 4
+        lFilETA := .T.
+        cCabec := "Ordenacao - ETA"
+    EndIf
+
     oFWMsExcel := FWMSExcelEx():New()
 
-    aAdd(aWorkSheet,"Analise para Cotacao Frete Internacional")
+    aAdd(aWorkSheet,"Analise para Cotacao Frete Internacional - " + cCabec )
     oFWMsExcel:AddworkSheet( aWorkSheet[x] ) 
     oFWMsExcel:AddTable( aWorkSheet[x], aWorkSheet[x] ) 
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Numero SC"      ,1,4,.F.)
@@ -118,14 +136,6 @@ Static Function OUROR25()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "ETA"            ,1,4,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "MT Cubico"      ,1,2,.F.)
 
-    If aParam[13] == 1
-        lFilSC := .T.
-    ElseIf aParam[13] == 2
-        lFilFor := .T.
-    ElseIf aParam[13] == 3
-        lFilPor := .T.
-    EndIf
-
     For nlx := 1 to Len(aLinha)
 
         If nlx == 1
@@ -136,13 +146,15 @@ Static Function OUROR25()
             ElseIf lFilPor
                 cPorOAtu := aLinha[nlx][6]
                 cPorDAtu := aLinha[nlx][7]
+            ElseIf lFilETA
+                cPorETA := aLinha[nlx][8]
             EndIf
         EndIF
 
         If lFilSC
             If cSCAtu <> aLinha[nlx][1]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
                 nTotFil := 0
                 lLinha := !lLinha
                 cSCAtu := aLinha[nlx][1]
@@ -150,7 +162,7 @@ Static Function OUROR25()
         ElseIf lFilFor
             If cForAtu <> aLinha[nlx][4]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
                 nTotFil := 0
                 lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
@@ -158,12 +170,20 @@ Static Function OUROR25()
         ElseIf lFilPor
             If cPorOAtu <> aLinha[nlx][6] .OR. cPorDAtu <> aLinha[nlx][7]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
                 nTotFil := 0
                 lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
                 cPorOAtu := aLinha[nlx][6]
                 cPorDAtu := aLinha[nlx][7]
+            EndIf
+        ElseIf lFilETA
+            If cPorETA <> aLinha[nlx][8]
+                oFWMsExcel:SetCelBold(.T.)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                nTotFil := 0
+                lLinha := !lLinha
+                cPorETA := aLinha[nlx][8]
             EndIf
         EndIf
 
@@ -201,9 +221,9 @@ Static Function OUROR25()
 
     oFWMsExcel:Activate()
     oFWMsExcel:GetXMLFile(cCaminho + cNome)
-    oExcel := MsExcel():New()
-    oExcel:WorkBooks:Open(cCaminho + cNome)
-    oExcel:SetVisible(.T.)
+    //oExcel := MsExcel():New()
+    //oExcel:WorkBooks:Open(cCaminho + cNome)
+    //oExcel:SetVisible(.T.)
     //oExcel:Destroy()
     shellExecute( "Open", cCaminho + cNome, "", "", 1 )
     msgalert("Planilha Gerada em: "+(cCaminho + cNome))  
@@ -224,16 +244,14 @@ Static Function PergPara()
 Local aRet	 := {}
 Local aPergs := {}
 local tmp    := getTempPath()
-Local aCombo := {"Solicitacao de Compra","Fornecedor","Porto Origem/Destino"}
+Local aCombo := {"Solicitacao de Compra","Fornecedor","Porto Origem/Destino","ETA"}
 
 aAdd(aPergs, {1, "Numero SC de"         ,Space(6)           ,"","","SC1","",50,.F.}) 
 aAdd(aPergs, {1, "Numero SC ate"        ,"ZZZZZZ"           ,"","","SC1","",50,.T.}) 
 aAdd(aPergs, {1, "ETA de"               ,Ctod(Space(8))     ,"","",""   ,"",50,.T.})
 aAdd(aPergs, {1, "ETA ate"              ,Ctod(Space(8))     ,"","",""   ,"",50,.T.})
 aAdd(aPergs, {1, "Fornecedor de"        ,Space(6)           ,"","","SA2","",50,.F.}) 
-aAdd(aPergs, {1, "Loja de"              ,Space(2)           ,"","",""   ,"",50,.F.}) 
 aAdd(aPergs, {1, "Fornecedor ate"       ,"ZZZZZZ"           ,"","","SA2","",50,.T.}) 
-aAdd(aPergs, {1, "Loja ate"             ,"ZZ"               ,"","",""   ,"",50,.T.}) 
 aAdd(aPergs, {1, "Porto Origem de"      ,Space(3)           ,"","","SYR","",50,.F.}) 
 aAdd(aPergs, {1, "Porto Origem ate"     ,"ZZZ"              ,"","","SYR","",50,.T.}) 
 aAdd(aPergs, {1, "Porto Destino de"     ,Space(3)           ,"","","SYR","",50,.F.}) 
