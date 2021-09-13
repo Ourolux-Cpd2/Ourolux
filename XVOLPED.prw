@@ -152,6 +152,7 @@ For xp := 1 To Len(aVetor)
 
         RecLock("SC5",.F.)
             SC5->C5_VOLUME1 := aVetor[xp][2]
+            SC5->C5_ESPECI1 := "Caixa(s)"
         SC5->(MsUnLock())
 
     EndIf
