@@ -124,7 +124,7 @@ User Function EICPO400
        					EndIf
 					
 					EndIf
-				war 10-02-2020 */
+				war 10-02-2020. */
 					Dbselectarea("SC7")
 					SC7->(dbGoTop())
 					SC7->(dbSetOrder(1))
@@ -229,6 +229,26 @@ User Function EICPO400
 
 					W3TMP->(dbSkip())
 				EndDo
+
+				cQuery := " SELECT SUM(W3_XCUBAGE) AS CUBAGEM FROM " + RetSqlName("SW3") 
+				cQuery += " WHERE D_E_L_E_T_ = '' "
+				cQuery += " AND W3_PO_NUM = '"+SW2->W2_PO_NUM+"' "
+				cQuery += " AND W3_SEQ = '0' "
+
+				If Select("XMT3") > 0
+					XMT3->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"XMT3",.F.,.T. )
+
+				If XMT3->CUBAGEM == 0
+					Alert("Atencao cubagem do PO esta zerada!!!")
+				EndIf
+
+				RecLock("SW2",.F.)
+				SW2->W2_MT3 := XMT3->CUBAGEM
+				SW2->(MsUnlock())
+				 
 		End Case
 
 	End Sequence
