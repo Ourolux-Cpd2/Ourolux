@@ -6,13 +6,13 @@
 /*--------------------------------------------------------|
 | Autor | Claudino Domingues              | Data 03/10/12 | 
 |---------------------------------------------------------|
-| Função: MEGA25	                                      |
+| Função: OUROR027	                                      |
 |---------------------------------------------------------|
 | Relatório que faz a Emissão do Saldo Atual em Estoque   |
 | para o representante.                      	          |
 ----------------------------------------------------------*/
 
-User Function MEGA25()
+User Function OUROR027()
 
 Local oReport
 
@@ -31,13 +31,13 @@ CriaSX1(cPerg) // Função que faz a criação do Pergunta na SX1 atraves do PUTSX1.
 Pergunte(cPerg,.F.) // Caso o parametro esteja como .T. o sistema ira apresentar a tela de perguntas antes que abrir a tela configuração do relatório.
 
 // Apresenta a tela de impressão para o usuário configurar o relatório.
-oReport:=TReport():New("MEGA25","MEGA25 - Emissão de Saldo em Estoque","MEGA25",{|oReport| PrintReport(oReport,oSection)},"Emissão de Saldo em Estoque")
+oReport:=TReport():New("OUROR027","OUROR027 - Emissão de Saldo em Estoque","MEGA25",{|oReport| PrintReport(oReport,oSection)},"Emissão de Saldo em Estoque")
 
 oReport:SetLineHeight(50)      // Define a altura da linha na impressão.
 oReport:nFontBody := 10        // Tamanho da fonte definida para impressão do relatório.
 oReport:lBold := .F.           // Aponta que as Informações serão impressas em negrito
 
-oSection:=TRSection():New(oReport,"MEGA25 - Emissão de Saldo em Estoque",{"SB1"})
+oSection:=TRSection():New(oReport,"OUROR027 - Emissão de Saldo em Estoque",{"SB1"})
 oSection:SetHeaderPage()       
 
 //TRCell():New(oParent,cName,cAlias,cTitle,cPicture,nSize,lPixel,bBlock,cAlign,lLineBreak,cHeaderAlign,lCellBreak,nColSpace,lAutoSize,nClrBack,nClrFore,lBold)
@@ -69,6 +69,8 @@ cQuery += " ON SB1.B1_COD = SB2.B2_COD "
 cQuery += " WHERE SB2.B2_LOCAL = '01' "
 cQuery += "		AND SB2.B2_FILIAL =  '" +cFilAnt+ "' "
 cQuery += "		AND SB2.D_E_L_E_T_= ' ' AND SB2.B2_COD >= '" +MV_PAR01+ "' AND SB1.B1_COD <= '" +MV_PAR02+ "' "   
+cQuery += " 	AND SB1.B1_DESC NOT LIKE '%XXXX%' "
+cQuery += " 	AND SB1.B1_MSBLQL <> '1' "
 cQuery += "	GROUP BY SB2.B2_COD , SB1.B1_DESC , SB2.B2_QATU , SB2.B2_RESERVA , SB2.B2_QPEDVEN , SB2.B2_QEMP , SB2.B2_QEMPN , SB2.B2_QNPT "
 cQuery += " ORDER BY COD "
                                          
