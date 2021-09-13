@@ -8,7 +8,7 @@ Local nOpt      := Paramixb[2]
 If nOpt == 3     
     WFKillProcess( Alltrim(SC1->C1_WFID) )
 
-    cQuery := " SELECT ZAE_FILIAL, ZAE_NUMSC, ZAE_DTENTR, ZAE_CT40HC, ZAE_CT40DR, ZAE_CT40RF, ZAE_CT20DR, ZAE_CT20RF, ZAE_DTCOTM, ZAE_DTCOTR, R_E_C_N_O_ "
+    cQuery := " SELECT ZAE_FILIAL, ZAE_NUMSC, ZAE_DTENTR, ZAE_CT40HC, ZAE_CT40DR, ZAE_CT40RF, ZAE_CT20DR, ZAE_CT20RF, ZAE_DTCOTM, R_E_C_N_O_ "
     cQuery += " FROM " + RetSqlName("ZAE")
     cQuery += " WHERE ZAE_FILIAL = '"+SC1->C1_FILIAL+"' "
     cQuery += " AND ZAE_NUMSC = '"+SC1->C1_NUM+"' "

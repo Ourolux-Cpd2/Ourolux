@@ -9,7 +9,8 @@
 #DEFINE POS_DATA	1
 #DEFINE POS_CUSTO	2
 #DEFINE POS_VLR_MTC	3
-#DEFINE RECNO		4
+#DEFINE POS_VLR_KG	4
+#DEFINE RECNO		5
 
 /*
 Rotina: OURO005
@@ -40,6 +41,7 @@ Private aAlterCo	:= {"CUSTO"}
 Aadd(aHeadSA, {"Data"       , "DATA"	    , ""				, TamSx3("C6_PRODUTO")[1]   , 0                       , "" ,, "D", ""		,,,,})
 Aadd(aHeadSA, {"Custo Total", "CUSTO"       , "@E 9,999,999.99" , TamSx3("ZAD_CUSTO")[1]    , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
 Aadd(aHeadSA, {"Valor MT³"  , "VALORMTC"    , "@E 9,999,999.99"	, TamSx3("ZAD_VALMTC")[1]   , TamSx3("ZAD_VALMTC")[2] , "" ,, "N", ""		,,,,})
+Aadd(aHeadSA, {"Valor KG"   , "VALORKG"     , "@E 9,999,999.99"	, TamSx3("ZAD_VALKG")[1]    , TamSx3("ZAD_VALKG")[2]  , "" ,, "N", ""		,,,,})
 
 DEFINE FONT _oFont NAME 'Arial Black' SIZE 09, 15
 
@@ -88,7 +90,7 @@ oDlg:lEscClose  := .F.
 	
     dbSelectArea("ZAD")
     
-    cQuery := " SELECT ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, R_E_C_N_O_ FROM " + RetSqlName("ZAD")
+    cQuery := " SELECT ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_VALKG, R_E_C_N_O_ FROM " + RetSqlName("ZAD")
     cQuery += " WHERE D_E_L_E_T_ = '' "
     cQuery += " AND ZAD_CODCTN = '" +ZAC->ZAC_CTN+ "' "
     cQuery += " ORDER BY ZAD_DATA "
@@ -104,7 +106,7 @@ oDlg:lEscClose  := .F.
     EndIf
 
     While VALX->(!EOF())
-		AADD(aColsSA,{STOD(VALX->ZAD_DATA), VALX->ZAD_CUSTO, VALX->ZAD_VALMTC, VALX->R_E_C_N_O_,.F.})
+		AADD(aColsSA,{STOD(VALX->ZAD_DATA), VALX->ZAD_CUSTO, VALX->ZAD_VALMTC, VALX->ZAD_VALKG, VALX->R_E_C_N_O_,.F.})
 		VALX->(dbSkip())
     EndDo
     
@@ -116,7 +118,7 @@ oDlg:lEscClose  := .F.
 	Next
 
 	If lGeraDia
-		AADD(aColsSA,{dDataBase, 0, 0, 0,.F.})
+		AADD(aColsSA,{dDataBase, 0, 0, 0, 0,.F.})
 	EndIf
 
 	ASORT(aColsSA,,, { |x, y| x[1] > y[1] } )
@@ -155,6 +157,9 @@ User Function 2TudoOk()
 			ElseIf oListPR:aCols[nlx][POS_VLR_MTC] <= 0
 				Alert("Custo do MT³ zerado, favor verificar o cadastro do container!")
 				Return nOPRet
+			ElseIf oListPR:aCols[nlx][POS_VLR_KG] <= 0
+				Alert("Custo do KG zerado, favor verificar o cadastro do container!")
+				Return nOPRet
 			EndIf
 			Exit
 		EndIf
@@ -187,6 +192,7 @@ User Function vldCam2()
                 lRet := .F.
             Else
 				oListPR:aCols[n][POS_VLR_MTC] := &cCampAux / ZAC->ZAC_MTC
+				oListPR:aCols[n][POS_VLR_KG]  := &cCampAux / ZAC->ZAC_KG
             EndIf
         EndIf
 	EndIf
@@ -221,6 +227,7 @@ Static Function GrvCTN()
 					ZAD->ZAD_DATA	:= oListPR:aCols[nlx][POS_DATA]
 					ZAD->ZAD_VALMTC	:= oListPR:aCols[nlx][POS_VLR_MTC]
 					ZAD->ZAD_CUSTO	:= oListPR:aCols[nlx][POS_CUSTO]
+					ZAD->ZAD_VALKG  := oListPR:aCols[nlx][POS_VLR_KG]
 					ZAD->ZAD_ATIVO	:= "S"
 					ZAD->(MsUnlock())
 
@@ -239,11 +246,12 @@ Static Function GrvCTN()
 				ZAD->(dbGoTo(oListPR:aCols[nlx][RECNO]))
 
 				If ZAD->(Recno()) == oListPR:aCols[nlx][RECNO]
-					If ZAD->ZAD_VALMTC == oListPR:aCols[nlx][POS_VLR_MTC] .AND. ZAD->ZAD_CUSTO == oListPR:aCols[nlx][POS_CUSTO]
+					If ZAD->ZAD_VALMTC == oListPR:aCols[nlx][POS_VLR_MTC] .AND. ZAD->ZAD_CUSTO == oListPR:aCols[nlx][POS_CUSTO] .AND. ZAD->ZAD_VALKG == oListPR:aCols[nlx][POS_VLR_KG]
 						MsgInfo("Os valores não foram alterados, formulario não sera salvo", "Historico de Valores")
 					Else
 						RecLock("ZAD", .F.)
 						ZAD->ZAD_VALMTC := oListPR:aCols[nlx][POS_VLR_MTC]
+						ZAD->ZAD_VALKG  := oListPR:aCols[nlx][POS_VLR_KG]
 						ZAD->ZAD_CUSTO	:= oListPR:aCols[nlx][POS_CUSTO]
 						ZAD->(MsUnlock())
 					EndIf

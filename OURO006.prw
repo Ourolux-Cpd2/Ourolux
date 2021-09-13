@@ -1,17 +1,6 @@
 #INCLUDE "PROTHEUS.CH"
 #Include "TOPCONN.CH"
 
-#DEFINE POS_MTC     1
-#DEFINE POS_PESOB   2
-#DEFINE POS_DATAENT 3
-#DEFINE POS_CTN40HC 4
-#DEFINE POS_CTN40DR 5
-#DEFINE POS_CTN40RF 6
-#DEFINE POS_CTN20DR 7
-#DEFINE POS_CTN20RF 8
-#DEFINE POS_PARTLOT 9
-#DEFINE POS_DATA_M  10
-#DEFINE POS_DATA_R  11
 //--------------------------------------------------------------------
 /*/{Protheus.doc} OURO006
 Calculo de container por item
@@ -34,6 +23,9 @@ User Function OURO006(nVolCub,nPesBru,nPos)
     Local nP40DR  := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_CTN40DR'})
     Local nP40RF  := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_CTN40RF'})
     Local nP40HC  := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_CTN40HC'})
+    Local nPParL  := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_PARTLOT'})
+    Local nPCub   := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XCUBAGE'})
+    Local nPPesB  := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XPESBRU'})
     Default nPos  := 0
 
     cQuery := " SELECT TOP(1) ZAC_MTC, ZAC_KG FROM " + RetSqlName("ZAC")
@@ -126,6 +118,7 @@ User Function OURO006(nVolCub,nPesBru,nPos)
         aCols[nPos][nP40DR] := 0
         aCols[nPos][nP40RF] := 0
         aCols[nPos][nP40HC] := 0
+        aCols[nPos][nPParL] := 0
 
 
         If aCTNVal[1][1] == "CTN20DR"
@@ -201,7 +194,7 @@ User Function OURO006(nVolCub,nPesBru,nPos)
         cQuery += " WHERE ZAD.ZAD_ATIVO = 'S' "
         cQuery += " AND ZAD.D_E_L_E_T_ = '' "
         cQuery += " AND ZAC.D_E_L_E_T_ = '' "
-        cQuery += " ORDER BY ZAD_CUSTO DESC "
+        cQuery += " ORDER BY ZAD_CUSTO "
 
 
         If Select("RESX") > 0
@@ -222,6 +215,18 @@ User Function OURO006(nVolCub,nPesBru,nPos)
             ElseIf RESX->ZAD_CODCTN == "CTN40HC"
                 aCols[nPos][nP40HC] += nResto
             EndIf
+            
+            If lPorMTC
+                aCols[nPos][nPParL] := nRestoM
+            ElseIf lPorPBR
+                aCols[nPos][nPParL] := nRestoP
+            EndIf
+        EndIf
+    Else
+        If lPorMTC
+            aCols[nPos][nPParL] := aCols[nPos][nPCub]
+        ElseIf lPorPBR
+            aCols[nPos][nPParL] := aCols[nPos][nPPesB]
         EndIf
     EndIf
 
