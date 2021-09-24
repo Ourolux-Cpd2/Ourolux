@@ -30,6 +30,7 @@ Local   nVlUnit     := 0
 Local   cDeptoEIC	  := SuperGetMV("ES_DPTOEIC",.F.,"000000027")
 Local   cDptoImp	  := SuperGetMV("ES_DPTOIMP",.F.,"") //000000035
 Local   cDespImp	  := SuperGetMV("ES_DESPIMP",.F.,"") //201/202/203/204/205/405/415
+Local   cDespQtd	  := SuperGetMV("ES_DESQTD",.F.,"402|406|421|411|416|417|426")  //402|406|421 - 402|406|421|411|416|417|426
 Private lMSHelpAuto := .T.
 Private lMsErroAuto := .F.
 Private cControle   := ""
@@ -112,57 +113,57 @@ DO CASE
 		EndIf  
    CASE PARAMIXB == "INCLUI_DESP"
       If lAtvEIC
-         If !(WD_DESPESA $ cNGFrete)
+         If !(SWD->WD_DESPESA $ cNGFrete)
             dbSelectArea("SW2")
             SW2->(dbSetOrder(1))
             SW2->(dbSeek(xFilial("SW2")+SW6->W6_PO_NUM))
             If SW2->W2_INCOTER <> "CIF"
-               If !(WD_DESPESA $ cDespFrete) 
+               If !(SWD->WD_DESPESA $ cDespFrete) 
                   aArea := SWD->(GetArea())
                   dbSelectArea("SB1")
-                  If SB1->(dbseek(xFilial("SB1")+"EIC"+WD_DESPESA))
-                     If (WD_DESPESA $ cDespImp)
+                  If SB1->(dbseek(xFilial("SB1")+"EIC"+SWD->WD_DESPESA))
+                     If (SWD->WD_DESPESA $ cDespImp)
                         cDeptoEIC := cDptoImp
                      EndIf
                      _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal( "SYT","YT_X_FILIA",XFILIAL("SYT") + SW6->W6_IMPORT,1 )	,Nil},;
                                  {"C7_EMISSAO" ,dDataBase                                                            ,Nil},; 
-                                 {"C7_FORNECE" ,WD_FORN                                                              ,Nil},;
-                                 {"C7_LOJA"	  ,WD_LOJA	                                                            ,Nil},;
+                                 {"C7_FORNECE" ,SWD->WD_FORN                                                         ,Nil},;
+                                 {"C7_LOJA"	  ,SWD->WD_LOJA                                                         ,Nil},;
                                  {"C7_XDEPART" ,cDeptoEIC	                                                         ,Nil},;
                                  {"C7_COND"	  ,"005"                                                                ,Nil},;
                                  {"C7_CONTATO" ,"IMPORTACOES"                                                        ,Nil},;
                                  {"C7_NUMIMP"  ,SW6->W6_PO_NUM                                                       ,Nil},;
                                  {"C7_ORIGEM"  ,"EICPO400"	                                                         ,Nil}}
                      
-                     If WD_DESPESA $ "402|406|421"
+                     If SWD->WD_DESPESA $ cDespQtd
 
                         nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
-                        nVlUnit := Round((WD_VALOR_R / nQtdPC),4)
+                        nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
                      
                         If nQtdPC == 0
                            Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
                            Return
                         EndIf
                      
-                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                    {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                    {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                    {"C7_QUANT"	   ,nQtdPC          	,Nil},;
-                                    {"C7_PRECO"	   ,nVlUnit	         ,Nil},;
-                                    {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                    {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                    {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	              ,Nil},;
+                                    {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA ,Nil},;
+                                    {"C7_UM"	      ,SB1->B1_UM		        ,Nil},;   
+                                    {"C7_QUANT"	   ,nQtdPC          	     ,Nil},;
+                                    {"C7_PRECO"	   ,nVlUnit	              ,Nil},;
+                                    {"C7_CC"	      ,SWD->WD_XCC           ,Nil},;     
+                                    {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB) ,Nil},;
+                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM        ,Nil},;
+                                    {"C7_OBS"	   ,SWD->WD_XOBS	        ,Nil}}
                      Else
-                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                    {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                    {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                    {"C7_QUANT"	   ,1             	,Nil},;
-                                    {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                    {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                    {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                    {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                    {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                    {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                    {"C7_QUANT"	   ,1             	      ,Nil},;
+                                    {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                    {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                    {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                    {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                      EndIf
 
                      Processa( {|| MsExecAuto( {|v,x,y,z| MATA120(v,x,y,z)},1,_aCabPC,{_aItemPC},3)  }, "Aguarde...", "Gerando pedido de compras...",.F.)
@@ -179,7 +180,7 @@ DO CASE
 
                         Alert("A T E N Ç Ã O !!!"+CRLF+CRLF+"Pedido não gerado"+CRLF+CRLF+cErro)
 
-                        ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                        ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
                      else
                         M->WD_XPEDCOM := SC7->C7_NUM
                         If RecLock("SWD",.F.)
@@ -194,10 +195,10 @@ DO CASE
                         EndIf
                      EndIf
                   else
-                     alert("Pedido de compra não sera gerado, produto EIC" + WD_DESPESA + " não cadastrado no sistema!")
+                     alert("Pedido de compra não sera gerado, produto EIC" + SWD->WD_DESPESA + " não cadastrado no sistema!")
                   EndIf
                else
-                  aPosFrete := aScan(aDesFrete, {|x| Alltrim(x) == WD_DESPESA})
+                  aPosFrete := aScan(aDesFrete, {|x| Alltrim(x) == SWD->WD_DESPESA})
 
                   If aPosFrete <> 0
                      aDel(aDesFrete,aPosFrete)
@@ -207,9 +208,9 @@ DO CASE
 
                   cQuery := " SELECT COUNT(DISTINCT(WD_DESPESA)) AS TOT_DESPESA FROM " + RetSqlName("SWD")
                   cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                  cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                  cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                   cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFrete,"/")
-                  cQuery += " AND WD_DESPESA <> '"+Alltrim(WD_DESPESA)+"' "
+                  cQuery += " AND WD_DESPESA <> '"+Alltrim(SWD->WD_DESPESA)+"' "
                   cQuery += " AND D_E_L_E_T_ = '' "
 
                   If Select("DESFRET") > 0
@@ -222,7 +223,7 @@ DO CASE
                      If DESFRET->TOT_DESPESA == nNumDesp
                         cQuery := " SELECT WD_DESPESA, WD_FORN, WD_LOJA, WD_VALOR_R, WD_XCC, WD_XOBS, R_E_C_N_O_ FROM " + RetSqlName("SWD")
                         cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                        cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                        cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                         cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFrete,"/")
                         cQuery += " AND D_E_L_E_T_ = '' "
                         cQuery += " ORDER BY WD_XCC DESC "
@@ -263,32 +264,73 @@ DO CASE
                            While AGLWD->(!EOF())
                               cItem := SOMA1(cItem)
 
-                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	                  ,Nil},;
-                                          {"C7_PRODUTO"  ,"EIC"+AGLWD->WD_DESPESA   ,Nil},;
-                                          {"C7_UM"	      ,SB1->B1_UM		            ,Nil},;   
-                                          {"C7_QUANT"	   ,1             	         ,Nil},;
-                                          {"C7_PRECO"	   ,AGLWD->WD_VALOR_R	      ,Nil},;
-                                          {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
-                                          {"C7_XHAWB"    ,Alltrim(WD_HAWB)          ,Nil},;
-                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
-                                          {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
+                              If AGLWD->WD_DESPESA $ cDespQtd
+
+                                 nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
+                                 nVlUnit := Round((AGLWD->WD_VALOR_R / nQtdPC),4)
                               
+                                 If nQtdPC == 0
+                                    Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
+                                    Return
+                                 EndIf
+
+                                 _aItemPC :=	{{"C7_ITEM"	   ,cItem	                  ,Nil},;
+                                             {"C7_PRODUTO"  ,"EIC"+AGLWD->WD_DESPESA   ,Nil},;
+                                             {"C7_UM"	      ,SB1->B1_UM		            ,Nil},;   
+                                             {"C7_QUANT"	   ,nQtdPC          	         ,Nil},;
+                                             {"C7_PRECO"	   ,nVlUnit          	      ,Nil},;
+                                             {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
+                                             {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)     ,Nil},;
+                                             {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
+                                             {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
+                              Else
+                                 _aItemPC :=	{{"C7_ITEM"	   ,cItem	                  ,Nil},;
+                                             {"C7_PRODUTO"  ,"EIC"+AGLWD->WD_DESPESA   ,Nil},;
+                                             {"C7_UM"	      ,SB1->B1_UM		            ,Nil},;   
+                                             {"C7_QUANT"	   ,1             	         ,Nil},;
+                                             {"C7_PRECO"	   ,AGLWD->WD_VALOR_R	      ,Nil},;
+                                             {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
+                                             {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)     ,Nil},;
+                                             {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
+                                             {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
+                              EndIf
+
                               AADD(aItens,_aItemPC)
                               AGLWD->(dbSkip())
                            EndDo
 
                            cItem := SOMA1(cItem)
 
-                           _aItemPC :=	{{"C7_ITEM"	   ,cItem	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,1             	,Nil},;
-                                       {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
-                           
+                           If SWD->WD_DESPESA $ cDespQtd
+
+                                 nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
+                                 nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
+                              
+                                 If nQtdPC == 0
+                                    Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
+                                    Return
+                                 EndIf
+                                 
+                                 _aItemPC :=	{{"C7_ITEM"	   ,cItem	               ,Nil},;
+                                             {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                             {"C7_UM"	      ,SB1->B1_UM	      	   ,Nil},;   
+                                             {"C7_QUANT"	   ,nQtdPC                	,Nil},;
+                                             {"C7_PRECO"	   ,nVlUnit       	      ,Nil},;
+                                             {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                             {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                             {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                             {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
+                           Else
+                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	               ,Nil},;
+                                          {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                          {"C7_UM"	      ,SB1->B1_UM	      	   ,Nil},;   
+                                          {"C7_QUANT"	   ,1                   	,Nil},;
+                                          {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                          {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                          {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                          {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
+                           EndIf  
                            AADD(aItens,_aItemPC)
 
 
@@ -302,7 +344,7 @@ DO CASE
 
                               FErase(cDirArq+cNomArq)
 
-                              ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                              ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao  incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                               Alert(cErro)
                            else
@@ -350,52 +392,52 @@ DO CASE
                   EndIf
                Endif
             Else
-               If !(WD_DESPESA $ cDespFCIF) 
+               If !(SWD->WD_DESPESA $ cDespFCIF) 
                   aArea := SWD->(GetArea())
                   dbSelectArea("SB1")
-                  If SB1->(dbseek(xFilial("SB1")+"EIC"+WD_DESPESA))
-                     If (WD_DESPESA $ cDespImp)
+                  If SB1->(dbseek(xFilial("SB1")+"EIC"+SWD->WD_DESPESA))
+                     If (SWD->WD_DESPESA $ cDespImp)
                         cDeptoEIC := cDptoImp
                      EndIf
                      _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal ( "SYT","YT_X_FILIA",XFILIAL("SYT") + SW6->W6_IMPORT,1 )	,Nil},;
                                  {"C7_EMISSAO" ,dDataBase                                                            ,Nil},; 
-                                 {"C7_FORNECE" ,WD_FORN                                                              ,Nil},;
-                                 {"C7_LOJA"	  ,WD_LOJA	                                                            ,Nil},;
+                                 {"C7_FORNECE" ,SWD->WD_FORN                                                         ,Nil},;
+                                 {"C7_LOJA"	  ,SWD->WD_LOJA                                                         ,Nil},;
                                  {"C7_XDEPART" ,cDeptoEIC	                                                         ,Nil},;
                                  {"C7_COND"	  ,"005"    	                                                         ,Nil},;
                                  {"C7_CONTATO" ,"IMPORTACOES"                                                        ,Nil},;
                                  {"C7_NUMIMP"  ,SW6->W6_PO_NUM                                                       ,Nil},;
                                  {"C7_ORIGEM"  ,"EICPO400"	                                                         ,Nil}}
                      
-                     If WD_DESPESA $ "402|406|421"
+                     If SWD->WD_DESPESA $ cDespQtd
 
                         nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
-                        nVlUnit := Round((WD_VALOR_R / nQtdPC),4)
+                        nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
                      
                         If nQtdPC == 0
                            Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
                            Return
                         EndIf
                      
-                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                    {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                    {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                    {"C7_QUANT"	   ,nQtdPC          	,Nil},;
-                                    {"C7_PRECO"	   ,nVlUnit 	      ,Nil},;
-                                    {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                    {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                    {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                    {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                    {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                    {"C7_QUANT"	   ,nQtdPC          	      ,Nil},;
+                                    {"C7_PRECO"	   ,nVlUnit 	            ,Nil},;
+                                    {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                    {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                    {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                      Else
-                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                    {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                    {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                    {"C7_QUANT"	   ,1             	,Nil},;
-                                    {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                    {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                    {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                    {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                        _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                    {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                    {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                    {"C7_QUANT"	   ,1             	      ,Nil},;
+                                    {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                    {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                    {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                    {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                    {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                      EndIf
 
                      Processa( {|| MsExecAuto( {|v,x,y,z| MATA120(v,x,y,z)},1,_aCabPC,{_aItemPC},3)  }, "Aguarde...", "Gerando pedido de compras...",.F.)
@@ -410,7 +452,7 @@ DO CASE
 
                         FErase(cDirArq+cNomArq)
 
-                        ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                        ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                         Alert("A T E N Ç Ã O !!!"+CRLF+CRLF+"Pedido não gerado"+CRLF+CRLF+cErro)
                   
@@ -428,10 +470,10 @@ DO CASE
                         EndIf
                      EndIf
                   else
-                     alert("Pedido de compra não sera gerado, produto EIC" + WD_DESPESA + " não cadastrado no sistema!")
+                     alert("Pedido de compra não sera gerado, produto EIC" + SWD->WD_DESPESA + " não cadastrado no sistema!")
                   EndIf
                else
-                  aPosFCIF := aScan(aDesFCIF, {|x| Alltrim(x) == WD_DESPESA})
+                  aPosFCIF := aScan(aDesFCIF, {|x| Alltrim(x) == SWD->WD_DESPESA})
 
                   If aPosFCIF <> 0
                      aDel(aDesFCIF,aPosFCIF)
@@ -441,9 +483,9 @@ DO CASE
 
                   cQuery := " SELECT COUNT(DISTINCT(WD_DESPESA)) AS TOT_DESPESA FROM " + RetSqlName("SWD")
                   cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                  cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                  cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                   cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFCIF,"/")
-                  cQuery += " AND WD_DESPESA <> '"+Alltrim(WD_DESPESA)+"' "
+                  cQuery += " AND WD_DESPESA <> '"+Alltrim(SWD->WD_DESPESA)+"' "
                   cQuery += " AND D_E_L_E_T_ = '' "
 
                   If Select("DESFRET") > 0
@@ -456,7 +498,7 @@ DO CASE
                      If DESFRET->TOT_DESPESA == nNumDCIF
                         cQuery := " SELECT WD_DESPESA, WD_FORN, WD_LOJA, WD_VALOR_R, WD_XCC, WD_XOBS, R_E_C_N_O_ FROM " + RetSqlName("SWD")
                         cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                        cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                        cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                         cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFCIF,"/")
                         cQuery += " AND D_E_L_E_T_ = '' "
                         cQuery += " ORDER BY WD_XCC DESC "
@@ -503,7 +545,7 @@ DO CASE
                                           {"C7_QUANT"	   ,1             	         ,Nil},;
                                           {"C7_PRECO"	   ,AGLWD->WD_VALOR_R	      ,Nil},;
                                           {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
-                                          {"C7_XHAWB"    ,Alltrim(WD_HAWB)          ,Nil},;
+                                          {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)     ,Nil},;
                                           {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
                                           {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
                               
@@ -513,15 +555,15 @@ DO CASE
 
                            cItem := SOMA1(cItem)
 
-                           _aItemPC :=	{{"C7_ITEM"	   ,cItem	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,1             	,Nil},;
-                                       {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                           _aItemPC :=	{{"C7_ITEM"	   ,cItem	               ,Nil},;
+                                       {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                       {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                       {"C7_QUANT"	   ,1             	      ,Nil},;
+                                       {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                       {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                       {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                       {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                            
                            AADD(aItens,_aItemPC)
 
@@ -536,7 +578,7 @@ DO CASE
 
                               FErase(cDirArq+cNomArq)
 
-                              ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                              ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                               Alert(cErro)
                            else
@@ -588,10 +630,10 @@ DO CASE
       EndIf
    CASE PARAMIXB == "ALTERA_DESP"
       If lAtvEIC
-         If !(WD_DESPESA $ cNGFrete)
+         If !(SWD->WD_DESPESA $ cNGFrete)
             dbSelectArea("SC7")
             SC7->(dbSetOrder(4))
-            If SC7->(dbSeek(GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1) + PADR("EIC"+WD_DESPESA,TamSX3("C7_PRODUTO")[1]) + WD_XPEDCOM ))
+            If SC7->(dbSeek(GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1) + PADR("EIC"+SWD->WD_DESPESA,TamSX3("C7_PRODUTO")[1]) + SWD->WD_XPEDCOM ))
                _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1)	,Nil},;
                            {"C7_NUM"     ,SC7->C7_NUM                                                    ,Nil},; 
                            {"C7_EMISSAO" ,SC7->C7_EMISSAO                                                ,Nil},; 
@@ -601,34 +643,34 @@ DO CASE
                            {"C7_XDEPART" ,SC7->C7_XDEPART                                                ,Nil},;
                            {"C7_FILENT"  ,SC7->C7_FILENT                                                 ,Nil}}
                            
-               If WD_DESPESA $ "402|406|421"
+               If SWD->WD_DESPESA $ cDespQtd
                
                   nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
-                  nVlUnit := Round((WD_VALOR_R / nQtdPC),4)
+                  nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
                
                   If nQtdPC == 0
                      Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
                      Return
                   EndIf               
                
-                  _aItemPC :=	{{"C7_ITEM"	   ,SC7->C7_ITEM     ,Nil},;
-                              {"C7_PRODUTO"  ,SC7->C7_PRODUTO  ,Nil},;
-                              {"C7_UM"	      ,SC7->C7_UM		   ,Nil},;   
-                              {"C7_QUANT"	   ,nQtdPC   	      ,Nil},;
-                              {"C7_PRECO"	   ,nVlUnit	         ,Nil},;
-                              {"C7_CC"	      ,WD_XCC           ,Nil},;
-                              {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;     
-                              {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                  _aItemPC :=	{{"C7_ITEM"	   ,SC7->C7_ITEM           ,Nil},;
+                              {"C7_PRODUTO"  ,SC7->C7_PRODUTO        ,Nil},;
+                              {"C7_UM"	      ,SC7->C7_UM		         ,Nil},;   
+                              {"C7_QUANT"	   ,nQtdPC   	            ,Nil},;
+                              {"C7_PRECO"	   ,nVlUnit	               ,Nil},;
+                              {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;
+                              {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;     
+                              {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                Else
-                  _aItemPC :=	{{"C7_ITEM"	   ,SC7->C7_ITEM     ,Nil},;
-                              {"C7_PRODUTO"  ,SC7->C7_PRODUTO  ,Nil},;
-                              {"C7_UM"	      ,SC7->C7_UM		   ,Nil},;   
-                              {"C7_QUANT"	   ,SC7->C7_QUANT   	,Nil},;
-                              {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                              {"C7_TOTAL"	   ,WD_VALOR_R	      ,Nil},;
-                              {"C7_CC"	      ,WD_XCC           ,Nil},;
-                              {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;     
-                              {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                  _aItemPC :=	{{"C7_ITEM"	   ,SC7->C7_ITEM           ,Nil},;
+                              {"C7_PRODUTO"  ,SC7->C7_PRODUTO        ,Nil},;
+                              {"C7_UM"	      ,SC7->C7_UM		         ,Nil},;   
+                              {"C7_QUANT"	   ,SC7->C7_QUANT   	      ,Nil},;
+                              {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                              {"C7_TOTAL"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                              {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;
+                              {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;     
+                              {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                EndIf
                                  
                Processa( {|| MSExecAuto( {|a,b,c,d,e| MATA120(a,b,c,d,e)},1,_aCabPC,{_aItemPC},4,.F.)}, "Aguarde...", "Alterando pedido de compras...",.F.)
@@ -641,7 +683,7 @@ DO CASE
 
                   FErase(cDirArq+cNomArq)
 
-                  ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao alterado - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA) + " Pedido: " + Alltrim(WD_XPEDCOM), cErro, "EICDESPESA" )
+                  ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao alterado - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA) + " Pedido: " + Alltrim(SWD->WD_XPEDCOM), cErro, "EICDESPESA" )
 
                   If "já foi atendido" $ cErro  
                      Alert("A T E N Ç Ã O ! ! !" + CRLF+CRLF+"Pedido de Compra " + SC7->C7_NUM + " já foi faturado não é possivel alterar o mesmo"+CRLF+CRLF+"OBSERVAÇÃO:"+CRLF+"A despesa sera alterada mesmo sem alteração do pedido de compra")
@@ -687,52 +729,52 @@ DO CASE
                SW2->(dbSetOrder(1))
                SW2->(dbSeek(xFilial("SW2")+SW6->W6_PO_NUM))
                If SW2->W2_INCOTER <> "CIF"
-                  If !(WD_DESPESA $ cDespFrete) 
+                  If !(SWD->WD_DESPESA $ cDespFrete) 
                      aArea := SWD->(GetArea())
                      dbSelectArea("SB1")
-                     If SB1->(dbseek(xFilial("SB1")+"EIC"+WD_DESPESA))
-                        If (WD_DESPESA $ cDespImp)
+                     If SB1->(dbseek(xFilial("SB1")+"EIC"+SWD->WD_DESPESA))
+                        If (SWD->WD_DESPESA $ cDespImp)
                            cDeptoEIC := cDptoImp
                         EndIf
                         _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal( "SYT","YT_X_FILIA",XFILIAL("SYT") + SW6->W6_IMPORT,1 )	,Nil},;
                                     {"C7_EMISSAO" ,dDataBase                                                            ,Nil},; 
-                                    {"C7_FORNECE" ,WD_FORN                                                              ,Nil},;
-                                    {"C7_LOJA"	  ,WD_LOJA	                                                            ,Nil},;
+                                    {"C7_FORNECE" ,SWD->WD_FORN                                                         ,Nil},;
+                                    {"C7_LOJA"	  ,SWD->WD_LOJA	                                                      ,Nil},;
                                     {"C7_XDEPART" ,cDeptoEIC	                                                         ,Nil},;
                                     {"C7_COND"	  ,"005"    	                                                         ,Nil},;
                                     {"C7_CONTATO" ,"IMPORTACOES"                                                        ,Nil},;
                                     {"C7_NUMIMP"  ,SW6->W6_PO_NUM                                                       ,Nil},;
                                     {"C7_ORIGEM"  ,"EICPO400"	                                                         ,Nil}}
                         
-                        If WD_DESPESA $ "402|406|421"
+                        If SWD->WD_DESPESA $ cDespQtd
 
                            nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
-                           nVlUnit := Round((WD_VALOR_R / nQtdPC),4)
+                           nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
                         
                            If nQtdPC == 0
                               Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
                               Return
                            EndIf
 
-                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,nQtdPC          	,Nil},;
-                                       {"C7_PRECO"	   ,nVlUnit 	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                       {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                       {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                       {"C7_QUANT"	   ,nQtdPC          	      ,Nil},;
+                                       {"C7_PRECO"	   ,nVlUnit 	            ,Nil},;
+                                       {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                       {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                       {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                         Else
-                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,1             	,Nil},;
-                                       {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                       {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                       {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                       {"C7_QUANT"	   ,1             	      ,Nil},;
+                                       {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                       {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                       {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                       {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                         EndIf
                                              
                         
@@ -748,7 +790,7 @@ DO CASE
                            
                            FErase(cDirArq+cNomArq)
 
-                           ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                           ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                            Alert("A T E N Ç Ã O !!!"+CRLF+CRLF+"Pedido não gerado"+CRLF+CRLF+cErro)
                      
@@ -766,10 +808,10 @@ DO CASE
                            EndIf
                         EndIf
                      else
-                        alert("Pedido de compra não sera gerado, produto EIC" + WD_DESPESA + " não cadastrado no sistema!")
+                        alert("Pedido de compra não sera gerado, produto EIC" + SWD->WD_DESPESA + " não cadastrado no sistema!")
                      EndIf
                   else
-                     aPosFrete := aScan(aDesFrete, {|x| Alltrim(x) == WD_DESPESA})
+                     aPosFrete := aScan(aDesFrete, {|x| Alltrim(x) == SWD->WD_DESPESA})
 
                      If aPosFrete <> 0
                         aDel(aDesFrete,aPosFrete)
@@ -779,9 +821,9 @@ DO CASE
 
                      cQuery := " SELECT COUNT(DISTINCT(WD_DESPESA)) AS TOT_DESPESA FROM " + RetSqlName("SWD")
                      cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                     cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                     cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                      cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFrete,"/")
-                     cQuery += " AND WD_DESPESA <> '"+Alltrim(WD_DESPESA)+"' "
+                     cQuery += " AND WD_DESPESA <> '"+Alltrim(SWD->WD_DESPESA)+"' "
                      cQuery += " AND D_E_L_E_T_ = '' "
 
                      If Select("DESFRET") > 0
@@ -794,7 +836,7 @@ DO CASE
                         If DESFRET->TOT_DESPESA == nNumDesp
                            cQuery := " SELECT WD_DESPESA, WD_FORN, WD_LOJA, WD_VALOR_R, WD_XCC, WD_XOBS, R_E_C_N_O_ FROM " + RetSqlName("SWD")
                            cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                           cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                           cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                            cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFrete,"/")
                            cQuery += " AND D_E_L_E_T_ = '' "
                            cQuery += " ORDER BY WD_XCC DESC "
@@ -841,7 +883,7 @@ DO CASE
                                              {"C7_QUANT"	   ,1             	         ,Nil},;
                                              {"C7_PRECO"	   ,AGLWD->WD_VALOR_R	      ,Nil},;
                                              {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
-                                             {"C7_XHAWB"    ,Alltrim(WD_HAWB)          ,Nil},;
+                                             {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)     ,Nil},;
                                              {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
                                              {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
                                  
@@ -851,15 +893,15 @@ DO CASE
 
                               cItem := SOMA1(cItem)
 
-                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	         ,Nil},;
-                                          {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                          {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                          {"C7_QUANT"	   ,1             	,Nil},;
-                                          {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                          {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                          {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                          {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	               ,Nil},;
+                                          {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                          {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                          {"C7_QUANT"	   ,1             	      ,Nil},;
+                                          {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                          {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                          {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                          {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                               
                               AADD(aItens,_aItemPC)
 
@@ -874,7 +916,7 @@ DO CASE
 
                                  FErase(cDirArq+cNomArq)
 
-                                 ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                                 ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                                  Alert(cErro)
                               else
@@ -922,51 +964,51 @@ DO CASE
                      EndIf
                   Endif
                Else
-                  If !(WD_DESPESA $ cDespFCIF) 
+                  If !(SWD->WD_DESPESA $ cDespFCIF) 
                      aArea := SWD->(GetArea())
                      dbSelectArea("SB1")
-                     If SB1->(dbseek(xFilial("SB1")+"EIC"+WD_DESPESA))
-                        If (WD_DESPESA $ cDespImp)
+                     If SB1->(dbseek(xFilial("SB1")+"EIC"+SWD->WD_DESPESA))
+                        If (SWD->WD_DESPESA $ cDespImp)
                            cDeptoEIC := cDptoImp
                         EndIf
                         _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal( "SYT","YT_X_FILIA",XFILIAL("SYT") + SW6->W6_IMPORT,1 )	,Nil},;
                                     {"C7_EMISSAO" ,dDataBase                                                            ,Nil},; 
-                                    {"C7_FORNECE" ,WD_FORN                                                              ,Nil},;
-                                    {"C7_LOJA"	  ,WD_LOJA	                                                            ,Nil},;
+                                    {"C7_FORNECE" ,SWD->WD_FORN                                                         ,Nil},;
+                                    {"C7_LOJA"	  ,SWD->WD_LOJA	                                                      ,Nil},;
                                     {"C7_XDEPART" ,cDeptoEIC	                                                         ,Nil},;
                                     {"C7_COND"	  ,"005"    	                                                         ,Nil},;
                                     {"C7_CONTATO" ,"IMPORTACOES"                                                        ,Nil},;
                                     {"C7_NUMIMP"  ,SW6->W6_PO_NUM                                                       ,Nil},;
                                     {"C7_ORIGEM"  ,"EICPO400"	                                                         ,Nil}}
 
-                        If WD_DESPESA $ "402|406|421"
+                        If SWD->WD_DESPESA $ cDespQtd
 
                            nQtdPC  := (SW6->W6_CONTA20 + SW6->W6_CONTA40 + SW6->W6_CON40HC + SW6->W6_OUTROS)
-                           nVlUnit := Round((WD_VALOR_R / nQtdPC),4)
+                           nVlUnit := Round((SWD->WD_VALOR_R / nQtdPC),4)
                         
                            If nQtdPC == 0
                               Alert("Quantidade de Container não foi preenchido, pedido de compra não sera gerado.")
                               Return
                            EndIf         
-                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,nQtdPC          	,Nil},;
-                                       {"C7_PRECO"	   ,nVlUnit 	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                       {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                       {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                       {"C7_QUANT"	   ,nQtdPC          	      ,Nil},;
+                                       {"C7_PRECO"	   ,nVlUnit 	            ,Nil},;
+                                       {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                       {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                       {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                         Else
-                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	         ,Nil},;
-                                       {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                       {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                       {"C7_QUANT"	   ,1             	,Nil},;
-                                       {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                       {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                       {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                       {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                           _aItemPC :=	{{"C7_ITEM"	   ,"0001"	               ,Nil},;
+                                       {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                       {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                       {"C7_QUANT"	   ,1             	      ,Nil},;
+                                       {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                       {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                       {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                       {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                       {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                         EndIf
                                           
                         Processa( {|| MsExecAuto( {|v,x,y,z| MATA120(v,x,y,z)},1,_aCabPC,{_aItemPC},3)  }, "Aguarde...", "Gerando pedido de compras...",.F.)
@@ -981,7 +1023,7 @@ DO CASE
 
                            FErase(cDirArq+cNomArq)
 
-                           ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                           ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                            Alert("A T E N Ç Ã O !!!"+CRLF+CRLF+"Pedido não gerado"+CRLF+CRLF+cErro)
                      
@@ -999,10 +1041,10 @@ DO CASE
                            EndIf
                         EndIf
                      else
-                        alert("Pedido de compra não sera gerado, produto EIC" + WD_DESPESA + " não cadastrado no sistema!")
+                        alert("Pedido de compra não sera gerado, produto EIC" + SWD->WD_DESPESA + " não cadastrado no sistema!")
                      EndIf
                   else
-                     aPosFCIF := aScan(aDesFCIF, {|x| Alltrim(x) == WD_DESPESA})
+                     aPosFCIF := aScan(aDesFCIF, {|x| Alltrim(x) == SWD->WD_DESPESA})
 
                      If aPosFCIF <> 0
                         aDel(aDesFCIF,aPosFCIF)
@@ -1012,9 +1054,9 @@ DO CASE
 
                      cQuery := " SELECT COUNT(DISTINCT(WD_DESPESA)) AS TOT_DESPESA FROM " + RetSqlName("SWD")
                      cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                     cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                     cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                      cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFCIF,"/")
-                     cQuery += " AND WD_DESPESA <> '"+Alltrim(WD_DESPESA)+"' "
+                     cQuery += " AND WD_DESPESA <> '"+Alltrim(SWD->WD_DESPESA)+"' "
                      cQuery += " AND D_E_L_E_T_ = '' "
 
                      If Select("DESFRET") > 0
@@ -1027,7 +1069,7 @@ DO CASE
                         If DESFRET->TOT_DESPESA == nNumDCIF
                            cQuery := " SELECT WD_DESPESA, WD_FORN, WD_LOJA, WD_VALOR_R, WD_XCC, WD_XOBS, R_E_C_N_O_ FROM " + RetSqlName("SWD")
                            cQuery += " WHERE WD_FILIAL = '"+xFilial("SWD")+"' "
-                           cQuery += " AND WD_HAWB = '"+Alltrim(WD_HAWB)+"' "
+                           cQuery += " AND WD_HAWB = '"+Alltrim(SWD->WD_HAWB)+"' "
                            cQuery += " AND WD_DESPESA IN " + FormatIn(cDespFCIF,"/")
                            cQuery += " AND D_E_L_E_T_ = '' "
                            cQuery += " ORDER BY WD_XCC DESC "
@@ -1074,7 +1116,7 @@ DO CASE
                                              {"C7_QUANT"	   ,1             	         ,Nil},;
                                              {"C7_PRECO"	   ,AGLWD->WD_VALOR_R	      ,Nil},;
                                              {"C7_CC"	      ,AGLWD->WD_XCC             ,Nil},;     
-                                             {"C7_XHAWB"    ,Alltrim(WD_HAWB)          ,Nil},;
+                                             {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)     ,Nil},;
                                              {"C7_NUMIMP"   ,SW6->W6_PO_NUM            ,Nil},;
                                              {"C7_OBS"	   ,AGLWD->WD_XOBS	         ,Nil}}
                                  
@@ -1084,15 +1126,15 @@ DO CASE
 
                               cItem := SOMA1(cItem)
 
-                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	         ,Nil},;
-                                          {"C7_PRODUTO"  ,"EIC"+WD_DESPESA ,Nil},;
-                                          {"C7_UM"	      ,SB1->B1_UM		   ,Nil},;   
-                                          {"C7_QUANT"	   ,1             	,Nil},;
-                                          {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                                          {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                                          {"C7_XHAWB"    ,Alltrim(WD_HAWB) ,Nil},;
-                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM   ,Nil},;
-                                          {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                              _aItemPC :=	{{"C7_ITEM"	   ,cItem	               ,Nil},;
+                                          {"C7_PRODUTO"  ,"EIC"+SWD->WD_DESPESA  ,Nil},;
+                                          {"C7_UM"	      ,SB1->B1_UM		         ,Nil},;   
+                                          {"C7_QUANT"	   ,1             	      ,Nil},;
+                                          {"C7_PRECO"	   ,SWD->WD_VALOR_R	      ,Nil},;
+                                          {"C7_CC"	      ,SWD->WD_XCC            ,Nil},;     
+                                          {"C7_XHAWB"    ,Alltrim(SWD->WD_HAWB)  ,Nil},;
+                                          {"C7_NUMIMP"   ,SW6->W6_PO_NUM         ,Nil},;
+                                          {"C7_OBS"	   ,SWD->WD_XOBS	         ,Nil}}
                               
                               AADD(aItens,_aItemPC)
 
@@ -1107,7 +1149,7 @@ DO CASE
                               
                                  FErase(cDirArq+cNomArq)
 
-                                 ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA), cErro, "EICDESPESA" )
+                                 ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao incluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA), cErro, "EICDESPESA" )
 
                                  Alert(cErro)
                               else
@@ -1162,7 +1204,7 @@ DO CASE
       If lAtvEIC
          dbSelectArea("SC7")
          SC7->(dbSetOrder(1))
-         If SC7->(dbSeek(GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1) + WD_XPEDCOM ))
+         If SC7->(dbSeek(GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1) + SWD->WD_XPEDCOM ))
             cNumPed := SC7->C7_NUM 
             _aCabPC	:=	{{"C7_FILIAL" ,GetAdvFVal("SYT","YT_X_FILIA",XFILIAL("SYT")+SW6->W6_IMPORT,1)	,Nil},;
                         {"C7_NUM"     ,SC7->C7_NUM                                                    ,Nil},; 
@@ -1178,10 +1220,10 @@ DO CASE
                         {"C7_PRODUTO"  ,SC7->C7_PRODUTO  ,Nil},;
                         {"C7_UM"	      ,SC7->C7_UM		   ,Nil},;   
                         {"C7_QUANT"	   ,SC7->C7_QUANT   	,Nil},;
-                        {"C7_PRECO"	   ,WD_VALOR_R	      ,Nil},;
-                        {"C7_TOTAL"	   ,WD_VALOR_R	      ,Nil},;
-                        {"C7_CC"	      ,WD_XCC           ,Nil},;     
-                        {"C7_OBS"	   ,WD_XOBS	         ,Nil}}
+                        {"C7_PRECO"	   ,SWD->WD_VALOR_R	,Nil},;
+                        {"C7_TOTAL"	   ,SWD->WD_VALOR_R	,Nil},;
+                        {"C7_CC"	      ,SWD->WD_XCC      ,Nil},;     
+                        {"C7_OBS"	   ,SWD->WD_XOBS	   ,Nil}}
                               
             Processa( {|| MSExecAuto( {|a,b,c,d,e| MATA120(a,b,c,d,e)},1,_aCabPC,{_aItemPC},5,.F.)}, "Aguarde...", "Excluindo pedido de compras...",.F.)
                
@@ -1193,7 +1235,7 @@ DO CASE
 
                FErase(cDirArq+cNomArq)
 
-               ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao excluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(WD_DESPESA) + " Pedido: " + Alltrim(WD_XPEDCOM), cErro, "EICDESPESA" )
+               ProcLogAtu("ERRO","EICDI500 - Pedido de compra nao excluido - Processo: " + Alltrim(SW6->W6_HAWB) + " Despesa: " + Alltrim(SWD->WD_DESPESA) + " Pedido: " + Alltrim(SWD->WD_XPEDCOM), cErro, "EICDESPESA" )
 
                If "já foi movimentado" $ cErro  
                   Alert("A T E N Ç Ã O ! ! !" + CRLF+CRLF+"Pedido de Compra " + SC7->C7_NUM + " já foi faturado não é possivel excluir o mesmo"+CRLF+CRLF+"OBSERVAÇÃO:"+CRLF+"A despesa sera excluida mesmo sem a exclusão do pedido de compra")
