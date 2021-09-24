@@ -10,6 +10,8 @@ User Function EICPO400
 	Local _cQryEST := ""    
 	Local cQuery   := ""
 	Local x, y 	   := 0
+	Local aItemPO  := {}
+	Local lPriCom  := .F.
 	Local cDeptoSC := SuperGetMV("ES_DEPTOSC",.F.,"000000025")
 
 	Begin Sequence    
@@ -41,20 +43,6 @@ User Function EICPO400
 					
 					ApMsgStop("Por favor informar o departamento no cabeçalho da SC", "EICPO400_RDM" )        
 					
-					/* war 10-02-2020				
-					PswSeek(__cUserId)
-	   				_aUser := PswRet()
-				
-					If Empty(_aUser[1][22])
-	   					ApMsgStop("Por favor solicitar ao TI que cadastre a sua matrícula no seu login!", "EICPO400_RDM" )
-						lGravaPO := .F. 
-					Else
-						If Empty(ALLTRIM(SRA->RA_DEPTO))
-							ApMsgStop("Por favor solicitar ao RH que cadastre o seu departamento no cadastro de funcionários!", "EICPO400_RDM" )
-							lGravaPO := .F.	
-						EndIf
-					EndIf
-				war 10-02-2020 */
 				EndIf
         		       	
         	// Gravar departamento no Pedido de Importação - Claudino 17/12/13.
@@ -91,40 +79,6 @@ User Function EICPO400
 				Else
 			
 					ApMsgStop("Por favor na proxima SC que lançar, informar o departamento no cabeçalho da SC", "EICPO400_RDM" )        
-/* war 10-02-2020				
-					PswSeek(__cUserId)
-   					_aUser := PswRet()
-			
-					If Empty(_aUser[1][22])
-   						ApMsgStop("Por favor solicitar ao TI que cadastre a sua matrícula no seu login!", "EICPO400_RDM" )
-					Else
-     					
-     					If !Empty(ALLTRIM(SRA->RA_DEPTO))
-					
-							_cNumPC := SC1->C1_PEDIDO
-							Dbselectarea("SC7")
-							SC7->(dbGoTop())
-							SC7->(dbSetOrder(1))
-							If SC7->(dbSeek(xFilial("SC7")+_cNumPC))
-								While !SC7->(Eof()) .And. _cNumPC == SC7->C7_NUM
-									RecLock("SC7",.F.)
-										SC7->C7_XDEPART := SRA->RA_DEPTO
-									MsUnlock("SC7")
-									
-									If SC7->C7_CONAPRO == "B"
-										_lRegAlt := .T.
-									EndIf
-									
-									SC7->(DbSkip())
-								EndDo
-							EndIf
-
-    					Else      				
-       						ApMsgStop("Por favor solicitar ao RH que cadastre o seu departamento no cadastro de funcionários!", "EICPO400_RDM" )
-       					EndIf
-					
-					EndIf
-				war 10-02-2020. */
 					Dbselectarea("SC7")
 					SC7->(dbGoTop())
 					SC7->(dbSetOrder(1))
@@ -197,7 +151,7 @@ User Function EICPO400
 					EndIf
    				EndIf
 			Case cParam == "APOS_CONFERENCIAFINAL"
-				cQuery := " SELECT W3_COD_I FROM " + RetSqlName("SW3")
+				cQuery := " SELECT W3_COD_I, W3_SI_NUM FROM " + RetSqlName("SW3")
 				cQuery += " WHERE D_E_L_E_T_ = '' "
 				cQuery += " AND W3_PO_NUM = '"+SW2->W2_PO_NUM+"' "
 
@@ -221,14 +175,20 @@ User Function EICPO400
 					DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"D1TMP",.F.,.T. )
 
 					If D1TMP->QUANTIDADE == 0
-						RecLock("SW2",.F.)
-						SW2->W2_X1COMP := "S"
-						SW2->(MsUnlock())
-						Exit
+						lPriCom := .T.
+						AADD(aItemPO,{SW2->W2_PO_NUM,SW2->W2_FORN,W3TMP->W3_COD_I,W3TMP->W3_SI_NUM})
 					EndIf 
 
 					W3TMP->(dbSkip())
 				EndDo
+
+				If lPriCom
+					RecLock("SW2",.F.)
+					SW2->W2_X1COMP := "S"
+					SW2->(MsUnlock())
+					U_MAILSOP(aItemPO)
+					MsgInfo("ALERTA DE PRIMEIRA COMPRA: Favor confirmar o prazo de entrega no CD com o departamento de S&OP")
+				EndIF
 
 				cQuery := " SELECT SUM(W3_XCUBAGE) AS CUBAGEM FROM " + RetSqlName("SW3") 
 				cQuery += " WHERE D_E_L_E_T_ = '' "
