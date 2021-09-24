@@ -54,6 +54,7 @@ cQry += " 				AND SC6.D_E_L_E_T_ = '' "
 cQry += " 		INNER JOIN " + RetSqlName("SB1") + " SB1 "
 cQry += " 			ON SB1.B1_COD = SC6.C6_PRODUTO "
 cQry += " 			AND SB1.B1_GRUPO IN " +Formatin(cGrpSol,"|")
+cQry += " 			AND SB1.D_E_L_E_T_ = '' "
 cQry += " WHERE  DAI_FILIAL = '"+xFilial("DAI")+"' "
 cQry += "        AND DAI_COD = '"+cCarga+"' "
 cQry += "        AND DAI.D_E_L_E_T_ = '' "
@@ -114,23 +115,20 @@ Return
 Static Function ValidA(aList, oBrw,nLin, nCol)
 **********************************************    
 
-Local lok := .F.
-Local nCont 
-Local nDig
+Local lok  := .F.
+Local nDig := 0
 
 While .T. .And. nCol == 2 
         lEditCell(@aList,oBrw,"@E 999999",nCol)  
         nDig := aList[nLin,nCol]
-        nCont := aList[nLin,2] 
-        
-         If nDig > nCont 
-         	MsgAlert("Quantidade inválida!")
+               
+        If nDig <= 0 
+            MsgAlert("Quantidade inválida!")
             lOk := .F.
-         Else
-         	lOk := .T.
-         EndIf          
-        	
-                
+        Else
+            lOk := .T.
+        EndIf          
+        	                
         If lOk == .T.
            Exit
         EndIf
