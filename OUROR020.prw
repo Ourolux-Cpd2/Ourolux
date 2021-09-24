@@ -51,45 +51,48 @@ Static Function ReportDef()
     oSection:=TRSection():New(oReport,"OUROR020 - Lead Time Import ",{"SB1"})
     oSection:SetTotalInLine(.T.) 
 
-    TRCell():New(oSection ,"FORNE"     	,,"Fornecedor"		                    ,		  ,10,,,"LEFT"  ,,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"NUMSC"     	,,"Sol.Compra"	                        ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"NUMPC"     	,,"Ped.Compra"	                        ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"NUMDESEMB" 	,,"Desembaraco" 	                    ,		  ,18,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"NUMNF"     	,,"N.Fiscal"		                    ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"PORDEST"  	,,"Porto Destino"                       ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection ,"FILCD"  	,,"Filial/CD"                           ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    If MV_PAR22 == 2
-        TRCell():New(oSection ,"DTEMSC"   	,,"Dt. Emis.SC"    	                ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTAPRSC"   	,,"Dt. Aprovacao SC"                ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTENVAR"   	,,"Dt. Envio Arte"                  ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMIPO"   	,,"Dt. Emissao PO"                  ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTLIMSC"   	,,"Dt. Limite Compra SC"            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTLIB02"   	,,"Dt. Lib.N2"    	                ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTSINAL"   	,,"Dt. Pgto.Sinal"  	            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"PSIREAL"   	,,"Dt. PSI. Realizado"              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"PSIAPR"   	,,"Dt. PSI. Aprovado"  	            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMBAR"   	,,"Dt. Embarque"  	                ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTPORTO"   	,,"Dt. Atracação"                   ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTDESEMB"  	,,"Dt. Desembaraco"	                ,		  ,14,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMINF"   	,,"Dt. Nota Fiscal"	 	            ,		  ,19,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTENTSC"   	,,"Dt. Entrega (META)"              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-    EndIf
-    TRCell():New(oSection ,"EMSCAPSC"  	,,"Emissão SC x Aprovação SC"           ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"EMPCAPSC"  	,,"Aprovação SC x Emissão PC"           ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"PCXLIM" 	,,"Emissao PC x Limite Compra"          ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"PCN2" 	    ,,"PC x N2"	   	   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"N2SINAL" 	,,"N2 x Sinal"	   	   	                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"SINPSIR" 	,,"Sinal x PSI R (PRODUÇÃO)"            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"PSIRPSIA" 	,,"PSI R x PSI A (QUALIDADE)"           ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"PSIAEMB" 	,,"PSI A x Embarque"	   	   	        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"MAR"   	   	,,"Embarque x Atracação(Mar)"           ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"DESEMB"    	,,"Atracação x NF(Porto)"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"1COMPRA" 	,,"1ª Compra"   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"PREVISTO"  	,,"Previsto"		                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"REALIZADO" 	,,"Realizado (N2xNF) OTD"	            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"DIFERENCA"  ,,"Diferenca"		                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"SCNF" 	    ,,"Emissao SC x NF"                     ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection ,"METAXNF" 	,,"Dt. Entrega (META) x NF"	            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"NUMSC"     	,,"Sol.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"NUMPC"     	,,"Ped.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"FORNE"     	,,"Fornecedor"		                        ,		  ,10,,,"LEFT"  ,,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"NUMDESEMB" 	,,"Desembaraco" 	                        ,		  ,18,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"NUMNF"     	,,"N.Fiscal"		                        ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"PORDEST"  	,,"Porto Destino"                           ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"FILCD"  	,,"Filial/CD"                               ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    If MV_PAR22 == 2    
+        TRCell():New(oSection ,"DTEMSC"   	,,"Emissao SC"    	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTAPRSC"   	,,"Aprova SC"                               ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTENVAR"   	,,"Envio Arte"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTAPRAR"   	,,"Aprova Arte"                             ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTEMIPO"   	,,"Emissao PO"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTLIMSC"   	,,"Limite Compra SC"                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTLIB02"   	,,"Lib.N2"    	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTSINAL"   	,,"Pgto.Sinal"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"PSIREAL"   	,,"PSI. Realizado"                          ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"PSIAPR"   	,,"PSI. Aprovado"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTEMBAR"   	,,"Embarque"  	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTPORTO"   	,,"Atracação"                               ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTDESEMB"  	,,"Desembaraco"	                            ,		  ,14,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTEMINF"   	,,"Nota Fiscal"	 	                        ,		  ,19,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTENTSC"   	,,"Entrega (META)"                          ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+    EndIf   
+    TRCell():New(oSection     ,"EMSCAPSC"  	,,"Emissao SC x Aprova SC"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"ENVXAPR"  	,,"Envio Arte x Aprova Arte"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"EMPCAPSC"  	,,"Aprova SC x Emissao PO"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"ARTEMPC"  	,,"Aprova Arte x Emissao PO"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PCXLIM" 	,,"Emissao PO x Limite Compra"              ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PCN2" 	    ,,"PC x N2"	   	   	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"N2SINAL" 	,,"N2 x Sinal"	   	   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"SINPSIR" 	,,"Sinal x PSI R (PRODUÇÃO)"                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PSIRPSIA" 	,,"PSI R x PSI A (QUALIDADE)"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PSIAEMB" 	,,"PSI A x Embarque"	   	   	            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"MAR"   	   	,,"Embarque x Atracação(Mar)"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"DESEMB"    	,,"Atracação x NF(Porto)"                   ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"1COMPRA" 	,,"1ª Compra"   	                        ,"@N"     ,01,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PREVISTO"  	,,"Previsto OTD"	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"REALIZADO" 	,,"Realizado OTD (N2 x NF)"	                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"DIFERENCA"  ,,"Diferenca OTD"		                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"SCNF" 	    ,,"Realizado (SC x NF)"                     ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"METAXNF" 	,,"Diferenca (META x NF)"	                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
 
     TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",,"PROCESSOS ELEGIVEIS:"  ,,{|| nTotProc 	},.F.,.T.,.F.)
     TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",,"DENTRO DA META:"		,,{|| nDenMet 	},.F.,.T.,.F.)
@@ -391,6 +394,7 @@ Static Function PrintReport(oReport,oSection)
             oSection:Cell("DTEMSC"):SetValue(SubStr(Dtos(dt_EmSC),7,2) + "/" + SubStr(Dtos(dt_EmSC),5,2) + "/" + SubStr(Dtos(dt_EmSC),3,2) )
             oSection:Cell("DTAPRSC"):SetValue(STOD(aDataNew[1][2]))
             oSection:Cell("DTENVAR"):SetValue(STOD(aDataNew[1][5]))
+            oSection:Cell("DTAPRAR"):SetValue(STOD(aDataNew[1][6]))
             oSection:Cell("DTEMIPO"):SetValue(STOD(aDataNew[1][1]))
             oSection:Cell("DTLIMSC"):SetValue(STOD(aDataNew[1][4]))
             oSection:Cell("DTLIB02"):SetValue(SubStr(Dtos(dDtLib2),7,2) + "/" + SubStr(Dtos(dDtLib2),5,2) + "/" + SubStr(Dtos(dDtLib2),3,2) )
@@ -421,11 +425,19 @@ Static Function PrintReport(oReport,oSection)
         EndIf
 
         IF !Empty(dDtLib2) .AND. !Empty(dt_Sin)
-            nN2xSIN := DateDiffDay(dDtLib2,dt_Sin)
+            If dt_Sin < dDtLib2
+                nN2xSIN := (DateDiffDay(dDtLib2,dt_Sin) * -1)
+            else
+                nN2xSIN := DateDiffDay(dDtLib2,dt_Sin)
+            EndIf
         EndIf
 
         IF !Empty(dt_Sin) .AND. !Empty(Wdt_PSIR)
-            nSINxPSR := DateDiffDay(dt_Sin,Wdt_PSIR)
+            If dt_Sin > Wdt_PSIR
+                nSINxPSR := (DateDiffDay(dt_Sin,Wdt_PSIR) * -1)
+            else
+                nSINxPSR := DateDiffDay(dt_Sin,Wdt_PSIR)
+            EndIf
         EndIf
 
         IF !Empty(Wdt_PSIR) .AND. !Empty(Wdt_PSIA)
@@ -455,7 +467,7 @@ Static Function PrintReport(oReport,oSection)
             Else
                 nSCxNF := 0
             EndIf
-        EndIf
+        EndIf'
 
         aRetW2	:= W2LEAD(SCPCNF->WN_PO_NUM,dDtLib2)
         
@@ -463,16 +475,20 @@ Static Function PrintReport(oReport,oSection)
 		cPorto	 := Alltrim(aRetW2[2])
 
         If MV_PAR21 == 1
-            n1Compra := Busca1C(SCPCNF->WN_PO_NUM)
+            n1Compra := Busca1C(SCPCNF->WN_PO_NUM) 
         Else
             n1Compra := Busca1C(SCPCNF->C7_PO_EIC)
         EndIf
 
-        oSection:Cell("1COMPRA"):SetValue(n1Compra)
+        If !Empty(aDataNew[1][3]) .AND. !Empty(aDataNew[1][4])
+            nLeadPre := (STOD(aDataNew[1][3]) - (STOD(aDataNew[1][4]) + 5))
+        EndIf
+
+        oSection:Cell("1COMPRA"):SetValue(Iif(n1Compra == 0,"N","S"))
 		oSection:Cell("PORDEST"):SetValue(cPorto)
         oSection:Cell("PREVISTO"):SetValue(nLeadPre)
         oSection:Cell("REALIZADO"):SetValue(nN2xNF)
-        oSection:Cell("DIFERENCA"):SetValue(nN2xNF - n1Compra - nLeadPre)
+        oSection:Cell("DIFERENCA"):SetValue(nN2xNF - nLeadPre)
         oSection:Cell("SCNF"):SetValue(nSCxNF)
         
         IF !Empty(dt_EmSC) .and. !Empty(aDataNew[1][2])
@@ -488,26 +504,39 @@ Static Function PrintReport(oReport,oSection)
         EndIf
         
         If !Empty(aDataNew[1][3]) .AND. !Empty(wdt_NF)
-            oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF))
+            If wdt_NF < STOD(aDataNew[1][3])
+                oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF) * -1)
+            else
+                oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF))
+            EndIf
         else
             oSection:Cell("METAXNF"):SetValue(0)
         EndIf
 
-        //If !Empty(aDataNew[1][5]) .AND. !Empty(dDtLib2)
-        //    oSection:Cell("ESPXN2"):SetValue(DateDiffDay(STOD(aDatanew[1][5]),dDtLib2))
-        //else
-        //     oSection:Cell("ESPXN2"):SetValue(0)
-        //EndIf
+        If !Empty(aDataNew[1][6]) .AND. !Empty(aDataNew[1][1])
+            If STOD(aDatanew[1][6]) > STOD(aDatanew[1][1])
+                oSection:Cell("ARTEMPC"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][6])) * -1)
+            Else
+                oSection:Cell("ARTEMPC"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][6])))
+            EndIf
+        else
+             oSection:Cell("ARTEMPC"):SetValue(0)
+        EndIf
 
-        //If !Empty(Wdt_PSIR) .AND. !Empty(aDataNew[1][5])
-        //    oSection:Cell("PSRXESP"):SetValue(DateDiffDay(Wdt_PSIR,STOD(aDataNew[1][5])))
-        //else
-        //    oSection:Cell("PSRXESP"):SetValue(0)
-        //EndIf
+        If !Empty(aDataNew[1][5]) .AND. !Empty(aDataNew[1][6])
+            If STOD(aDatanew[1][5]) > STOD(aDatanew[1][6])
+                oSection:Cell("ENVXAPR"):SetValue(DateDiffDay(STOD(aDatanew[1][5]),STOD(aDatanew[1][6])) * -1)
+            Else
+                oSection:Cell("ENVXAPR"):SetValue(DateDiffDay(STOD(aDatanew[1][5]),STOD(aDatanew[1][6])))
+            EndIf
+        else
+             oSection:Cell("ENVXAPR"):SetValue(0)
+        EndIf
+
 
         If !Empty(aDataNew[1][1]) .AND. !Empty(aDataNew[1][4])
             If STOD(aDatanew[1][4]) > STOD(aDatanew[1][1])
-                oSection:Cell("PCXLIM"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][4])) * - DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][4])))
+                oSection:Cell("PCXLIM"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][4])) * -1)
             Else
                 oSection:Cell("PCXLIM"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][4])))
             EndIf
@@ -517,7 +546,7 @@ Static Function PrintReport(oReport,oSection)
 
         nTotProc++
 
-        If (nN2xNF - n1Compra - nLeadPre) > 0
+        If (nN2xNF - nLeadPre) > 0
             nForMet++
         Else
             nDenMet++
@@ -576,7 +605,7 @@ Static Function BusNewDt()
 	    cQry += " AND C1_NUM = '"+SCPCNF->C1_NUM+"' "
 	    cQry += " AND D_E_L_E_T_ = '' "
 
-        cQuery := " SELECT W2_PO_DT, W2_XENVART FROM " + RetSqlName("SW2")
+        cQuery := " SELECT W2_PO_DT, W2_XENVART, W2_XAPRART FROM " + RetSqlName("SW2")
         cQuery += " WHERE W2_PO_NUM = '"+Alltrim(SCPCNF->C7_PO_EIC)+"' "
         cQuery += " AND W2_FORN = '"+SCPCNF->C7_FORNECE+"' "
         cQuery += " AND D_E_L_E_T_ = '' "
@@ -603,9 +632,9 @@ Static Function BusNewDt()
     EndIF
     
     If nOpQry == 1
-        aAdd(aResult,{"", C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, ""})
+        aAdd(aResult,{"", C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, "", ""})
     ElseIf nOpQry == 2
-        aAdd(aResult,{W2DT->W2_PO_DT, C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, W2DT->W2_XENVART})
+        aAdd(aResult,{W2DT->W2_PO_DT, C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, W2DT->W2_XENVART, W2DT->W2_XAPRART})
     EndIf
 
 Return aResult
