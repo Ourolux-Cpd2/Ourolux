@@ -62,7 +62,8 @@ Local cQuery   := ""
 cQuery := " SELECT SB2.B2_COD COD , SB1.B1_DESC DESCRI, "
 cQuery += " 	   SB2.B2_QATU QATU , SB2.B2_RESERVA RESERVA , "
 cQuery += "		   SB2.B2_QPEDVEN QPEDVEN , SB2.B2_QEMP QEMP, "
-cQuery += "		   SB2.B2_QEMPN QEMPNF , SB2.B2_QNPT PODER3 "  
+cQuery += "		   SB2.B2_QEMPN QEMPNF , SB2.B2_QNPT PODER3, "
+cQuery += " 	   SB2.B2_QACLASS AS QCLAS	"  
 cQuery += " FROM " +RetSqlName("SB2")+ " SB2 " 
 cQuery += " INNER JOIN " +RetSqlName("SB1")+ " SB1"
 cQuery += " ON SB1.B1_COD = SB2.B2_COD "    
@@ -71,7 +72,7 @@ cQuery += "		AND SB2.B2_FILIAL =  '" +cFilAnt+ "' "
 cQuery += "		AND SB2.D_E_L_E_T_= ' ' AND SB2.B2_COD >= '" +MV_PAR01+ "' AND SB1.B1_COD <= '" +MV_PAR02+ "' "   
 cQuery += " 	AND SB1.B1_DESC NOT LIKE '%XXXX%' "
 cQuery += " 	AND SB1.B1_MSBLQL <> '1' "
-cQuery += "	GROUP BY SB2.B2_COD , SB1.B1_DESC , SB2.B2_QATU , SB2.B2_RESERVA , SB2.B2_QPEDVEN , SB2.B2_QEMP , SB2.B2_QEMPN , SB2.B2_QNPT "
+cQuery += "	GROUP BY SB2.B2_COD , SB1.B1_DESC , SB2.B2_QATU , SB2.B2_RESERVA , SB2.B2_QPEDVEN , SB2.B2_QEMP , SB2.B2_QEMPN , SB2.B2_QNPT, SB2.B2_QACLASS "
 cQuery += " ORDER BY COD "
                                          
 //MEMOWRITE("E:\QUERYTESTE.SQL",cQuery)
@@ -89,9 +90,9 @@ While !Eof()
 	oSection:Cell("DESCPROD"):SetValue((cAlias)->DESCRI)
 	
 	//nSaldAtu := (cAlias)->QATU-(cAlias)->QEMP-(cAlias)->QEMPNF-(cAlias)->PODER3
-	nSaldAtu := (cAlias)->QATU-(cAlias)->RESERVA-(cAlias)->QPEDVEN-(cAlias)->QEMP-(cAlias)->QEMPNF-(cAlias)->PODER3
+	nSaldAtu := (cAlias)->QATU-(cAlias)->RESERVA-(cAlias)->QPEDVEN-(cAlias)->QEMP-(cAlias)->QEMPNF-(cAlias)->PODER3-(cAlias)->QCLAS
 		
-	nSaldFim := If(nSaldAtu > 5000,5000,nSaldAtu)
+	nSaldFim := If(nSaldAtu > 50000,50000,nSaldAtu)
 	
 	oSection:Cell("SALDATU" ):SetValue(nSaldFim) 
 	
