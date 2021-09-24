@@ -43,6 +43,9 @@ Static Function OUROR25()
     Local cPorPO        := ""
     Local cCabec        := ""
     Local nContPO       := 0
+    Local aPoLista      := {}
+    Local lImp          := .T.
+    Local nPos          := 0
     Private cCaminho    := ""
     Private aParam      := {}
 
@@ -173,7 +176,6 @@ Static Function OUROR25()
                 oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
                 nTotPes := 0
-                //lLinha := !lLinha
                 cSCAtu := aLinha[nlx][1]
             EndIf
         ElseIf lFilFor
@@ -183,7 +185,6 @@ Static Function OUROR25()
                 oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
                 nTotPes := 0
-                //lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
             EndIf
         ElseIf lFilPor
@@ -193,7 +194,6 @@ Static Function OUROR25()
                 oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
                 nTotPes := 0
-                //lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
                 cPorOAtu := aLinha[nlx][6]
                 cPorDAtu := aLinha[nlx][7]
@@ -205,7 +205,6 @@ Static Function OUROR25()
                 oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
                 nTotPes := 0
-                //lLinha := !lLinha
                 cPorETA := aLinha[nlx][8]
             EndIf
         ElseIf lFilPO
@@ -215,7 +214,6 @@ Static Function OUROR25()
                 oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
                 nTotPes := 0
-                //lLinha := !lLinha
                 cPorPO := aLinha[nlx][3]
                 nContPO := 1 
             Else 
@@ -223,16 +221,19 @@ Static Function OUROR25()
             EndIf
         EndIf
 
-        //If lLinha
-        //    cCor := cCor1   
-        //else
-        //    cCor := cCor2
-        //endIf
-        
         oFWMsExcel:SetCelBold(.F.)
         oFWMsExcel:SetCelBgColor(cCor1)
-        
-        If lFilPO .and. nContPO <> 1
+
+        nPos := aScan(aPoLista ,{|x| AllTrim(x) == Alltrim(aLinha[nlx][3])})
+
+        If nPos > 0
+            lImp := .F.
+        else
+            lImp := .T.
+            AADD(aPoLista,Alltrim(aLinha[nlx][3]))
+        EndIf
+
+        If !lImp
             oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],,},{1,2,3,4,5,6,7,8,9,10} )
         else
             oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],aLinha[nlx][9],aLinha[nlx][10]},{1,2,3,4,5,6,7,8,9,10} )
@@ -249,13 +250,6 @@ Static Function OUROR25()
             oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
             nTotFil := 0
             nTotPes := 0
-            //lLinha := !lLinha
-            
-            //If lLinha
-            //    cCor := cCor1   
-            //else
-            //    cCor := cCor2
-            //endIf
             
             oFWMsExcel:SetCelBgColor("#4f81bd") 
             oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,"TOTAL GERAL",,,,nTotGer,nPesGer},{1,2,3,4,5,6,7,8,9,10} )
@@ -266,10 +260,6 @@ Static Function OUROR25()
 
     oFWMsExcel:Activate()
     oFWMsExcel:GetXMLFile(cCaminho + cNome)
-    //oExcel := MsExcel():New()
-    //oExcel:WorkBooks:Open(cCaminho + cNome)
-    //oExcel:SetVisible(.T.)
-    //oExcel:Destroy()
     shellExecute( "Open", cCaminho + cNome, "", "", 1 )
     msgalert("Planilha Gerada em: "+(cCaminho + cNome))  
 
