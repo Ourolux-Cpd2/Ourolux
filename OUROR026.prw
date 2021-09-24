@@ -32,36 +32,57 @@ Static Function OUROR26()
         Return(.T.)
     EndIf
 
-    cQuery := " SELECT 	SG1.G1_COD AS PRODUTO, "
-    cQuery += " 		SG1.G1_COMP AS COMPONENTE, "
-    cQuery += " 		SG1.G1_QUANT AS QUANTIDADE, "
-    cQuery += "         SB2.B2_CM1 AS CUSTO_UNIT, "
-    cQuery += " 		(SG1.G1_QUANT * SB2.B2_CM1) AS CUSTO "
-    cQuery += " FROM "
-    cQuery += " 	( "
-    cQuery += " 		SELECT * FROM " + RetSqlName("SG1")
-    cQuery += " 		WHERE G1_COD BETWEEN '"+aParam[1]+"' AND '"+aParam[2]+"' "
-    cQuery += " 		AND G1_INI <= '"+DTOS(dDataBase)+"' "
-    cQuery += " 		AND G1_FIM >= '"+DTOS(dDataBase)+"' "
-    cQuery += " 		AND D_E_L_E_T_ = '' "
-    cQuery += " 	) SG1 "
-    cQuery += " LEFT JOIN " + RetSqlName("SB2") + " SB2 "
-    cQuery += " 	ON SB2.B2_COD = SG1.G1_COMP "
-    cQuery += " 	AND SB2.B2_FILIAL = '"+xFilial("SB2")+"' "
-    cQuery += " 	AND SB2.B2_LOCAL = '01' "
-    cQuery += " 	AND SB2.D_E_L_E_T_ = '' "
-    cQuery += " ORDER BY G1_COD, G1_COMP "
-    
-    If Select("RELX") > 0
-        RELX->(dbCloseArea())
+    cQuery := " SELECT G1_COD,G1_COMP FROM " + RetSqlName("SG1")
+    cQuery += " WHERE G1_COD BETWEEN '"+aParam[1]+"' AND '"+aParam[2]+"' "
+    cQuery += " AND G1_INI <= '"+DTOS(dDataBase)+"' "
+    cQuery += " AND G1_FIM >= '"+DTOS(dDataBase)+"' "
+    cQuery += " AND D_E_L_E_T_ = ''
+    cQuery += " ORDER  BY G1_COD,G1_COMP "
+
+    If Select("ESTX") > 0
+        ESTX->(dbCloseArea())
     EndIf
 
-    DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'RELX', .T., .F.)
+    DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'ESTX', .T., .F.)
 
-    
-    While RELX->(!EOF())
-        AADD(aLinha,{Alltrim(RELX->PRODUTO),Alltrim(RELX->COMPONENTE),RELX->QUANTIDADE,Round(RELX->CUSTO,4),Round(RELX->CUSTO_UNIT,4)})
-        RELX->(dbSkip())
+    While ESTX->(!EOF())
+        cQuery := " 	SELECT SG1.G1_COD                    AS PRODUTO, "
+	    cQuery += " 		   SG1.G1_COMP                   AS COMPONENTE, "
+	    cQuery += " 		   SG1.G1_QUANT                  AS QUANTIDADE, "
+	    cQuery += " 		   SB9.B9_CM1                    AS CUSTO_UNIT, "
+	    cQuery += " 		   ( SG1.G1_QUANT * SB9.B9_CM1 ) AS CUSTO "
+	    cQuery += " 	FROM   (SELECT * "
+	    cQuery += " 			FROM   " + RetSqlName("SG1")
+	    cQuery += " 			WHERE  G1_COD = '"+ESTX->G1_COD+"' "
+	    cQuery += " 				AND G1_COMP = '"+ESTX->G1_COMP+"' "
+	    cQuery += " 				AND G1_INI <= '"+DTOS(dDataBase)+"' "
+	    cQuery += " 				AND G1_FIM >= '"+DTOS(dDataBase)+"' "
+	    cQuery += " 				AND D_E_L_E_T_ = '') SG1
+	    cQuery += " 		   LEFT JOIN " + RetSqlName("SB9") + " SB9 "
+	    cQuery += " 				  ON SB9.B9_COD = SG1.G1_COMP
+	    cQuery += " 					 AND SB9.B9_DATA = (SELECT MAX(B9_DATA) FROM " + RetSqlName("SB9")
+	    cQuery += " 										WHERE B9_COD = '"+ESTX->G1_COMP+"' "
+	    cQuery += " 										AND B9_FILIAL = '"+xFilial("SB9")+"' "
+	    cQuery += " 										AND B9_LOCAL = '01'
+	    cQuery += " 										AND D_E_L_E_T_ = '')
+	    cQuery += " 					 AND SB9.B9_FILIAL = '01'
+	    cQuery += " 					 AND SB9.B9_LOCAL = '01'
+	    cQuery += " 					 AND SB9.D_E_L_E_T_ = ''
+	    cQuery += " 	ORDER  BY G1_COD,
+	    cQuery += " 			  G1_COMP "
+
+        If Select("RELX") > 0
+            RELX->(dbCloseArea())
+        EndIf
+
+        DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'RELX', .T., .F.)
+
+        If RELX->(!EOF())
+            AADD(aLinha,{Alltrim(RELX->PRODUTO),Alltrim(RELX->COMPONENTE),RELX->QUANTIDADE,Round(RELX->CUSTO,4),Round(RELX->CUSTO_UNIT,4)})
+        EndIf
+        
+        ESTX->(dbSkip())
+
     EndDo
 
     If Empty(aLinha)
@@ -127,9 +148,9 @@ Static Function OUROR26()
 
     oFWMsExcel:Activate()
     oFWMsExcel:GetXMLFile(cCaminho + cNome)
-    oExcel := MsExcel():New()
-    oExcel:WorkBooks:Open(cCaminho + cNome)
-    oExcel:SetVisible(.T.)
+    //oExcel := MsExcel():New()
+    //oExcel:WorkBooks:Open(cCaminho + cNome)
+    //oExcel:SetVisible(.T.)
     shellExecute( "Open", cCaminho + cNome, "", "", 1 )
     msgalert("Planilha Gerada em: "+(cCaminho + cNome))  
 
