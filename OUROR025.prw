@@ -22,22 +22,27 @@ Static Function OUROR25()
     Local nlx           := 0
     Local cCor1         := "#F0F8FF"
     Local cCor2         := "#87CEFA"
-    Local cCor          := ""
+    //Local cCor          := ""
     Local cHora		    := Time()
     Local cNome		    := 'Relatorio_Frete_Internacional'+ DtoS(dDataBase)+ '_' + SubStr(cHora,1,2) + SubStr(cHora,4,2) + '.xls'
-    Local lLinha        := .T.
+    //Local lLinha        := .T.
     Local nTotFil       := 0
+    Local nTotPes       := 0
     Local nTotGer       := 0
+    Local nPesGer       := 0
     Local lFilSC        := .F.
     Local lFilFor       := .F.
     Local lFilPor       := .F.
     Local lFilETA       := .F.
+    Local lFilPO        := .F.
     Local cSCAtu        := ""
     Local cForAtu       := ""
     Local cPorOAtu      := ""
     Local cPorDAtu      := ""
     Local cPorETA       := ""
+    Local cPorPO        := ""
     Local cCabec        := ""
+    Local nContPO       := 0
     Private cCaminho    := ""
     Private aParam      := {}
 
@@ -55,7 +60,8 @@ Static Function OUROR25()
     cQuery += "        SW2.W2_ORIGEM, "
     cQuery += " 	   SW2.W2_DEST, "
     cQuery += "        SW2.W2_MT3, "
-    cQuery += "        SW2.W2_XDT_ETA "
+    cQuery += "        SW2.W2_XDT_ETA, "
+    cQuery += "        SW2.W2_PESO_B "
     cQuery += " FROM " + RetSqlName("SW2") + " SW2 "
     cQuery += " INNER JOIN " + RetSqlName("SW3") + " SW3 "
     cQuery += " ON SW3.W3_FILIAL = SW2.W2_FILIAL "
@@ -78,7 +84,8 @@ Static Function OUROR25()
     cQuery += "        SW2.W2_ORIGEM, "
     cQuery += " 	   SW2.W2_DEST, "
     cQuery += "        SW2.W2_MT3, "
-    cQuery += "        SW2.W2_XDT_ETA "
+    cQuery += "        SW2.W2_XDT_ETA, "
+    cQuery += "        SW2.W2_PESO_B "
     
     If aParam[11] == 1
         cQuery += " ORDER BY SW0.W0_C1_NUM, W2_XDT_ETA
@@ -88,6 +95,8 @@ Static Function OUROR25()
         cQuery += " ORDER BY SW2.W2_ORIGEM, SW2.W2_DEST, W2_XDT_ETA
     ElseIf aParam[11] == 4
         cQuery += " ORDER BY W2_XDT_ETA
+    ElseIf aParam[11] == 5
+        cQuery += " ORDER BY SW2.W2_PO_NUM, W2_XDT_ETA
     EndIf 
     
     If Select("RELX") > 0
@@ -98,7 +107,7 @@ Static Function OUROR25()
 
         
     While RELX->(!EOF())
-        AADD(aLinha,{RELX->W0_C1_NUM, STOD(RELX->W2_PO_DT), RELX->W2_PO_NUM, RELX->W2_FORN, Alltrim(GetAdvFVal("SA2","A2_NOME",xFilial("SA2") + RELX->W2_FORN + RELX->W2_FORLOJ,1 )), Alltrim(GetAdvFVal("SYR","YR_CID_ORI",xFilial("SYR") + "01" + RELX->W2_ORIGEM,1 )) , RELX->W2_DEST , STOD(RELX->W2_XDT_ETA), RELX->W2_MT3})
+        AADD(aLinha,{RELX->W0_C1_NUM, STOD(RELX->W2_PO_DT), RELX->W2_PO_NUM, RELX->W2_FORN, Alltrim(GetAdvFVal("SA2","A2_NREDUZ",xFilial("SA2") + RELX->W2_FORN + RELX->W2_FORLOJ,1 )), Alltrim(GetAdvFVal("SYR","YR_CID_ORI",xFilial("SYR") + "01" + RELX->W2_ORIGEM,1 )) , RELX->W2_DEST , STOD(RELX->W2_XDT_ETA), RELX->W2_MT3, RELX->W2_PESO_B })
         RELX->(dbSkip())
     EndDo
 
@@ -119,6 +128,9 @@ Static Function OUROR25()
     ElseIf aParam[11] == 4
         lFilETA := .T.
         cCabec := "Ordenacao - ETA"
+    ElseIf aParam[11] == 5
+        lFilPO := .T.
+        cCabec := "Ordenacao - Purchase Order"
     EndIf
 
     oFWMsExcel := FWMSExcelEx():New()
@@ -135,6 +147,7 @@ Static Function OUROR25()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Porto Destino"  ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "ETA"            ,1,4,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "MT Cubico"      ,1,2,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Peso Bruto"     ,1,2,.F.)
 
     For nlx := 1 to Len(aLinha)
 
@@ -148,31 +161,39 @@ Static Function OUROR25()
                 cPorDAtu := aLinha[nlx][7]
             ElseIf lFilETA
                 cPorETA := aLinha[nlx][8]
+            ElseIf lFilPO
+                cPorPO := aLinha[nlx][3]
             EndIf
         EndIF
 
         If lFilSC
             If cSCAtu <> aLinha[nlx][1]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:SetCelBgColor(cCor2)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
-                lLinha := !lLinha
+                nTotPes := 0
+                //lLinha := !lLinha
                 cSCAtu := aLinha[nlx][1]
             EndIf
         ElseIf lFilFor
             If cForAtu <> aLinha[nlx][4]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:SetCelBgColor(cCor2)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
-                lLinha := !lLinha
+                nTotPes := 0
+                //lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
             EndIf
         ElseIf lFilPor
             If cPorOAtu <> aLinha[nlx][6] .OR. cPorDAtu <> aLinha[nlx][7]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:SetCelBgColor(cCor2)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
-                lLinha := !lLinha
+                nTotPes := 0
+                //lLinha := !lLinha
                 cForAtu := aLinha[nlx][4]
                 cPorOAtu := aLinha[nlx][6]
                 cPorDAtu := aLinha[nlx][7]
@@ -180,40 +201,64 @@ Static Function OUROR25()
         ElseIf lFilETA
             If cPorETA <> aLinha[nlx][8]
                 oFWMsExcel:SetCelBold(.T.)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil},{1,2,3,4,5,6,7,8,9} )
+                oFWMsExcel:SetCelBgColor(cCor2)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
                 nTotFil := 0
-                lLinha := !lLinha
+                nTotPes := 0
+                //lLinha := !lLinha
                 cPorETA := aLinha[nlx][8]
+            EndIf
+        ElseIf lFilPO
+            If cPorPO <> aLinha[nlx][3]
+                oFWMsExcel:SetCelBold(.T.)
+                oFWMsExcel:SetCelBgColor(cCor2)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
+                nTotFil := 0
+                nTotPes := 0
+                //lLinha := !lLinha
+                cPorPO := aLinha[nlx][3]
+                nContPO := 1 
+            Else 
+                nContPO++
             EndIf
         EndIf
 
-        nTotFil += aLinha[nlx][9]
-        nTotGer += aLinha[nlx][9]
-
-        If lLinha
-            cCor := cCor1   
-        else
-            cCor := cCor2
-        endIf
+        //If lLinha
+        //    cCor := cCor1   
+        //else
+        //    cCor := cCor2
+        //endIf
         
         oFWMsExcel:SetCelBold(.F.)
-        oFWMsExcel:SetCelBgColor(cCor)
-        oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],aLinha[nlx][9]},{1,2,3,4,5,6,7,8,9} )
+        oFWMsExcel:SetCelBgColor(cCor1)
+        
+        If lFilPO .and. nContPO <> 1
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],,},{1,2,3,4,5,6,7,8,9,10} )
+        else
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],aLinha[nlx][9],aLinha[nlx][10]},{1,2,3,4,5,6,7,8,9,10} )
+            nTotFil += aLinha[nlx][9]
+            nTotPes += aLinha[nlx][10]
+            nTotGer += aLinha[nlx][9]
+            nPesGer += aLinha[nlx][10]
+        EndIf
+
         
         If nlx == Len(aLinha)
             oFWMsExcel:SetCelBold(.T.)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,,nTotFil},{1,2,3,4,5,6,7,8,9} )
+            oFWMsExcel:SetCelBgColor(cCor2)
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes},{1,2,3,4,5,6,7,8,9,10} )
             nTotFil := 0
-            lLinha := !lLinha
+            nTotPes := 0
+            //lLinha := !lLinha
             
-            If lLinha
-                cCor := cCor1   
-            else
-                cCor := cCor2
-            endIf
+            //If lLinha
+            //    cCor := cCor1   
+            //else
+            //    cCor := cCor2
+            //endIf
             
-            oFWMsExcel:SetCelBgColor(cCor)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,"TOTAL GERAL",,,,nTotGer},{1,2,3,4,5,6,7,8,9} )
+            oFWMsExcel:SetCelBgColor("#4f81bd") 
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,"TOTAL GERAL",,,,nTotGer,nPesGer},{1,2,3,4,5,6,7,8,9,10} )
 
         EndIf
         
@@ -244,7 +289,7 @@ Static Function PergPara()
 Local aRet	 := {}
 Local aPergs := {}
 local tmp    := getTempPath()
-Local aCombo := {"Solicitacao de Compra","Fornecedor","Porto Origem/Destino","ETA"}
+Local aCombo := {"Solicitacao de Compra","Fornecedor","Porto Origem/Destino","ETA","Purchase Order"}
 
 aAdd(aPergs, {1, "Numero SC de"         ,Space(6)           ,"","","SC1","",50,.F.}) 
 aAdd(aPergs, {1, "Numero SC ate"        ,"ZZZZZZ"           ,"","","SC1","",50,.T.}) 
