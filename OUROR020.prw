@@ -80,7 +80,7 @@ Static Function ReportDef()
     TRCell():New(oSection     ,"EMPCAPSC"  	,,"Aprova SC x Emissao PO"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"ARTEMPC"  	,,"Aprova Arte x Emissao PO"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"PCXLIM" 	,,"Emissao PO x Limite Compra"              ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PCN2" 	    ,,"PC x N2"	   	   	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PCN2" 	    ,,"PO x N2"	   	   	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"N2SINAL" 	,,"N2 x Sinal"	   	   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"SINPSIR" 	,,"Sinal x PSI R (PRODUÇÃO)"                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"PSIRPSIA" 	,,"PSI R x PSI A (QUALIDADE)"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
@@ -482,6 +482,8 @@ Static Function PrintReport(oReport,oSection)
 
         If !Empty(aDataNew[1][3]) .AND. !Empty(aDataNew[1][4])
             nLeadPre := (STOD(aDataNew[1][3]) - (STOD(aDataNew[1][4]) + 5))
+        else
+            nLeadPre := 0
         EndIf
 
         oSection:Cell("1COMPRA"):SetValue(Iif(n1Compra == 0,"N","S"))
