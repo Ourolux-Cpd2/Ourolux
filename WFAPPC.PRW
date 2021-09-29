@@ -606,7 +606,7 @@ while !(cAlias1)->(EOF())
     cMensagem += ' <p align="left">Para abrir a relação de Pedidos de Compra, <a href="'+_cHostWF+cAnexo2+'"> Click AQUI </a></p>'
     cMensagem += ' </body> '
 
-	cPara := "cpd2@ourolux.com.br"
+	//cPara := "cpd2@ourolux.com.br"
 	
 	SEND MAIL FROM cUserFrom TO cPara CC "" SUBJECT cAssunto BODY cMensagem RESULT lResult  // ATTACHMENT cAnexo1 
 
