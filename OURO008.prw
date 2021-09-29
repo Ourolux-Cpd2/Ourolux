@@ -440,8 +440,8 @@ Static Function OURO08B()
             PASX->(dbSkip())
         EndDo
 
-        cDataDe  := DTOS(FirstDate(dDataBase))
-        cDataAte := DTOS(LastDate(FirstDate(dDataBase) + 90))
+        cXDataDe  := DTOS(FirstDate(dDataBase))
+        cXDataAte := DTOS(LastDate(FirstDate(dDataBase) + 90))
 
         For nlx := 1 to len(aMovPas)
             
@@ -456,6 +456,8 @@ Static Function OURO08B()
             EndIf
         Next
 
+        aMovPas := {}
+
         cQuery := " SELECT C4_QUANT AS QUANTIDADE, SUBSTRING(C4_DATA, 1, 6) AS PERIODO "
         cQuery += " FROM " + RetSqlName("SC4") + " SC4 "
         cQuery += " INNER JOIN " + RetSqlName("SB1") + " SB1 "
@@ -466,7 +468,7 @@ Static Function OURO08B()
         cQuery += "     AND SBM.BM_GRUPO BETWEEN '" +aParam[POS_FAMILIA_DE]+ "' AND '" +aParam[POS_FAMILIA_ATE]+ "' ""
         cQuery += " 	AND SBM.D_E_L_E_T_ = '' "
         cQuery += " WHERE SC4.C4_PRODUTO BETWEEN '" +aParam[POS_PRODUTO_DE]+ "' AND '" +aParam[POS_PRODUTO_ATE]+ "' "
-        cQuery += " AND SC4.C4_DATA BETWEEN '"+cDataDe+"' AND '"+cDataAte+"' "
+        cQuery += " AND SC4.C4_DATA BETWEEN '"+cXDataDe+"' AND '"+cXDataAte+"' "
         cQuery += " AND SC4.C4_PRODUTO = '"+Alltrim(PROD->PRODUTO)+"' "
         cQuery += " AND SC4.D_E_L_E_T_ = '' "
         cQuery += " ORDER BY C4_PRODUTO "
