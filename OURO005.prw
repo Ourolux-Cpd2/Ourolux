@@ -102,7 +102,7 @@ oDlg:lEscClose  := .F.
     DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'VALX', .T., .F.)
 
     If VALX->(EOF())
-        AADD(aColsSA,{dDataBase, 0, 0, 0,.F.})
+        AADD(aColsSA,{dDataBase, 0, 0, 0, 0, .F.})
     EndIf
 
     While VALX->(!EOF())
