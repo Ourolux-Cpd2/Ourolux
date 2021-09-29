@@ -256,14 +256,16 @@ PRIVATE nVlF1Total	:= SF1->F1_VALBRUT		// MGOMES 23/07/2013 - Valor Bruto
 							U_xdelPRE(SE2->E2_HAWBEIC)
 						EndIf
 
-						//EICFI400("POS_GRV_DESP")
-
-						//axFl2DelWork:={}
-						//If SW6->W6_TIPOFEC <> "DIN"
-						//	conout("SF1100I - Inclusão dos PRE")
-						//	cControle := "Inclusao"
-						//	Processa({|| AVPOS_DI(SW6->W6_HAWB,lGerPrDI,,.T.) })//ASR - 28/09/2005 - Integração EIC x FIN - antes testa a MV_EASYFDI - Processa({|| AVPOS_DI(SW6->W6_HAWB,.T.) })
-						//EndIf
+						If !IsInCallStack("U_WSAPRPC") .AND. !IsInCallStack("U_MT094END")
+							EICFI400("POS_GRV_DESP")
+							axFl2DelWork:={}
+							
+							If SW6->W6_TIPOFEC <> "DIN"
+								conout("SF1100I - Inclusão dos PRE")
+								cControle := "Inclusao"
+								Processa({|| AVPOS_DI(SW6->W6_HAWB,lGerPrDI,,.T.) })
+							EndIf
+						EndIf
 						RESTArea( _cArSE2 )
 					Else
 						conout("SF1100I - Processo: " + Alltrim(SE2->E2_HAWBEIC) + " nao localizado")
