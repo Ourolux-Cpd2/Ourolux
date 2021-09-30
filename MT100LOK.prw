@@ -28,7 +28,7 @@ Local nPLoteCtl     := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_LOTECTL" 
 Local nPLoteFor     := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_LOTEFOR" }) 
 Local nPLocal       := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_LOCAL" }) 
 Local nPTes         := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_TES" })
-Local nPosTot         := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_TOTAL" })
+Local nPosTot       := aScan(aHeader,{ |x| Upper(AllTrim(x[2])) == "D1_TOTAL" })
 Local lRet          := .T. 
 Local aAreaSC7 		
 Local nRet          := 0
@@ -37,7 +37,6 @@ Local nLen,nDel
 
 //Conout("Modulo: " + cmodulo +'    '+ " FunName()" + FunName() ) 
 
-//If AllTrim(cmodulo) <> 'GFE' 
 If FunName() <> 'MATA116'
 
 	If !l103Auto 
@@ -56,13 +55,11 @@ If FunName() <> 'MATA116'
 					If !( SC7->(DBSEEK ( xFilial("SC7") + aCols[ n ][ nPosCod ] + ;
 	 					aCols[ n ][ nPosPed ] + aCols[ n ][ nPosItemPC ] ) )) 
 	 		            
-	 		            /* TESTE
-	 		            If cXpcnfe == 'S'
-	 						lRet := .F.
-	 						ApMsgStop("Informe o numero de PC e item usando as teclas F5/F6", 'MT100LOK')
-	 					EndIf
-	 		            */
-	 		
+	 		            	lRet := .F.
+	 						ApMsgStop("Informe o numero de PC e item!", 'MT100LOK')
+	 					
+						
+	 		            
 	 				ElseIf (aCols[ n ][ nPosQuant ] > (SC7->C7_QUANT - SC7->C7_QUJE))  
 		    
 		 				//lRet := .F.
@@ -72,7 +69,7 @@ If FunName() <> 'MATA116'
 		
 				EndIf
 		
-				If lRet .AND. SB1->B1_RASTRO == 'L' .And. Empty(aCols[n][nPLoteCtl])
+				If lRet .AND. SB1->B1_RASTRO == 'L' .And. Empty(aCols[n][nPLoteCtl]) .And. CTIPO == "N"
 			
 					lRet := .F.
 					ApMsgStop('Favor informar o campo Lote.', 'MT100LOK')
@@ -105,11 +102,8 @@ If FunName() <> 'MATA116'
 	
 	EndIf
 
-//author	Icaro Queiroz
-//since		10 de Fevereiro de 2015
-//owner		FIT Gestao & Tecnologia, solicitante Ourolux
-ElseIf FunName() == 'MATA116'
-	/*
+/* ElseIf (FunName() == 'MATA116')
+	
 	If Empty( aCols[ n ][ nPosPed ] ) .And. !aCols[n,Len(aheader)+1]
 		lRet := .F.
 		ApMsgStop( 'Favor Informar o número do pedido de compras', 'MT100LOK' )
@@ -142,8 +136,8 @@ ElseIf FunName() == 'MATA116'
 		EndIf
 
 		XMT100->( dbCloseArea() )
-	EndIf
-*/
+	EndIf     */
+
 EndIf
 
 Return(lRet)
