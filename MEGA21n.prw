@@ -121,7 +121,7 @@ Static Function RptDetail()
 	Local lNewQry	:= .T.// Roberto Souza 29/06/2017
 	Local Nw        := 0
 	Local nX
-	Local i
+	Local i,a,b
 	Local n
 	Local x
 	Local y
@@ -469,7 +469,8 @@ Static Function RptDetail()
 
 				EndIf
 				
-				(cSWN)->(DbCloseArea())
+				DbSelectArea(cSWN)
+				DbCloseArea(cSWN)
 			// I1706-074 - Fim
 			Else
 		
@@ -1081,8 +1082,8 @@ Return(Nil)
 
 Static Function ImpRodape(cProds)
     
-	Local x, y := 0
-	Local a,b
+	Local x := y := 0
+	Local a,b,nX
 	Local nDiv	 := 0
     
   	If Empty(_aTotCom) .or. Empty(_aTotVen)
@@ -1139,8 +1140,8 @@ Static Function ImpRodape(cProds)
 	//*************************************************
 	// Retirado - Roberto Santiago - Ethosx - 14.02.19
 	//*************************************************
-	
-	//If MV_PAR15 == 2
+	/*
+	If MV_PAR15 == 2
 	//***************************************** 
 	// Maurício Aureliano - 05/04/2018
 	// Início da alteração - Chamado I1711-323
@@ -1171,7 +1172,7 @@ Static Function ImpRodape(cProds)
 		@ _nLin+0.5,000 PSAY Replicate("_",220)
 	
 	  
-	 _nLin := _nLin + 2 
+	 _nLin := _nLin + 2 */	                                       
 
 	 @ _nLin,000 PSAY "Q T D E.   P A L L E T S   T O T A L:  --->    "
 
@@ -1328,6 +1329,81 @@ Static Function ImpRodape(cProds)
 	// EndIf 
 Return
 
+
+//-------------------------------------------------------------------------------------
+/*/{Protheus.doc} ImpCub
+Imprime a relação de Cubagem
+
+@type 		function
+@author 	Roberto Souza
+@since 		30/08/2017
+@version 	P11 
+ 
+@return nil
+/*/    
+//-------------------------------------------------------------------------------------
+Static Function ImpCub()
+    
+	Local x 	:= y := 0
+	Local Nw	:= 0
+	Local nX
+  
+	// #################################
+	// CUBAGEM
+
+	_nLin := _nLin + 1
+	
+	@ _nLin,000 PSAY Replicate("_",220)
+	_nLin := _nLin + 2
+	@ _nLin,000 PSAY "C U B A G E M   --->"
+	
+	@ _nLin,_aTotCom[ 01 ][ 4 ]+10 PSAY nAllCub Picture PICT_CUB
+	@ _nLin,_aTotCom[ 01 ][ 4 ]+32 PSAY nMedCub Picture PICT_CUB
+	@ _nLin,_aTotCom[ 01 ][ 4 ]+44 PSAY nAtuCub Picture PICT_CUB
+		
+	For y := 1 To Min(Len(aCub),Len(_aTotVen))
+		@ _nLin,_aTotVen[ y ][ 3 ]-2 PSAY aCub[ y ][2] Picture PICT_CUB
+	Next y
+
+	_nLin := _nLin + 1
+
+	@ _nLin,000 PSAY Replicate("_",220)
+	@ _nLin+0.5,000 PSAY Replicate("_",220)
+	
+	If !Empty( aNoCub )
+
+		If _nLin > 60 //58
+			_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
+		EndIf
+	
+		nTotC := 0
+		aRetCub := AvisCub( aNoCub , @nTotC )
+
+		_nLin ++
+		
+		@ _nLin,000 PSAY Replicate("_",220)
+		_nLin ++
+		@ _nLin,001 PSAY "* * *  Existem [ " + StrZero(nTotC,6) + " ] produtos sem cadastro de cubagem!  * * * "
+		
+		For Nx := 1 To Len( aRetCub )
+			_nLin ++
+			If _nLin > 60 //58
+				_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
+				_nLin += 2
+			EndIf
+	
+			@ _nLin,001 PSAY aRetCub[Nx]
+		
+		Next
+
+		_nLin := _nLin + 1
+	
+		@ _nLin,000 PSAY Replicate("_",220)
+		
+	EndIf
+	
+Return
+
 //-------------------------------------------------------------------------------------
 /*/{Protheus.doc} RetCub
 Retorna a cubagem de um item
@@ -1343,31 +1419,65 @@ Retorna a cubagem de um item
 Static Function RetCub( cProd, nQuant)
 	Local nCub 		:= 0
 	Local nQtEmb    := 0
+	Local lEEC		:= .F.
 	Local aArea 	:= GetArea()
     
 	Default cProd 	:= SB1->B1_COD
     
-	DbSelectArea("SB5")
-	If SB5->(DbSeek( xFilial("SB5")+cProd))
-		If !Empty(SB5->B5_EMB1)
-			DbSelectArea("EE5")
-			If EE5->(DbSeek(xFilial("EE5")+SB5->B5_EMB1))
-				nQtEmb	:= nQuant/SB1->B1_QE
-				nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
-			Else
-				nQtEmb	:= nQuant
-				nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
-			EndIf
-		EndIf
+	If lEEC
+		nQtEmb	:= nQuant/SB1->B1_QE
+		nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
 	Else
-		AADD( aNoCub , SB1->B1_COD )
+		DbSelectArea("SB5")
+		If SB5->(DbSeek( xFilial("SB5")+cProd))
+			nQtEmb	:= nQuant
+			nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
+		Else
+			AADD( aNoCub , SB1->B1_COD )
+		EndIf
 	EndIf
 	
 	RestArea( aArea )
 
 Return( nCub )
       
+//-------------------------------------------------------------------------------------
+/*/{Protheus.doc} AvisCub
+Emite aviso de itens sem cubagem 
 
+@type 		function
+@author 	Roberto Souza
+@since 		23/06/2017
+@version 	P11 
+ 
+@return nil
+/*/    
+//-------------------------------------------------------------------------------------
+Static Function	AvisCub( aNoCub , nTotC )
+	Local nNoCub	:= Len(aNoCub)
+	Local Nx 		:= 0
+	Local cMsgAvis  := ""
+	Local cRet      := ""
+	Local aRet 		:= {}
+	Local nMaxLin	:= 200
+	      
+	If nNoCub > 0
+		For Nx := 1 To nNoCub
+			If !(aNoCub[Nx] $ cMsgAvis)
+				cMsgAvis +=	aNoCub[Nx] + CRLF
+				cRet += AllTrim(aNoCub[Nx])+", "
+				nTotC ++
+			EndIf
+			
+			If Len(cRet) >= nMaxLin .Or. Nx == nNoCub
+				AADD( aRet, cRet )
+				cRet := ""
+			EndIf
+		Next
+		cRet := Substr( cRet , 1, Len( cRet ) -1 )
+	EndIf
+Return( aRet )
+               
 
 //-------------------------------------------------------------------------------------
 /*/{Protheus.doc} PutLog
@@ -1501,7 +1611,6 @@ Return nDiv
 */
 
 Static Function ValidP1(cPerg)
-Local j, i := 0
 
 dbSelectArea("SX1")
 dbSetOrder(1)
