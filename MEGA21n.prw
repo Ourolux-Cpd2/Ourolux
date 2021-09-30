@@ -9,36 +9,25 @@
 #DEFINE COMP_DATE "20191209"
 #DEFINE PICT_CUB  "@E 99,999,999.99"
 
-/*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Programa  ³ MEGA21   ³ Autor ³Eletromega             ³ Data ³18/10/2002³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ RELA€ŽO DE VENDA MENSAL POR PRODUTO                        ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Utilidade ³ Imprime a Totalizacao das Vendas de um Determinado Produto ³±±
-±±³          ³ Durante um Periodo Pr‚ Estabelecido.                       ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Uso       ³ Eletromega                                                 ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
-/*/
-//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-//³ Variaveis utilizadas para parametros                         ³
-//³ mv_par01             // Produto de?                          ³
-//³ mv_par02             // Produto até?                         ³
-//³ mv_par03             // Data de?                             ³
-//³ mv_par04             // Data até?                            ³
-//³ mv_par05             // Almoxarifado?                        ³
-//³ mv_par06             // Da Filial?							 ³
-//³ mv_par07             // Ate Filial?                          ³
-//³ mv_par08             // Exporta p/ Excel?		             ³
-//³ mv_par09             // Consolida Filial?                    ³
-//³ mv_par10             // Imprime Saldo x Previsão?            ³
-//³ mv_par11             // Fornecedor ?                         ³
-//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+/*
+Rotina: MEGA21n
+Descricao: Relatorio de venda mensal por produto
+Autor: Eletromega
+Utilidade: Imprime a Totalizacao das Vendas de um Determinado Produto Durante um Periodo pré Estabelecido
+Data: 18/10/2002
+Variaveis utilizadas para parametros                         
+	mv_par01             // Produto de?                          
+	mv_par02             // Produto ate?                         
+	mv_par03             // Data de?                             
+	mv_par04             // Data ate?                            
+	mv_par05             // Almoxarifado?                        
+	mv_par06             // Da Filial?							 
+	mv_par07             // Ate Filial?                          
+	mv_par08             // Exporta p/ Excel?		             
+	mv_par09             // Consolida Filial?                    
+	mv_par10             // Imprime Saldo x Previsao?            
+	mv_par11             // Fornecedor ?                         
+*/
 
 User Function MEGA21n()
 
@@ -121,7 +110,7 @@ Static Function RptDetail()
 	Local lNewQry	:= .T.// Roberto Souza 29/06/2017
 	Local Nw        := 0
 	Local nX
-	Local i,a,b
+	Local i
 	Local n
 	Local x
 	Local y
@@ -279,9 +268,10 @@ Static Function RptDetail()
 	PutLog( "QPRVTRB - Fim da criacao: " +Time() )
 
 	SM0->(dbSetOrder(1))
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Procura o CNPJ da Filial para localizar o Fornecedor e/ou Cliente cadastrado ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+
+	/*
+	Procura o CNPJ da Filial para localizar o Fornecedor e/ou Cliente cadastrado
+	*/
 
 	SM0->(MsSeek(Subs(cNumEmp,1,2)+" ",.T.))
 
@@ -325,7 +315,7 @@ Static Function RptDetail()
 	cDtIni := Dtos(FIRSTDAY(mv_par03))
 	cDtFim := Dtos(LASTDAY(mv_par04))
 
-	If MV_par10 == 1 //Imprime Saldo x Previsão? (1 = Nao) -  Chamado: I1711-323 - 06.04.2018
+	If MV_par10 == 1 //Imprime Saldo x Previso? (1 = Nao) -  Chamado: I1711-323 - 06.04.2018
 		nMesPrv := 12 - _nMeses // 05.07.2011
 	Else
 		nMesPrv := 11 - _nMeses // We can display a maximum of 13 fields (consumo + previsao) // Alterado por Claudino, 08/04/16 - I1603-1376
@@ -411,7 +401,7 @@ Static Function RptDetail()
 	
 	PutLog( "Montando Query - Prv - Fim :" +Time() )
 
-	//>---- Alteração feita por Claudino, 30/08/12. 
+	//>---- Alteracao feita por Claudino, 30/08/12. 
 	dbSelectArea("SWN")
 	dbSetOrder(3)
 
@@ -469,8 +459,7 @@ Static Function RptDetail()
 
 				EndIf
 				
-				DbSelectArea(cSWN)
-				DbCloseArea(cSWN)
+				(cSWN)->(DbCloseArea())
 			// I1706-074 - Fim
 			Else
 		
@@ -496,7 +485,7 @@ Static Function RptDetail()
 
 	PutLog( "Gravando SWNTRB - Fim :" +Time() )
 	
-			//Seleciona as movimentações
+			//Seleciona as movimentacoes
 			_cQry := " SELECT	SD2.D2_COD AS Codigo, "
 			_cQry += " 		  	SUBSTRING(SD2.D2_EMISSAO, 1, 6) AS Periodo, "
 			_cQry += " 		  	SUM(SD2.D2_QUANT) AS Qde, "
@@ -713,7 +702,7 @@ Static Function RptDetail()
 
 	M_Pag := 1
 
-	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
+	If MV_par10 == 2 //Imprime Saldo x Previsao? (2 = Sim)
 		Cabec2 += "   Sld/Futuro"       // Alterado por Claudino, 08/04/16 - I1603-1376
 		AADD(_CabExc,{"SLD. FUTURO"})   // Alterado por Claudino, 08/04/16 - I1603-1376
 	EndIf
@@ -928,7 +917,7 @@ Static Function RptDetail()
 					nTotCubPrev += IIf( aQtdPrv[i][2] > 0, RetCub(,aQtdPrv[i][2]), 0 )
 				Next
 				
-				If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
+				If MV_par10 == 2 //Imprime Saldo x Previso? (2 = Sim)
 					_nCol += 6
 				
 					@ _nLin, _nCol PSAY NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9'
@@ -948,7 +937,7 @@ Static Function RptDetail()
 	If MV_par08 == 2//Exporta Excel (2 = Sim)
 		
 		
-		If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
+		If MV_par10 == 2 //Imprime Saldo x Previsao? (2 = Sim)
 			ASIZE(aDados1,Len(aDados1)+3)          	// Alterado por Claudino, 12/01/16.
 			
 			For x:= 1 to Len(_aTotCom)             	// Alterado por Claudino, 12/01/16.
@@ -1082,8 +1071,8 @@ Return(Nil)
 
 Static Function ImpRodape(cProds)
     
-	Local x := y := 0
-	Local a,b,nX
+	Local x, y := 0
+	Local a,b
 	Local nDiv	 := 0
     
   	If Empty(_aTotCom) .or. Empty(_aTotVen)
@@ -1105,7 +1094,7 @@ Static Function ImpRodape(cProds)
 	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+12 PSAY _qMedTot Picture '@E 99,999,999'
 	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+24 PSAY _nSldTot Picture '@E 99,999,999'
 	
-	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
+	If MV_par10 == 2 //Imprime Saldo x Previsao? (2 = Sim)
 	
 		_nTotSM := _nSldTot / _qMedTot                                              // Alterado por Claudino, 08/04/16 - I1603-1376
 		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+36 PSAY _nTotSM Picture '@E 99999.9' // Alterado por Claudino, 08/04/16 - I1603-1376
@@ -1140,13 +1129,13 @@ Static Function ImpRodape(cProds)
 	//*************************************************
 	// Retirado - Roberto Santiago - Ethosx - 14.02.19
 	//*************************************************
-	/*
-	If MV_PAR15 == 2
+	
+	//If MV_PAR15 == 2
 	//***************************************** 
-	// Maurício Aureliano - 05/04/2018
-	// Início da alteração - Chamado I1711-323
+	// Mauricio Aureliano - 05/04/2018
+	// Inicio da alteracao - Chamado I1711-323
 	//*****************************************
-		@ _nLin,000 PSAY "C U B A G E M  (M" + Trim(Chr(179)) + ") U N I T Á R I A ---> "
+		@ _nLin,000 PSAY "C U B A G E M  (M" + Trim(Chr(179)) + ") U N I T  R I A ---> "
 	
 		For a := 1 To Len(_aTotCom)
 			_nTotCub += _aTotCom[ a ][ 2 ]
@@ -1172,7 +1161,7 @@ Static Function ImpRodape(cProds)
 		@ _nLin+0.5,000 PSAY Replicate("_",220)
 	
 	  
-	 _nLin := _nLin + 2 */	                                       
+	 _nLin := _nLin + 2 
 
 	 @ _nLin,000 PSAY "Q T D E.   P A L L E T S   T O T A L:  --->    "
 
@@ -1185,7 +1174,7 @@ Static Function ImpRodape(cProds)
 	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+13 PSAY _qMedTot/nDiv Picture '@E 99,999,999'
 	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+25 PSAY _nSldTot/nDiv Picture '@E 99,999,999'
 	
-	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
+	If MV_par10 == 2 //Imprime Saldo x Previsao? (2 = Sim)
 	
 		_nTotSM := _nSldTot / _qMedTot                                              
 		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+37 PSAY _nTotSM/nDiv Picture '@E 99999.9' 
@@ -1324,84 +1313,9 @@ Static Function ImpRodape(cProds)
 		Endif
 	*/
 	//****************************************
-	// Final da alteração - Chamado I1711-323
+	// Final da alteracao - Chamado I1711-323
 	//****************************************
 	// EndIf 
-Return
-
-
-//-------------------------------------------------------------------------------------
-/*/{Protheus.doc} ImpCub
-Imprime a relação de Cubagem
-
-@type 		function
-@author 	Roberto Souza
-@since 		30/08/2017
-@version 	P11 
- 
-@return nil
-/*/    
-//-------------------------------------------------------------------------------------
-Static Function ImpCub()
-    
-	Local x 	:= y := 0
-	Local Nw	:= 0
-	Local nX
-  
-	// #################################
-	// CUBAGEM
-
-	_nLin := _nLin + 1
-	
-	@ _nLin,000 PSAY Replicate("_",220)
-	_nLin := _nLin + 2
-	@ _nLin,000 PSAY "C U B A G E M   --->"
-	
-	@ _nLin,_aTotCom[ 01 ][ 4 ]+10 PSAY nAllCub Picture PICT_CUB
-	@ _nLin,_aTotCom[ 01 ][ 4 ]+32 PSAY nMedCub Picture PICT_CUB
-	@ _nLin,_aTotCom[ 01 ][ 4 ]+44 PSAY nAtuCub Picture PICT_CUB
-		
-	For y := 1 To Min(Len(aCub),Len(_aTotVen))
-		@ _nLin,_aTotVen[ y ][ 3 ]-2 PSAY aCub[ y ][2] Picture PICT_CUB
-	Next y
-
-	_nLin := _nLin + 1
-
-	@ _nLin,000 PSAY Replicate("_",220)
-	@ _nLin+0.5,000 PSAY Replicate("_",220)
-	
-	If !Empty( aNoCub )
-
-		If _nLin > 60 //58
-			_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
-		EndIf
-	
-		nTotC := 0
-		aRetCub := AvisCub( aNoCub , @nTotC )
-
-		_nLin ++
-		
-		@ _nLin,000 PSAY Replicate("_",220)
-		_nLin ++
-		@ _nLin,001 PSAY "* * *  Existem [ " + StrZero(nTotC,6) + " ] produtos sem cadastro de cubagem!  * * * "
-		
-		For Nx := 1 To Len( aRetCub )
-			_nLin ++
-			If _nLin > 60 //58
-				_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
-				_nLin += 2
-			EndIf
-	
-			@ _nLin,001 PSAY aRetCub[Nx]
-		
-		Next
-
-		_nLin := _nLin + 1
-	
-		@ _nLin,000 PSAY Replicate("_",220)
-		
-	EndIf
-	
 Return
 
 //-------------------------------------------------------------------------------------
@@ -1419,65 +1333,31 @@ Retorna a cubagem de um item
 Static Function RetCub( cProd, nQuant)
 	Local nCub 		:= 0
 	Local nQtEmb    := 0
-	Local lEEC		:= .F.
 	Local aArea 	:= GetArea()
     
 	Default cProd 	:= SB1->B1_COD
     
-	If lEEC
-		nQtEmb	:= nQuant/SB1->B1_QE
-		nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
-	Else
-		DbSelectArea("SB5")
-		If SB5->(DbSeek( xFilial("SB5")+cProd))
-			nQtEmb	:= nQuant
-			nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
-		Else
-			AADD( aNoCub , SB1->B1_COD )
+	DbSelectArea("SB5")
+	If SB5->(DbSeek( xFilial("SB5")+cProd))
+		If !Empty(SB5->B5_EMB1)
+			DbSelectArea("EE5")
+			If EE5->(DbSeek(xFilial("EE5")+SB5->B5_EMB1))
+				nQtEmb	:= nQuant/SB1->B1_QE
+				nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
+			Else
+				nQtEmb	:= nQuant
+				nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
+			EndIf
 		EndIf
+	Else
+		AADD( aNoCub , SB1->B1_COD )
 	EndIf
 	
 	RestArea( aArea )
 
 Return( nCub )
       
-//-------------------------------------------------------------------------------------
-/*/{Protheus.doc} AvisCub
-Emite aviso de itens sem cubagem 
 
-@type 		function
-@author 	Roberto Souza
-@since 		23/06/2017
-@version 	P11 
- 
-@return nil
-/*/    
-//-------------------------------------------------------------------------------------
-Static Function	AvisCub( aNoCub , nTotC )
-	Local nNoCub	:= Len(aNoCub)
-	Local Nx 		:= 0
-	Local cMsgAvis  := ""
-	Local cRet      := ""
-	Local aRet 		:= {}
-	Local nMaxLin	:= 200
-	      
-	If nNoCub > 0
-		For Nx := 1 To nNoCub
-			If !(aNoCub[Nx] $ cMsgAvis)
-				cMsgAvis +=	aNoCub[Nx] + CRLF
-				cRet += AllTrim(aNoCub[Nx])+", "
-				nTotC ++
-			EndIf
-			
-			If Len(cRet) >= nMaxLin .Or. Nx == nNoCub
-				AADD( aRet, cRet )
-				cRet := ""
-			EndIf
-		Next
-		cRet := Substr( cRet , 1, Len( cRet ) -1 )
-	EndIf
-Return( aRet )
-               
 
 //-------------------------------------------------------------------------------------
 /*/{Protheus.doc} PutLog
@@ -1599,18 +1479,14 @@ Local nY		:= 1
 Return nDiv
 
 /*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-±±ÚÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÂÄÄÄÄÄÄÂÄÄÄÄÄÄÄÄÄÄÄ¿±±
-±±³Fun‡…o    ³ValidP1   ³ Autor ³ Marcelo - Ethosx      ³ Data ³ 29.04.19  ³±±
-±±ÃÄÄÄÄÄÄÄÄÄÄÅÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄ´±±
-±±³Descri‡…o ³ Parametros da rotina.                			      	   ³±±
-±±ÀÄÄÄÄÄÄÄÄÄÄÁÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ±±
-±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
-ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+Rotina: ValidP1
+Descricao: Parametros da rotina.
+Autor: Marcelo - Ethosx 
+Data: 29/04/2019
 */
 
 Static Function ValidP1(cPerg)
+Local j, i := 0
 
 dbSelectArea("SX1")
 dbSetOrder(1)
