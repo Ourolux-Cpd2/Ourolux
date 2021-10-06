@@ -45,10 +45,10 @@ Static Function ReportDef()
 
     Pergunte(cPerg,.T.) 
 
-    oReport:=TReport():New("OUROR020","OUROR020 - Lead Time Import ","MEGA38",{|oReport| PrintReport(oReport,oSection)},"Lead Time Import")
+    oReport:=TReport():New("OUROR029","OUROR029 - Lead Time Import ","MEGA38",{|oReport| PrintReport(oReport,oSection)},"Lead Time Import")
     
     oReport:SetLandscape(.T.) 
-    oSection:=TRSection():New(oReport,"OUROR020 - Lead Time Import ",{"SB1"})
+    oSection:=TRSection():New(oReport,"OUROR029 - Lead Time Import ",{"SB1"})
     oSection:SetTotalInLine(.T.) 
 
     TRCell():New(oSection     ,"NUMSC"     	,,"Sol.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
@@ -157,7 +157,8 @@ Static Function PrintReport(oReport,oSection)
     cQryFin += " 	    SC1.C1_NUM,"
     cQryFin += "        SC1.C1_FILIAL, "
     cQryFin += "        SC7.C7_PO_EIC, "
-    cQryFin += "        SC7.C7_FORNECE "
+    cQryFin += "        SC7.C7_FORNECE, "
+    cQryFin += "        SC7.C7_XHAWB "
     cQryFin += " FROM " + RetSqlName("SWN") + " SWN "
     cQryFin += " LEFT JOIN " +RetSqlName("SD1")+ " SD1 ON" 
     cQryFin += "        SWN.WN_PO_NUM = SD1.D1_PEDIDO AND "
@@ -192,87 +193,72 @@ Static Function PrintReport(oReport,oSection)
     EndIf 
 
     cQryFin += " GROUP BY SD1.D1_FILIAL, SD1.D1_DTDIGIT, SWN.WN_PO_NUM, SWN.WN_HAWB, SWN.WN_SERIE, SWN.WN_FORNECE, SWN.WN_LOJA, "
-    cQryFin += " SD1.D1_EMISSAO, SC7.C7_EMISSAO, SWN.WN_DOC, SC7.C7_NUMSC,SC1.C1_NUM,SC1.C1_FILIAL, SC7.C7_PO_EIC, SC7.C7_FORNECE "
+    cQryFin += " SD1.D1_EMISSAO, SC7.C7_EMISSAO, SWN.WN_DOC, SC7.C7_NUMSC,SC1.C1_NUM,SC1.C1_FILIAL, SC7.C7_PO_EIC, SC7.C7_FORNECE, SC7.C7_XHAWB "
 
     //Em abertos
-    cQryAbe := " SELECT SD1.D1_FILIAL, "
-    cQryAbe += "        SD1.D1_DTDIGIT, "
-    cQryAbe += "        SD1.D1_EMISSAO, "
-    cQryAbe += "        SWN.WN_PO_NUM, "
-    cQryAbe += "        SWN.WN_HAWB, "
-    cQryAbe += "        SWN.WN_DOC, "
-    cQryAbe += "        SWN.WN_SERIE, "
-    cQryAbe += "        Sum(SWN.WN_QUANT) WN_QUANT, "
-    cQryAbe += "        SWN.WN_FORNECE, "
-    cQryAbe += "        SWN.WN_LOJA, "
+
+    cQryAbe := "     SELECT "
+    cQryAbe += " 	   '' AS D1_FILIAL , "
+    cQryAbe += " 	   '' AS D1_DTDIGIT , "
+    cQryAbe += " 	   '' AS D1_EMISSAO , "
+    cQryAbe += " 	   '' AS WN_PO_NUM , "
+    cQryAbe += " 	   '' AS WN_HAWB , "
+    cQryAbe += " 	   '' AS WN_DOC , "
+    cQryAbe += " 	   '' AS WN_SERIE , "
+    cQryAbe += " 	   '' AS WN_QUANT, "
+    cQryAbe += " 	   '' AS WN_FORNECE , "
+    cQryAbe += " 	   '' AS WN_LOJA , "
+    cQryAbe += " 	   SC7.C7_EMISSAO, "
+    cQryAbe += "        SC7.C7_NUMSC, "
+    cQryAbe += "        SC1.C1_NUM, "
+    cQryAbe += "        SC1.C1_FILIAL, "
+    cQryAbe += "        SC7.C7_PO_EIC, "
+    cQryAbe += "        SC7.C7_FORNECE, "
+    cQryAbe += "        SC7.C7_XHAWB "
+    cQryAbe += " FROM   (SELECT * "
+    cQryAbe += "         FROM  " + RetSqlName("SC1")
+    cQryAbe += "         WHERE  C1_NUM BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
+    cQryAbe += "                AND C1_IMPORT = 'S' "
+    cQryAbe += "                AND C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "'"
+    cQryAbe += "                AND C1_APROV = 'L' "
+    cQryAbe += "                AND D_E_L_E_T_ = '') SC1 "
+    cQryAbe += "        LEFT JOIN " + RetSqlName("SC7") + " SC7 "
+    cQryAbe += "               ON SC7.C7_NUMSC = SC1.C1_NUM "
+    cQryAbe += "                  AND SC7.C7_FILIAL = SC1.C1_FILIAL "
+    cQryAbe += "                  AND SC7.D_E_L_E_T_ = '' "
+    cQryAbe += "        WHERE NOT EXISTS (SELECT * FROM " + RetSqlName("SWN")
+    cQryAbe += "               WHERE WN_PRODUTO = SC7.C7_PRODUTO "
+    cQryAbe += "                  AND WN_ITEM = SC7.C7_ITEM "
+    cQryAbe += "                  AND WN_FORNECE = SC7.C7_FORNECE "
+    cQryAbe += "                  AND WN_LOJA = SC7.C7_LOJA "
+    cQryAbe += "                  AND WN_PO_NUM = SC7.C7_NUM "
+    cQryAbe += "                  AND WN_TIPO_NF IN ( '1', '3', '5' ) "
+    cQryAbe += "                  AND WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
+    cQryAbe += "                  AND WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "' "
+    cQryAbe += "                  AND WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "' " 
+    cQryAbe += "                  AND D_E_L_E_T_ = '' ) "
+
+    If !Empty(MV_PAR15) .And. !Empty(MV_PAR17) .And. !Empty(MV_PAR16) .And. !Empty(MV_PAR18)
+        cQryAbe += "        AND SC7.C7_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "'"
+        cQryAbe += "        AND SC7.C7_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "'
+    EndIf 
+
+    cQryAbe += " GROUP  BY "
     cQryAbe += "        SC7.C7_EMISSAO, "
     cQryAbe += "        SC7.C7_NUMSC, "
     cQryAbe += "        SC1.C1_NUM, "
     cQryAbe += "        SC1.C1_FILIAL, "
     cQryAbe += "        SC7.C7_PO_EIC, "
-    cQryAbe += "        SC7.C7_FORNECE "
-    cQryAbe += " FROM ( "
-    cQryAbe += " 	SELECT * FROM " + RetSqlName("SC1")
-    cQryAbe += " 	WHERE C1_NUM BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
-    cQryAbe += " 	AND C1_IMPORT = 'S' "
-    cQryAbe += "    AND C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "'"
-    cQryAbe += "    AND C1_APROV = 'L' "
-    cQryAbe += " 	AND D_E_L_E_T_ = ''	"
-    cQryAbe += " 	) SC1 "
-    cQryAbe += " LEFT JOIN " + RetSqlName("SC7") + " SC7 "
-    cQryAbe += " 	ON SC7.C7_NUMSC = SC1.C1_NUM "
-    cQryAbe += "    AND SC7.C7_FILIAL = SC1.C1_FILIAL "
-    cQryAbe += " 	AND SC7.D_E_L_E_T_ = '' "
-    cQryAbe += " LEFT JOIN " + RetSqlName("SWN") + " SWN "
-    cQryAbe += " 	ON SWN.WN_PRODUTO = SC7.C7_PRODUTO "
-    cQryAbe += " 	AND SWN.WN_ITEM = SC7.C7_ITEM "
-    cQryAbe += " 	AND SWN.WN_FORNECE = SC7.C7_FORNECE "
-    cQryAbe += " 	AND SWN.WN_LOJA = SC7.C7_LOJA "
-    cQryAbe += " 	AND SWN.WN_PO_NUM = SC7.C7_NUM "
-    cQryAbe += " 	AND SWN.WN_TIPO_NF IN ( '1', '3', '5' ) "
-    cQryAbe += " 	AND SWN.WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
-    cQryAbe += " 	AND SWN.WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "' "
-    cQryAbe += " 	AND SWN.WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "' " 
-    cQryAbe += " 	AND SWN.WN_DOC = '' "
-    cQryAbe += "    AND SWN.D_E_L_E_T_ = '' "
+    cQryAbe += "        SC7.C7_FORNECE, "
+    cQryAbe += "        SC7.C7_XHAWB "
+
     
-    If !Empty(MV_PAR15) .And. !Empty(MV_PAR17) .And. !Empty(MV_PAR16) .And. !Empty(MV_PAR18)
-        cQryAbe += "        AND SWN.WN_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "'"
-        cQryAbe += "        AND SWN.WN_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "'
-    EndIf 
-    
-    cQryAbe += " LEFT JOIN " + RetSqlName("SD1") + " SD1 "
-    cQryAbe += " 	ON SWN.WN_PO_NUM = SD1.D1_PEDIDO "
-    cQryAbe += " 	AND SWN.WN_ITEM = SD1.D1_ITEMPC "
-    cQryAbe += " 	AND SWN.WN_FORNECE = SD1.D1_FORNECE "
-    cQryAbe += " 	AND SWN.WN_LOJA = SD1.D1_LOJA "
-    cQryAbe += " 	AND SWN.WN_SERIE = SD1.D1_SERIE "
-    cQryAbe += " 	AND SWN.WN_DOC = SD1.D1_DOC "
-    cQryAbe += " 	AND SWN.WN_TIPO_NF = SD1.D1_TIPO_NF "
-    cQryAbe += " 	AND SD1.D1_FILIAL BETWEEN '" + MV_PAR01 + "' AND '" + MV_PAR02 + "' "
-    cQryAbe += " 	AND SD1.D1_EMISSAO BETWEEN '" + DTOS(MV_PAR13) + "' AND '" + DTOS(MV_PAR14) + "' "
-    cQryAbe += " GROUP  BY SD1.D1_FILIAL, "
-    cQryAbe += "           SD1.D1_DTDIGIT, "
-    cQryAbe += "           SWN.WN_PO_NUM, "
-    cQryAbe += "           SWN.WN_HAWB, "
-    cQryAbe += "           SWN.WN_SERIE, "
-    cQryAbe += "           SWN.WN_FORNECE, "
-    cQryAbe += "           SWN.WN_LOJA, "
-    cQryAbe += "           SD1.D1_EMISSAO, "
-    cQryAbe += "           SC7.C7_EMISSAO, "
-    cQryAbe += "           SWN.WN_DOC, "
-    cQryAbe += "           SC7.C7_NUMSC, "
-    cQryAbe += "           SC1.C1_NUM, "
-    cQryAbe += "           SC1.C1_FILIAL, "
-    cQryAbe += "           SC7.C7_PO_EIC, "
-    cQryAbe += "           SC7.C7_FORNECE "
-      
     If MV_PAR21 == 1
         cQuery := cQryFin
         cQuery += " ORDER BY SD1.D1_FILIAL, SWN.WN_HAWB DESC "
     ElseIf MV_PAR21 == 2
         cQuery := cQryAbe
-        cQuery += " ORDER BY SD1.D1_FILIAL, SWN.WN_HAWB DESC "
+        cQuery += " ORDER BY SC1.C1_NUM DESC "
     ElseIf MV_PAR21 == 3
         cQuery := cQryFin
         cQuery += "UNION ALL"
@@ -333,7 +319,12 @@ Static Function PrintReport(oReport,oSection)
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->C7_FORNECE))
         EndIf    
 
-        oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->WN_HAWB)
+        If !Empty(SCPCNF->C7_XHAWB)
+            oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->C7_XHAWB)
+        Else
+            oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->WN_HAWB)
+        EndIf
+
         oSection:Cell("NUMNF"):SetValue(SCPCNF->WN_DOC)
         
         aResDatas:= ConsEtdEta(SCPCNF->WN_HAWB)
@@ -381,7 +372,7 @@ Static Function PrintReport(oReport,oSection)
             Wdt_PSIA	:= Stod(aResDatas[1][9])
         EndIf
 
-        dt_Sin  := ConsSin(AllTrim(SCPCNF->WN_HAWB))
+        dt_Sin  := ConsSin(AllTrim(SCPCNF->C7_PO_EIC))
         If MV_PAR21 == 2 .OR. MV_PAR21 == 3
             dt_EmSC := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
         Else
