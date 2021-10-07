@@ -356,18 +356,33 @@ If !lImpDir
 
 			//ROGERIO/ INTRODE (03/02/2021) Incluir autorizacao para impressao de notas que nao movimentam estoque
 				cEstoque := 'N'
-				dbselectarea('SD2')
-				dbsetorder(3) 
-				if dbseek(XFILIAL('SD2')+(cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE)
-				    while ((cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE) == SD2->(D2_DOC+D2_SERIE)
-						cTes:= D2_TES
-						cEstoque:= GetAdvFVal("SF4","F4_ESTOQUE",(XFILIAL('SF4')+cTes),1)
-						if cEstoque = 'N' .AND. !(Upper(Alltrim(cUserName)) $ cUsrAutE )
-						   exit
-						endif   
-						sd2->(dbskip()) 
-					enddo
-				endif
+				If MV_PAR04 == 2
+					dbselectarea('SD2')
+					dbsetorder(3) 
+					if dbseek(XFILIAL('SD2')+(cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE)
+						while ((cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE) == SD2->(D2_DOC+D2_SERIE)
+							cTes:= D2_TES
+							cEstoque:= GetAdvFVal("SF4","F4_ESTOQUE",(XFILIAL('SF4')+cTes),1)
+							if cEstoque = 'N' .AND. !(Upper(Alltrim(cUserName)) $ cUsrAutE )
+								exit
+							endif   
+							SD2->(dbskip()) 
+						enddo
+					endif
+				else
+					dbselectarea('SD1')
+					dbsetorder(1) 
+					if dbseek(XFILIAL('SD1')+(cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE)
+						while ((cAliasSF3)->F3_NFISCAL+(cAliasSF3)->F3_SERIE) == SD1->(D1_DOC+D1_SERIE)
+							cTes:= D1_TES
+							cEstoque:= GetAdvFVal("SF4","F4_ESTOQUE",(XFILIAL('SF4')+cTes),1)
+							if cEstoque = 'N' .AND. !(Upper(Alltrim(cUserName)) $ cUsrAutE )
+								exit
+							endif   
+							SD1->(dbskip()) 
+						enddo
+					endif
+				EndIf
 				//MSGALERT('Parametro: ' + GetMv("ES_USRNFES")+ ' Estoque: ' + cEstoque)
 
 				if cEstoque = 'S' .OR. (cEstoque = 'N' .and. (Upper(Alltrim(cUserName)) $ cUsrAutE ))
@@ -1136,6 +1151,7 @@ Local cCfop			:= ""
 Local cCfopAnt		:= ""
 Local aItensAux     := {}
 Local aArray		:= {}
+Local npos			:= 0
 Default cDtHrRecCab := ""
 Default dDtReceb    := CToD("")
 Private aInfNf    := {}
