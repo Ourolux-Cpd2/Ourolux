@@ -177,9 +177,13 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 				*/
 				SCR->(dbSetOrder(2)) // CR_FILIAL+CR_TIPO+CR_NUM+CR_USER
 				if SCR->(dbSeek(alltrim(ws_filial)+"PC"+alltrim(ws_pedido)+Space(TamSx3("CR_NUM")[1]-Len(alltrim(ws_pedido)))+alltrim(ws_aprovador)))
-			   
-					lLiberou := MaAlcDoc({SCR->CR_NUM,SCR->CR_TIPO,SCR->CR_TOTAL,SCR->CR_APROV,,,,,,,},dDataBase,4)
-					// Precisa verificar porque esta retornando .F.
+
+					If ws_nivel == "02"
+						lLiberou := MaAlcDoc({SCR->CR_NUM,SCR->CR_TIPO,SCR->CR_TOTAL,SCR->CR_APROV,,,,,,,},dDataBase,4)
+					Else
+						lLiberou := MaAlcDoc({SCR->CR_NUM,SCR->CR_TIPO,SCR->CR_TOTAL,SCR->CR_APROV,,SCR->CR_GRUPO,,,,,},dDataBase,4) 
+					EndIf
+					
 			    
 					conout("Status")
 					conout(SCR->CR_NUM + " - Status: " + SCR->CR_STATUS)
