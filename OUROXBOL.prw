@@ -822,7 +822,7 @@ Local aBolText 		:= {"","","","","","",""}
 Local cNoImp    	:= ""
 Local aRecImp   	:= {}
 Local cCedente 		:= AllTrim(SM0->M0_NOMECOM) 
-
+Local xcParcela		:= ""	
 Private nHori				:= 3.5 //3.9 //096774
 Private nVert				:= 3.60// 3.85
 Private oPrint              := oLabel  
@@ -1018,7 +1018,8 @@ For Nx := 1 To nBoletos
 					NossoNum()
 				Endif
 
-				cNroDoc		:= PADL(Alltrim(SE1->E1_NUM)+Alltrim(SE1->E1_PARCELA),9,"0")
+				xcParcela 	:= NumParcela(Alltrim(SE1->E1_PARCELA))
+				cNroDoc		:= PADL(Alltrim(SE1->E1_NUM),9,"0") + xcParcela
 				//cDvNN 		:= Str(modulo10(Alltrim(SEE->EE_AGENCIA)+Alltrim(SEE->EE_CONTA)+aBcoBol[06]+Right(AllTrim(SE1->E1_NUMBCO),8)),1)  //Alltrim(Str(Modulo10(cNossoNum)))
 				//cNossoNum   := aBcoBol[06] + cNroDoc + cDvNN
 
@@ -1188,15 +1189,18 @@ For Nx := 1 To nBoletos
 //	cEndBenef := AllTrim(SM0->M0_ENDCOB) + " - " +AllTrim(SM0->M0_BAIRCOB) +" - "+ AllTrim(SM0->M0_CIDCOB)+"/"+SM0->M0_ESTCOB
 	
 	cEndBenef := GetEndFil( "01" )     
+	
+	cStr	:= AllTrim(Transform((SE1->E1_VALOR *(10/100)),"@E 9,999,999.99"))
+	aBolText[2] := "Multa de R$ "+cStr+" ap๓s o vencimento"
 
 	IF nTxPer > 0
 		cStr	:= AllTrim(Transform((SE1->E1_VALOR *(nTxper/100)),"@E 9,999,999.99"))  //
-		aBolText[2] := "Ap๓s o vencimento mora dia......: R$ " + cStr
+		aBolText[3] := "Ap๓s o vencimento mora dia: R$ " + cStr
 	EndIf
 
 	nVlrJuros := 0.00
 
-	aBolText[3] := "Sujeito a Protesto ap๓s 06 (Seis) dias do vencimento."
+	aBolText[4] := "Sujeito a Protesto ap๓s 06 (Seis) dias do vencimento."
 /*
 	If nTxDesc > 0
 		aBolText[2] := "   "
@@ -2744,184 +2748,7 @@ cRN   += cFator + StrZero(Int(nValor * 100),14-Len(cFator))
 
 Return({cCB,cRN,cNN})
 
-/*
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑษออออออออออัออออออออออออหอออออออัออออออออออออออออออออหออออออัอออออออออออออปฑฑ
-ฑฑบPrograma  ณ NNumItau   บ Autor ณ Microsiga          ณ Data ณ 10/06/10    ณฑฑ
-ฑฑฬออออออออออุออออออออออออสอออออออฯออออออออออออออออออออสออออออฯอออออออออออออนฑฑ
-ฑฑบDescricao ณ Funcao que gera o Nosso N๚mero de Acordo com o Banco         บฑฑ
-ฑฑฬออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบParametrosณ Banco , Agencia e Conta Corrente                             บฑฑ
-ฑฑฬออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบRetorno   ณ lGerou    - .T. Gerou o Nosso Numero Correto .F. - Nao Gerou บฑฑ
-ฑฑบ          ณ cNossoNum - Nosso Numero Gerado                              บฑฑ
-ฑฑฬออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบUso       ณ                                                              บฑฑ
-ฑฑศออออออออออฯออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออผฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿
-*/
-Static Function NNumItau( cBco , cAge , cCC , cSubcon, lCorresp )
-Local aArea     := GetArea()
-Local aAreaSEE  := SEE->( GetArea() )
-//Local lGerou    := .T.
-Local cNossoNum := ""
-Local lCartSimp := '|126|131|146|150|168|'
 
-Default lCorresp := .F.
-
-DbSelectArea("SEE")
-DbSetOrder(1)
-
-If DbSeek ( xFilial("SEE") + cBco + cAge + cCC + cSubcon)
-
-	cNossoNum 	:= Soma1 ( StrZero( Val( SEE->EE_FAXATU ) , 8 ) )
-	nNrCart 	:= cCodCart //SUBSTR(SEE->EE_X_CART,1,3)
-	If !lCorresp
-		nNrBanc		:= Alltrim(nNrCart) + Alltrim(cNossoNum)
-	Else
-		If nNrCart $ lCartSimp
-			nNrBanc		:= Alltrim(nNrCart) + Alltrim(cNossoNum)
-		Else
-			nNrBanc		:= Substr(cAge,1,4)+Substr(cCC,1,5)+Alltrim(nNrCart)+Alltrim(cNossoNum)
-		EndIf
-	EndIf
-	nDVNrBanc	:= modulo10(nNrBanc)
-	cNossoNum	:= cNossoNum + Alltrim(str(nDVNrBanc,0))
-
-	RecLock( "SEE" , .F. )
-	SEE->EE_FAXATU := SubStr(cNossoNum, 1, 8)
-	MsUnlock()
-
-Endif
-
-
-RestArea(aAreaSEE)
-RestArea(aArea)
-
-Return ( cNossoNum )
-
-
-
-/*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑฺฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฟฑฑ
-ฑฑณPrograma  ณcBarItau  ณ Autor ณ Microsiga             ณ Data ณ 10/06/10 ณฑฑ
-ฑฑรฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤดฑฑ
-ฑฑณDescri…o ณ IMPRESSAO DO BOLETO LASE DO ITAU COM CODIGO DE BARRAS      ณฑฑ
-ฑฑรฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤดฑฑ
-ฑฑณUso       ณ Especifico para Clientes Microsiga                         ณฑฑ
-ฑฑภฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤูฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿
-/*/
-Static Function cBarItau(cBanco,cAgencia,cConta,cDacCC,cNrBancario,nValor,dVencto)
-
-Local cValorFinal 	:= strzero(nValor*100,10)
-//Local nDvnn			:= 0
-Local nDvcb			:= 0
-//Local nDv			:= 0
-Local cNN			:= ''
-Local cRN			:= ''
-Local cCB			:= ''
-Local cS				:= ''
-Local cFator      := strzero(dVencto - ctod("07/10/97"),4)
-Local cCart			:= "109"
-//-----------------------------
-// Definicao do NOSSO NUMERO
-// ----------------------------
-//cS    :=  cAgencia + cConta + cCart + cNrBancario
-//nDvnn := modulo10(cS) // digito verifacador Agencia + Conta + Carteira + Nosso Num
-cNN   := cCart + cNrBancario
-
-//----------------------------------
-//	 Definicao do CODIGO DE BARRAS
-//----------------------------------
-cS:= cBanco + cFator +  cValorFinal + cNN + cAgencia + cConta + cDacCC + '000'
-nDvcb := Mod11Itau(cS)
-cCB   := SubStr(cS, 1, 4) + AllTrim(Str(nDvcb)) + SubStr(cS,5,39)
-
-//-------- Definicao da LINHA DIGITAVEL (Representacao Numerica)
-//	Campo 1			Campo 2			Campo 3			Campo 4		Campo 5
-//	AAABC.CCDDX		DDDDD.DDFFFY	FGGGG.GGHHHZ	K			UUUUVVVVVVVVVV
-
-// 	CAMPO 1:
-//	AAA	= Codigo do banco na Camara de Compensacao
-//	  B = Codigo da moeda, sempre 9
-//	CCC = Codigo da Carteira de Cobranca
-//	 DD = Dois primeiros digitos no nosso numero
-//	  X = DAC que amarra o campo, calculado pelo Modulo 10 da String do campo
-
-cS1   := cBanco + cCart + SubStr(cNrBancario,1,2)
-nDv1  := modulo10(cS1)
-cRN1  := SubStr(cS1, 1, 5) + '.' + SubStr(cS1, 6, 4) + AllTrim(Str(nDv1)) + '   '
-
-// 	CAMPO 2:
-//	DDDDDD = Restante do Nosso Numero
-//	     E = DAC do campo Agencia/Conta/Carteira/Nosso Numero
-//	   FFF = Tres primeiros numeros que identificam a agencia
-//	     Y = DAC que amarra o campo, calculado pelo Modulo 10 da String do campo
-
-cS2 := Subs(cNN,6,7) + Subs(cAgencia,1,3)
-nDv2:= modulo10(cS2)
-cRN2:= SubStr(cS2, 1, 5) + '.' + SubStr(cS2, 6, 5) + AllTrim(Str(nDv2)) + '   '
-
-// 	CAMPO 3:
-//	     F = Restante do numero que identifica a agencia
-//	GGGGGG = Numero da Conta + DAC da mesma
-//	   HHH = Zeros (Nao utilizado)
-//	     Z = DAC que amarra o campo, calculado pelo Modulo 10 da String do campo
-cS3   := Subs(cAgencia,4,1) + Subs(cConta,1,5) + cDacCC + '000'
-nDv3  := modulo10(cS3)
-cRN3  := SubStr(cS3, 1, 5) + '.' + SubStr(cS3, 6, 5) + AllTrim(Str(nDv3)) + '   '
-
-//	CAMPO 4:
-//	     K = DAC do Codigo de Barras
-cRN4  := AllTrim(Str(nDvcb)) + '  '
-
-// 	CAMPO 5:
-//	      UUUU = Fator de Vencimento
-//	VVVVVVVVVV = Valor do Titulo
-cRN5  := cFator + cValorFinal
-
-cRN	  := cRN1 + cRN2 + cRN3 + cRN4 + cRN5
-
-Return({cCB,cRN})
-
-
-/*/
-ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑฺฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤยฤฤฤฤฤฤยฤฤฤฤฤฤฤฤฤฤฟฑฑ
-ฑฑณPrograma  ณ Modulo11 ณ Autor ณ Microsiga             ณ Data ณ 10/06/10 ณฑฑ
-ฑฑรฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤดฑฑ
-ฑฑณDescri…o ณ IMPRESSAO DO BOLETO LASER DO ITAU COM CODIGO DE BARRAS     ณฑฑ
-ฑฑรฤฤฤฤฤฤฤฤฤฤลฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤดฑฑ
-ฑฑณUso       ณ Especifico para Clientes Microsiga                         ณฑฑ
-ฑฑภฤฤฤฤฤฤฤฤฤฤมฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤฤูฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿
-/*/
-Static Function Mod11Itau(cData)
-Local L, D, P := 0
-L := Len(cdata)
-D := 0
-P := 1
-While L > 0
-	P := P + 1
-	D := D + (Val(SubStr(cData, L, 1)) * P)
-	If P = 9
-		P := 1
-	End
-	L := L - 1
-End
-D := 11 - (mod(D,11))
-If (D == 0 .Or. D == 1 .Or. D == 10 .Or. D == 11)
-	D := 1
-End
-Return(D)
 /*
 ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
 ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
@@ -3011,71 +2838,6 @@ Else
 	EndIf
 EndIf
 Return( cRet )
-
-
-/*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-ฑฑษออออออออออัออออออออออหอออออออัออออออออออออออออออออหออออออัอออออออออออออปฑฑ
-ฑฑบPrograma  ณAvalNNum  บAutor  ณ Microsiga          บ Data ณ  01/13/11   บฑฑ
-ฑฑฬออออออออออุออออออออออสอออออออฯออออออออออออออออออออสออออออฯอออออออออออออนฑฑ
-ฑฑบDesc.     ณ Forca o calculo correto do digito verificador do nosso     บฑฑ
-ฑฑบ          ณ Numero para o banco Votorantim                             บฑฑ
-ฑฑฬออออออออออุออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออนฑฑ
-ฑฑบUso       ณ AP                                                         บฑฑ
-ฑฑศออออออออออฯออออออออออออออออออออออออออออออออออออออออออออออออออออออออออออผฑฑ
-ฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑฑ
-฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿฿*/
-
-Static Function AvalNNum(cNossoNum, lAtualiza)
-
-Local cDvNNum	:= Substr(cNossoNum,9,1)
-Local cValDv	:= ""
-Local cArq		:= 'L'+DtoS(dDataBase)+'VT.txt'
-Local nHdl		:= Nil
-Local cMsg		:= ""
-
-DEFAULT lAtualiza := .F.
-
-If File(cArq)
-	nHdl := fOpen(cArq,68)
-Else
-	nHdl := fCreate(cArq, 1)
-EndIf
-If nHdl <> -1
-	fSeek(nHdl,0,2)
-EndIf
-
-SA1->( dbSetOrder(1) )
-SA1->( MsSeek(xFilial('SA1')+SE1->E1_CLIENTE+SE1->E1_LOJA) )
-
-SF2->(dbSetOrder(1)) // F2_FILIAL+F2_DOC+F2_SERIE+F2_CLIENTE+F2_LOJA+F2_FORMUL
-SF2->( MsSeek(xFilial('SF2')+SE1->E1_NUM+SE1->E1_PREFIXO+SE1->E1_CLIENTE+SE1->E1_LOJA, .T.) )
-
-If SE1->E1_PORTADO == '341' .and. SubStr(SE1->E1_AGEDEP,1,4) == '1248' .and. SubStr(SE1->E1_CONTA,1,5) == '02707' .and. len(AllTrim(cNossoNum))>=8
-	cValDv := AllTrim(Str(Modulo10('124802707109'+SubStr(cNossoNum,1,8)),1))
-	If cValDv <> cDvNNum
-		//cMsg+=	"A;"+GetEnvServer()+';'+xFilial('SF2')+';'+SF2->F2_DOC+';'+SF2->F2_SERIE+';'+SF2->F2_CLIENTE+';'+SF2->F2_LOJA+';'/*+SA1->A1_IMPRBOL+';'*/
-		//	+=  SA1->A1_BCOCOB+';'+SA1->A1_AGCOB+';'+SA1->A1_CTACOB+';'+SE1->E1_PORTADO+';'+SE1->E1_AGEDEP+';'+SE1->E1_CONTA+';'
-		//cMsg+=  cNossoNum+';'+SubStr(cNossoNum,1,8)+cValDv+';'+CRLF
-		cNossoNum := SubStr(cNossoNum,1,8)+cValDv
-		If lAtualiza
-			RecLock('SE1',.F.)
-			SE1->E1_IDCNAB := cNossoNum
-			SE1->( MsUnlock() )
-		EndIf
-	EndIf
-EndIf
-
-//cMsg+=	"L;"+GetEnvServer()+';'+xFilial('SF2')+';'+SF2->F2_DOC+';'+SF2->F2_SERIE+';'+SF2->F2_CLIENTE+';'+SF2->F2_LOJA+';'/*+SA1->A1_IMPRBOL+';'*/
-//cMsg+=  SA1->A1_BCOCOB+';'+SA1->A1_AGCOB+';'+SA1->A1_CTACOB+';'+SE1->E1_PORTADO+';'+SE1->E1_AGEDEP+';'+SE1->E1_CONTA+';'
-//cMsg+=  cNossoNum+';VALIDADO;'
-
-If nHdl <> -1
-	fWrite(nHdl, cMsg+CRLF )
-	fClose(nHdl)
-EndIf
-
-Return(cNossoNum)
 
 
 /*ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
@@ -4104,7 +3866,7 @@ Local cCampo3   	:= Replicate("0",05)+"."+Replicate("0",06)
 Local cCampo4   	:= Replicate("0",01)
 Local cCampo5   	:= Replicate("0",14)
 Local cTemp     	:= ""
-Local cNossoNum 	:= Right(AllTrim(SE1->E1_NUMBCO),8) // Nosso numero
+Local cNossoNum 	:= LEFT(AllTrim(SE1->E1_NUMBCO),8) // Nosso numero
 Local cDV			:= "" // Digito verificador dos campos
 Local cLinDig		:= ""
 /*
@@ -4118,8 +3880,8 @@ If At("-",cConta) > 0
 Else
 	cConta := AllTrim(Str(Val(cConta)))
 Endif
-cNossoNum   := Alltrim(cAgencia) + Left(Alltrim(cConta),5) + Right(alltrim(cConta),1) + cCarteira + Right(AllTrim(SE1->E1_NUMBCO),8) //cNroDoc
-cDvNN 		:= Str(modulo10(Alltrim(SEE->EE_AGENCIA)+Alltrim(SEE->EE_CONTA)+__cCarteira+Right(AllTrim(SE1->E1_NUMBCO),8)),1)  //Alltrim(Str(Modulo10(cNossoNum)))
+cNossoNum   := Alltrim(cAgencia) + Left(Alltrim(cConta),5) + Right(alltrim(cConta),1) + cCarteira + LEFT(AllTrim(SE1->E1_NUMBCO),8) //cNroDoc
+cDvNN 		:= Str(modulo10(Alltrim(SEE->EE_AGENCIA)+Alltrim(SEE->EE_CONTA)+cCarteira+LEFT(AllTrim(SE1->E1_NUMBCO),8)),1)  //Alltrim(Str(Modulo10(cNossoNum)))
 cNossoNum   := cCarteira + cNroDoc + cDvNN
 //cNossoNum   := cCarteira + cNroDoc + '-' + cDvNN
 /*
@@ -4129,17 +3891,18 @@ Definicao do CODIGO DE BARRAS
 */
 //Alltrim(cNroDoc)              + ; // 23 a 30
 
-cTemp := Alltrim(cCodBanco)            + ; // 01 a 03
-Alltrim(cCodMoeda)            + ; // 04 a 04
-Alltrim(cFator)               + ; // 06 a 09
-Alltrim(cValorFinal)          + ; // 10 a 19
-Alltrim(cCarteira)            + ; // 20 a 22
-Right(AllTrim(SE1->E1_NUMBCO),8) +; // 23 A 30
-Alltrim(cDvNN)                + ; // 31 a 31
-Alltrim(cAgencia)             + ; // 32 a 35
-Alltrim(Left(cConta,5))               + ; // 36 a 40
-Alltrim(cDvConta)             + ; // 41 a 41
-"000"                             // 42 a 44
+cTemp := Alltrim(cCodBanco)            	+ ; // 01 a 03
+Alltrim(cCodMoeda)            			+ ; // 04 a 04	
+Alltrim(cFator)               			+ ; // 06 a 09
+Alltrim(cValorFinal)          			+ ; // 10 a 19
+Alltrim(cCarteira)            			+ ; // 20 a 22
+LEFT(AllTrim(SE1->E1_NUMBCO),8) 		+ ; // 23 A 30
+Alltrim(cDvNN)                			+ ; // 31 a 31
+Alltrim(cAgencia)             			+ ; // 32 a 35
+Alltrim(Left(cConta,5))               	+ ; // 36 a 40
+Alltrim(cDvConta)             			+ ; // 41 a 41
+"000"                             			// 42 a 44
+
 cDvCB  := Alltrim(modulo11(cTemp))	// Digito Verificador CodBarras
 cCodBar:= SubStr(cTemp,1,4) + cDvCB + SubStr(cTemp,5)// + cDvNN + SubStr(cTemp,31)
 
@@ -4158,7 +3921,7 @@ CCC = Codigo da Carteira de Cobranca
 DD = Dois primeiros digitos no nosso numero
 X = DAC que amarra o campo, calculado pelo Modulo 10 da String do campo
 */
-cTemp   := cCodBanco + cCodMoeda + cCarteira + Substr(Right(AllTrim(SE1->E1_NUMBCO),8),1,2)
+cTemp   := cCodBanco + cCodMoeda + cCarteira + Substr(LEFT(AllTrim(SE1->E1_NUMBCO),8),1,2)
 cDV		:= Alltrim(Str(Modulo10(cTemp)))
 cCampo1 := SubStr(cTemp,1,5) + '.' + Alltrim(SubStr(cTemp,6)) + cDV + Space(2)
 /*
@@ -4168,7 +3931,7 @@ E = DAC do campo Agencia/Conta/Carteira/Nosso Numero
 FFF = Tres primeiros numeros que identificam a agencia
 Y = DAC que amarra o campo, calculado pelo Modulo 10 da String do campo
 */
-cTemp	:= Substr(Right(AllTrim(SE1->E1_NUMBCO),8),3) + cDvNN + Substr(cAgencia,1,3)
+cTemp	:= Substr(LEFT(AllTrim(SE1->E1_NUMBCO),8),3) + cDvNN + Substr(cAgencia,1,3)
 //cDV		:= Str(modulo10(Alltrim(SEE->EE_AGENCIA)+Alltrim(SEE->EE_CONTA)+__cCarteira+Right(AllTrim(SE1->E1_NUMBCO),8)),1)
 cDV		:= Alltrim(Str(Modulo10(cTemp)))
 cCampo2 := Substr(cTemp,1,5) + '.' + Substr(cTemp,6) + cDV + Space(3)
