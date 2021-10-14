@@ -70,50 +70,20 @@ Impressão de Boleto em PDF usando TotvsPrinter (FwMsPrinter)
 User Function OUROXBOL()
 	Local oArea		   		:= FWLayer():New()
 	Local aCoord			:= {0,0,550,1300}//FWGetDialogSize(oMainWnd)
-	//.Local lMDI				:= oAPP:lMDI
-	//.Local aTamObj			:= Array(4)
-	//.Local oOk 				:= LoadBitmap(GetResources(),"LBOK")
-	//.Local oNo 				:= LoadBitmap(GetResources(),"LBNO")
-	
 	Local cCodCart          := ""
-	//.Local nOpcA		  		:= 0
 	Local bOk				:= {|| U_BolPdfPt(oMark, cMark, cCodCart ),(cAliasB)->(DbGoTop())}
 	Local bGeraBol			:= {|| U_BolSetB( oMainBol, oMark ),(cAliasB)->(DbGoTop())}
 	Local bCancel			:= {|| oMainBol:End() }
-	//.Local bLegenda			:= {|| U_BolPdfLg() }
-	//.Local aButtons			:= {}
-	//.Local aTamCpo			:= {}
-	//.Local nA				:= 0
-	//.Local nI				:= 0
 	Local nW				:= 0
-	//.Local cNomDep			:= ""
-	//.Local oFont		  		:= TFont():New("Arial",08,10,,.T.,,,,.T.)
-	
 	Local oButt1,oButt2
 	Local aSize     	:= {}
 	Local aArea     	:= GetArea()
 	Local aInfo     	:= {}
 	Local aObjects  	:= {}
 	Local aPosObj 		:= {}
-	//.Local bChange   	:= {|| }
-	//.Local aCols1    	:= {}
-	//.Local aFields   	:= {}
-	//.Local aField    	:= {}
-	//.Local aFieldEdit	:= {}
-	//.Local aCpoEnch  	:= {}
-	//.Local aPos 	    	:= {012,005,200,600}
-	//.Local aCpoH     	:= {}
-	//.Local cDescView 	:= ""
-	//.Local aCombo    	:= {}
 	Local aPerg     	:= {}
 	Local aParam    	:= Array(1)
-	//.Local aView     	:= {}
-	//.Local nLimit    	:= 9999
-	//.Local oEnt1,oEnt2
-	
-	//.Local aStru			:= {}
 	Local aCpoBro 		:= {}
-	//.Local oDlg
 	Local aCores 		:= {}
 	Local cPerg     	:="BOLPDF"
 	Local cWhere        := ""
@@ -150,15 +120,6 @@ User Function OUROXBOL()
 	
 	lPendentes    := .F.  
 	
-/*	
-	If Aviso("Impressão de boleto","Deseja imprimir os boletos pendentes ou selecionar os parâmetros para impressão?",{"Pendentes","Selecionar"},2) == 2
-		lPendentes := .F.
-	Else
-		lPendentes := .T.
-	EndIf
-*/
-
-
 	If lPendentes // Imprime somente os boletos faturados não impressos
 		aLabel := {}
 	
@@ -166,7 +127,6 @@ User Function OUROXBOL()
 		cWhere	+= 	"E1_XBOLETO = '1' "
 		cWhere	+= 	"AND E1_FILIAL ='"+xFilial("SE1")+"'"
 		cWhere	+= 	"AND E1_PORTADO <> '' "
-	//	cWhere	+= 	"AND E1_AGEDEP <>'' AND E1_CONTA <> '' "
 		cWhere	+= 	"%"
 	
 		cAliasBol := GetNextAlias()
@@ -234,7 +194,6 @@ User Function OUROXBOL()
 			Aadd(aPerg,{1,"Ate Loja"	,aParam[12]	,"",".T.",,".T.",010,.T.})
 			Aadd(aPerg,{1,"De Emissao"	,aParam[13]	,"",".T.",,".T.",040,.F.})
 			Aadd(aPerg,{1,"Ate Emissao"	,aParam[14]	,"",".T.",,".T.",040,.T.})
-//			Aadd(aPerg,{2,"Carteira"	,PadR("",Len("02-Sem Registro")),{"02-Sem Registro","09-Registrada"},060,".T.",.T.,".T."})
 		
 			For Nx := 1 To Len(aParam)
 				aParam[Nx] := ParamLoad(cParBol,aPerg,Nx,aParam[Nx])
@@ -242,7 +201,6 @@ User Function OUROXBOL()
 			
 			If ParamBox(aPerg,"Parâmetros",,,,,,,,cParBol,.T.,.T.)
 		    	lContinua := .T.
-//				cCodCart := Substr(MV_PAR15,1,2)
 			EndIf
 		Else
 			AjustaSX1( cPerg )
@@ -251,15 +209,6 @@ User Function OUROXBOL()
 			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 			If Pergunte(cPerg,.T.)  
 		    	lContinua := .T.
-/*		
-				If MV_PAR15 == 1
-					cCodCart := "02" // MV_?? Carteira
-				ElseIf MV_PAR15 == 2
-					cCodCart := "09" // MV_?? Carteira
-				Else
-					cCodCart := "02" // MV_?? Carteira
-				EndIf	                              
-*/
 			EndIf
 			   	
 		EndIf
@@ -278,10 +227,6 @@ User Function OUROXBOL()
 							"E1_FILIAL   = '" + xFilial("SE1") + "' And E1_SALDO > 0 And " + ;
 							"E1_XBOLETO <> ' ' " +;
 							"%"
-//							"E1_PORTADO <> ' ' And " +;
-//							"E1_NUMBCO  <> ' ' And " +;
-//							"E1_XBOLETO <> ' ' " +;
-//							"%"
 
 				cAliasB := GetNextAlias()
                                       
@@ -313,19 +258,6 @@ User Function OUROXBOL()
 			Else
 				cIndexName := Criatrab(Nil,.F.)
 				cIndexKey  := 	"E1_NUM+E1_PARCELA+E1_TIPO+DTOS(E1_EMISSAO)"
-/*				
-				cFilter  := "E1_PREFIXO >= '" + MV_PAR01 + "' .And. E1_PREFIXO <= '" + MV_PAR02 + "' .And. " + ;
-							"E1_NUM     >= '" + MV_PAR03 + "' .And. E1_NUM     <= '" + MV_PAR04 + "' .And. " + ;
-							"E1_PARCELA >= '" + MV_PAR05 + "' .And. E1_PARCELA <= '" + MV_PAR06 + "' .And. " + ;
-							"E1_PORTADO >= '" + MV_PAR07 + "' .And. E1_PORTADO <= '" + MV_PAR08 + "' .And. " + ;
-							"E1_CLIENTE >= '" + MV_PAR09 + "' .And. E1_CLIENTE <= '" + MV_PAR11 + "' .And. " + ;
-							"E1_LOJA    >= '"+MV_PAR10+"' .And. E1_LOJA <= '"+MV_PAR12+"' .And. "+;
-							"DTOS(E1_EMISSAO) >= '" + DTOS(MV_PAR13) + "' .And. DTOS(E1_EMISSAO) <= '" + DTOS(MV_PAR14) + "' .And. " + ;
-							"E1_FILIAL   = '"+xFilial("SE1")+"' .And. E1_SALDO > 0 .And. " + ;
-							"E1_PORTADO != ' ' .And. "+;
-							"!Empty(E1_NUMBCO) .And. "+;
-							"E1_XBOLETO <> ' '" 
-*/
 				cFilter  := "E1_PREFIXO >= '" + MV_PAR01 + "' .And. E1_PREFIXO <= '" + MV_PAR02 + "' .And. " + ;
 							"E1_NUM     >= '" + MV_PAR03 + "' .And. E1_NUM     <= '" + MV_PAR04 + "' .And. " + ;
 							"E1_PARCELA >= '" + MV_PAR05 + "' .And. E1_PARCELA <= '" + MV_PAR06 + "' .And. " + ;
@@ -335,6 +267,9 @@ User Function OUROXBOL()
 							"DTOS(E1_EMISSAO) >= '" + DTOS(MV_PAR13) + "' .And. DTOS(E1_EMISSAO) <= '" + DTOS(MV_PAR14) + "' .And. " + ;
 							"E1_FILIAL   = '"+xFilial("SE1")+"' .And. E1_SALDO > 0 .And. " + ;
 							"E1_XBOLETO <> ' '" 
+				If cFilAnt $ aBcoBol[8]
+					cFilter += " .And. E1_PORTADO = '" + aBcoBol[1] + "' "
+				EndIf
 							
 				DbSelectArea("SE1")
 				DbSetOrder(7)
@@ -429,13 +364,9 @@ User Function OUROXBOL()
 
 				oLeg01 := TBitmap():New((oAreaBut:NCLIENTHEIGHT/2) - 30,000,110,010,,"BR_VERDE"		,.T.,oAreaBut,{||},,.F.,.F.,,,.F.,,.T.,,.F.)
 				oLeg02 := TBitmap():New((oAreaBut:NCLIENTHEIGHT/2) - 20,000,120,010,,"BR_AMARELO"	,.T.,oAreaBut,{||},,.F.,.F.,,,.F.,,.T.,,.F.)
-//				oLeg03 := TBitmap():New((oAreaBut:NCLIENTHEIGHT/2) - 10,000,120,010,,"BR_BLUE"		,.T.,oAreaBut,{||},,.F.,.F.,,,.F.,,.T.,,.F.)
-
                 
 				oSay01:= TSay():New((oAreaBut:NCLIENTHEIGHT/2) - 30,010,{||'Impresso'}		,oAreaBut,,/*oFont*/,,,,.T.,CLR_BLUE,CLR_WHITE,,)
 				oSay02:= TSay():New((oAreaBut:NCLIENTHEIGHT/2) - 20,010,{||'Não Impresso'}	,oAreaBut,,/*oFont*/,,,,.T.,CLR_BLUE,CLR_WHITE,,)				
-//				oSay03:= TSay():New((oAreaBut:NCLIENTHEIGHT/2) - 10,010,{||'E-mail Enviado'},oAreaBut,,/*oFont*/,,,,.T.,CLR_BLUE,CLR_WHITE,,)				
-
 		
 				oMainBol:Activate(,,,.T.,/*valid*/,,/*On Init*/)
 			
@@ -531,7 +462,6 @@ Prepara os registros marcados para impressão
 User Function BolPdfPt(oMark, cMark, cCodCart )
 Local aLabel 	:= {}
 Local cBcoBol   := "237|341"
-//Local lRet 		:= .T.
 Local lImprime 	:= .T.
 Local cMsgErro  := ""
 Default cCodCart := "02"
@@ -663,20 +593,13 @@ Rotina para impressao de boletos bancarios em PDF para multiplos bancos
 User Function MYBOLPDF( aLabel , lTela )
 	Local aArea         := GetArea()
 	Local oLabelPDF
-	//.Local nHRes  		:= 0
-	//.Local nVRes  		:= 0
-	//.Local nDevice
 	Local cFilePrint	:= ""
 	Local oSetupPDF
 	Local aDevice  		:= {}
 	Local cSession     	:= GetPrinterSession()
-	//.Local cPrinter	  	:= GetProfString( cSession,"DEFAULT","",.T. )
-	//.Local nRet 			:= 0
-	//.Local Nx 			:= 0
-	//.Local aTipos 		:= {}
 	Local nTipo  		:= 1
 	Local lGoPrint 		:= .F. 
-	Local cPrefFile     := ""//aLabel[01][05]+"-"+aLabel[01][06]+"-"		
+	Local cPrefFile     := ""
 
 	Default lTela := .T.
 	
@@ -747,15 +670,7 @@ User Function MYBOLPDF( aLabel , lTela )
 				//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
 				oLabelPDF:cPathPDF := oSetupPDF:aOptions[PD_VALUETYPE]
 			Endif
-			//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-			//³Salva os Parametros no Profile             ³
-			//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	        //.WriteProfString( cSession, "Local"      , If(oSetupPDF:GetProperty(PD_DESTINATION)==1 ,"SERVER"    ,"CLIENT"    ), .T. )
-	        //.WriteProfString( cSession, "PRINTTYPE"  , If(oSetupPDF:GetProperty(PD_PRINTTYPE)==1   ,"SPOOL"     ,"PDF"       ), .T. )
-	        //.WriteProfString( cSession, "ORIENTATION", If(oSetupPDF:GetProperty(PD_ORIENTATION)==1 ,"PORTRAIT"  ,"LANDSCAPE" ), .T. )
-			//.WriteProfString( cSession, "DEFAULT"    , oSetupPDF:aOptions[PD_VALUETYPE], .T.)
-			//.WriteProfString( cSession, "PATHDEST"   , oSetupPDF:aOptions[6], .T.)
-	
+			
 	        If lTela
 				MsgRun( "Imprimindo...", "Boleto", {|| OUBOLPDFA(aLabel,oLabelPDF) } )
 			Else
@@ -801,19 +716,14 @@ Local oFont20
 Local aSavAre    := SaveArea1({"SF2", "SF4", "SD2", "SB1", "SE1", "SE4", "SEE", "SA6", "SA1", "SA3", "SA4", "DAK", "DA3", "DA4"})
 Local aDatSacado := Nil
 Local cMsgMulta  := ""
-//.Local cMsgDesc	 := ""
 Local cMsg		 := ""
 Local nItemNota  := 0
-//.Local bWhileD2   := Nil
 Local lContD2    := .F.
 Local nTotUnid1  := 0
 Local nTotUnid2  := 0
-//.Local cTotUnid1  := ""
-//.Local cTotUnid2  := ""
 Local lBoleto    := .T.
 Local aCB_RN_NN  	:= Nil
 Local cNossoNum  	:= Nil
-//.Local cAgenCeden 	:= Nil
 Local cAgCed	 	:= ""
 Local cPagavel		:= "PAGÁVEL EM QUALQUER BANCO ATÉ O VENCIMENTO"
 Local Nx			:= 0
@@ -823,8 +733,8 @@ Local cNoImp    	:= ""
 Local aRecImp   	:= {}
 Local cCedente 		:= AllTrim(SM0->M0_NOMECOM) 
 Local xcParcela		:= ""	
-Private nHori				:= 3.5 //3.9 //096774
-Private nVert				:= 3.60// 3.85
+Private nHori				:= 3.5 
+Private nVert				:= 3.60
 Private oPrint              := oLabel  
 
 Private nModel				:= 1 // Modelo de impressão com 2 partes padrao FEBRABAN
@@ -930,11 +840,6 @@ For Nx := 1 To nBoletos
 		Loop
 	EndIf
 
-	If SE1->E1_PORTADO == "341"
-		//U_BLTITAU(SE1->E1_NUM,SE1->E1_PREFIXO,SE1->E1_CLIENTE,SE1->E1_LOJA,SE1->E1_PARCELA)
-		//Loop
-	EndIf
-
 	If Empty(SA1->A1_ENDCOB)
 		aDatSacado   := {	Capital(AllTrim(SA1->A1_NOME))   ,;  // [ 1]Razão Social
 		Capital(Alltrim(SA1->A1_NREDUZ))                     ,;  // [ 2]Nome Reduzido
@@ -1011,25 +916,15 @@ For Nx := 1 To nBoletos
 				cNumDocto := cNossoNum
 	
 			ElseIf cBanco $ "341|630"	//ITAU + INTERCAP
-				//cNossoNum := NNumItau( cBanco,SA6->A6_AGENCIA,SA6->A6_NUMCON,ALLTRIM(SEE->EE_SUBCTA), !Empty(AllTrim(cCedente)) )
-				//cNossoNum := AvalNNum(cNossoNum)
-				
 				If Empty(SE1->E1_NUMBCO)
 					NossoNum()
 				Endif
 
 				xcParcela 	:= NumParcela(Alltrim(SE1->E1_PARCELA))
 				cNroDoc		:= PADL(Alltrim(SE1->E1_NUM),9,"0") + xcParcela
-				//cDvNN 		:= Str(modulo10(Alltrim(SEE->EE_AGENCIA)+Alltrim(SEE->EE_CONTA)+aBcoBol[06]+Right(AllTrim(SE1->E1_NUMBCO),8)),1)  //Alltrim(Str(Modulo10(cNossoNum)))
-				//cNossoNum   := aBcoBol[06] + cNroDoc + cDvNN
-
+				
 				cNossoNum := SE1->E1_NUMBCO
 
-				//If RecLock("SE1",.F.)
-				//	SE1->E1_NUMBCO := cNossoNum
-				//	SE1->(MsUnlock())
-				//EndIf
-		
 				nNomBCO   := "Itau"
 				cNumDocto := cNroDoc
 				
@@ -1073,7 +968,6 @@ For Nx := 1 To nBoletos
 				nNrConvenio := SUBSTR(SEE->EE_CODEMP,1,7)
 				nNrBanc		:= Alltrim(nNrConvenio) + Alltrim(nNrBancario)
 				nDVNrBanc	:= modulo11A(nNrBanc) //
-				//cNossoNum	:= Transform(Right(cNossoNum,9),"@R 99999999-9")        alterado em 2001 por solicitacao do vicente
 				aCB_RN_NN    := CBarBB(Subs(aDadosBanco[1],1,3)+"9",aDadosBanco[8],nNrBancario,aDadosTit[5],SE1->E1_VENCREA,nDVNrBanc,aDadosBanco[6])
 
 			ElseIf cBanco $ "237" // BRADESCO
@@ -1100,10 +994,7 @@ For Nx := 1 To nBoletos
 				nNrCart 	:= cCodCart //"03"//SUBSTR(SEE->EE_X_CART,1,3)
 				nNrBanc		:= Alltrim(nNrCart) + Alltrim(nNrBancario)
 				nDVNrBanc	:= Substr(SE1->E1_IDCNAB,9,1)
-				//cNossoNum	:= nNrCart + "/" + nNrBancario + "-" +nDVNrBanc
 				cDescCart := StrZero(Val(cCodCart),3)
-				//aCB_RN_NN    := CBarItau(Subs(aDadosBanco[1],1,3)+"9",Alltrim(SA6->A6_AGENCIA),Alltrim(SA6->A6_NUMCON),alltrim(SA6->A6_DVCTA),nNrBancario+nDVNrBanc,aDadosTit[5],SE1->E1_VENCTO)
-				//aCB_RN_NN    := CBarItau(Alltrim(SA6->A6_AGENCIA),Alltrim(SA6->A6_NUMCON),alltrim(SA6->A6_DVCTA),nNrBancario+nDVNrBanc,aDadosTit[5],SE1->E1_VENCTO)
 				aCB_RN_NN    := fLinhaDig(aBcoBol[1]   ,; // Numero do Banco
 										  __cMoeda     ,; // Codigo da Moeda
 										  aBcoBol[6]   ,; // Codigo da Carteira
@@ -1119,7 +1010,6 @@ For Nx := 1 To nBoletos
 				cNossoNum   := StrZero(Val(SE1->E1_NUMBCO),13)
 				cPagavel	:= "Até o Vencimento, Preferencialmente no "+Alltrim(SA6->A6_NREDUZ)+". Após somente no " + Alltrim(SA6->A6_NREDUZ) +"."
 				cAgCed		:= Alltrim(SA6->A6_AGENCIA)+"/"+Alltrim(SEE->EE_CODEMP) //"/ 4635329" //+Alltrim(SA6->A6_NUMCON)
-	//			cNossoNum	:= Transform(Right(cNossoNum,13), '@R 999999999999-9' )//"@R 99999999999-9")
 				aCB_RN_NN   := RetBarSant(	Substr(cBanco, 1, 3),;
 				SE1->E1_VALOR,;
 				SE1->E1_VENCTO,;
@@ -1186,8 +1076,6 @@ For Nx := 1 To nBoletos
 	nTxPer	:= SE1->E1_PORCJUR
 	nTxDesc	:= SE1->E1_DESCFIN
                         
-//	cEndBenef := AllTrim(SM0->M0_ENDCOB) + " - " +AllTrim(SM0->M0_BAIRCOB) +" - "+ AllTrim(SM0->M0_CIDCOB)+"/"+SM0->M0_ESTCOB
-	
 	cEndBenef := GetEndFil( "01" )     
 	
 	cStr	:= AllTrim(Transform((SE1->E1_VALOR *(10/100)),"@E 9,999,999.99"))
@@ -1201,12 +1089,6 @@ For Nx := 1 To nBoletos
 	nVlrJuros := 0.00
 
 	aBolText[4] := "Sujeito a Protesto após 06 (Seis) dias do vencimento."
-/*
-	If nTxDesc > 0
-		aBolText[2] := "   "
-		cStr1	:= AllTrim(Transform((SE1->E1_VALOR * nTxDesc/100),"@E 9,999,999.99"))
-		aBolText[4] := "ATE O VENCIMENTO DESCONTO DE R$ " + cStr1
-	Endif*/
 	nVlrDesc := 0
 	If (SE1->E1_DESCFIN <> 0)
 		nVlrDesc := Round((SE1->E1_VALOR * SE1->E1_DESCFIN)/100,2)
@@ -1267,8 +1149,7 @@ For Nx := 1 To nBoletos
 			nLine += nSalto
 			oPrint:Box(nLine  ,  nCol         ,  nLine+nTamLin, nCol + nColC , cTamGrid)
 			// Linha Extra
-			// oPrint:Box(nLine  ,  nCol         ,  nLine+nTamLin-nSubl-1, nCol + nColC , cTamGrid)
-			
+						
 			// Box Logo Banco
 			oPrint:Box(nLine  ,  nCol + nColC ,  nLine+(nTamLin*8), nCol + nColE , cTamGrid)
 			oPrint:SayBitmap(nLine+30, nColC + 35, "banco"+SE1->E1_PORTADO+"_g.png",100,75)
@@ -1367,7 +1248,6 @@ For Nx := 1 To nBoletos
 		
 			nLine += nSalto
 			nLine += nSalto
-//			nLine += nSalto
 	
 	
 			nLine += nSalto
@@ -1376,19 +1256,16 @@ For Nx := 1 To nBoletos
 			oPrint:FillRect({nLine,nCol + nColC,nLine+nTamLin, nCol + nColE},oBrush)
 			
 			oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT, "Vencimento"             , oFont09:oFont)
-//			oPrint:SayAlign(nLine + nLinT ,nCol + nColC + nSpacT	, Ano4Dig(SE1->E1_VENCTO)       , oFont11b:oFont,120,0,2,1)
 			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, PadL(Ano4Dig(SE1->E1_VENCTO),nPadL)       , oFont11b:oFont)
 	
 			nLine += nSalto
 			oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
 			oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT, "Agência/Código Beneficiário" , oFont09:oFont)
-//			oPrint:SayAlign(nLine + nLinT ,nCol + nColC + nSpacT	, cAgCed        , oFont11b:oFont,120,0,2,1)
 			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, PadL(cAgCed,nPadL)        , oFont11b:oFont)
 	
 			nLine += nSalto
 			oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
 			oPrint:Say(nLine + nLinT ,nCol + nColC+ nSpacT	 	   		, "Nosso número"		  , oFont09:oFont)
-//			oPrint:SayAlign(nLine + nLinT ,nCol + nColC + nSpacT  		, cNossoNum      		  , oFont11b:oFont,120,0,2,1)
 			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT  		, PadL(cNossoNum,nPadL)      		  , oFont11b:oFont)
 
 	
@@ -1398,7 +1275,6 @@ For Nx := 1 To nBoletos
 			oPrint:FillRect({nLine,nCol + nColC,nLine+nTamLin, nCol + nColE},oBrush)
 						
 			oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   	  		, "1 (=) Valor documento" , oFont09:oFont)
-//			oPrint:SayAlign(nLine + nLinT ,nCol + nColC + nSpacT	, Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99"))       , oFont11b:oFont,120,0,2,1)
 			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, PadL(Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99")),nPadL)       , oFont11b:oFont)
 	
 			nLine += nSalto
@@ -1426,7 +1302,6 @@ For Nx := 1 To nBoletos
 			nLine += nSalto
 			oPrint:Box(nLine  ,  nCol         ,  nLine+(nTamLin*2), nCol + nColE , cTamGrid)
 			// Linha Extra
-			// oPrint:Box(nLine  + nSubl ,  nCol         ,  nLine+(nTamLin*2), nCol + nColE , cTamGrid)
 
 			oPrint:Say(nLine + nLinT+ nSubl,nCol + nSpacT	 	 		, "Pagador:"    , oFont09:oFont)
 	
@@ -1492,9 +1367,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nColB + nSpacT, cNossoNum     		        	, oFont11N:oFont)
 			oPrint:SayAlign(nLine + nLinT ,nCol + nColD + nSpacT, Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99"))   , oFont11N:oFont,070,0,2,1)
 	
-	
-	
-	
 			nLine += nSalto + 2
 			oPrint:Box(nLine  ,  nCol         ,  nLine+(nTamLin*3), nCol + nColE , cTamGrid)
 	
@@ -1506,7 +1378,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT + 55	,  SA1->A1_TEL	   				, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 440 + nSpacT + 55	,  SA1->A1_COD+"-"+SA1->A1_LOJA , oFont09:oFont)
 	
-
 			nLine += nSalto/2
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		   	,  "Unidade:"   	   				, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT	,  "Pagamento:"  	   				, oFont11N:oFont)
@@ -1516,8 +1387,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT	+ 55,  SE4->E4_COND     				, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 440 + nSpacT	+ 55	,  Ano4Dig(SE1->E1_EMISSAO)		, oFont09:oFont)
 	
-	
-	
 			nLine += nSalto/2
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		   	,  "Entrega:"   	   				, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT	,  "Vendedor:"   	   				, oFont11N:oFont)
@@ -1526,8 +1395,7 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		  + 55 	,  SA1->A1_ENDENT   	   			, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT + 55	,  SA3->A3_NREDUZ 	   				, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 440 + nSpacT + 55	, TransForm(AllTrim(SA1->A1_CEPE),"@R 99999-999") 	   	 		 	, oFont09:oFont)
-	
-	
+		
 			nLine += nSalto/2
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		  	,  "Bairro:"   	   				, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT	,  "Cidade:"   	   				, oFont11N:oFont)
@@ -1536,7 +1404,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		  + 55	,  SA1->A1_BAIRROE   				, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT + 55	,  SA1->A1_MUNE   	   				, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 440 + nSpacT + 55	,  SA1->A1_ESTE   	   				, oFont09:oFont)
-	
 	
 			nLine += nSalto/2
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		  	,  "Serie/Docto:"  		   				, oFont11N:oFont)
@@ -1547,12 +1414,10 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT		  + 55	, AllTrim(SE1->E1_SERIE)+"/"+Alltrim(SE1->E1_NUM) 	, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 240 + nSpacT + 55	,  ""			   	 					, oFont09:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + 440 + nSpacT + 55	,  StrZero(Max(Val(SE1->E1_PARCELA),1),2)+"/"+StrZero(nParc,2)	, oFont09:oFont)
-	
-	
+		
 			nLine += nSalto +2
 			oPrint:Box(nLine  ,  nCol         ,  nLine+(nTamLin*2), nCol + nColE , cTamGrid)
-	
-	
+		
 			nLine += 2
 			oPrint:Say(nLine + nLinT ,nCol + nSpacT		  	,  cMsgCab1   				, oFont09N:oFont)
 			nLine += nSalto/2
@@ -1562,8 +1427,7 @@ For Nx := 1 To nBoletos
 			nLine += nSalto/2
 			oPrint:Say(nLine + nLinT ,nCol + nSpacT		  	,  cMsgCab4   				, oFont09N:oFont)
 			nLine += nSalto/2
-	
-	
+		
 			nLine += nSalto
 	
 		//  Pontilhado
@@ -1572,14 +1436,10 @@ For Nx := 1 To nBoletos
 		 	oPrint:Line(nLine, nCol, nLine, nCol + nColE, 0, cTamGrid )
 	
 			nLine += nSalto
-	
-	
+		
 			oPrint:Say(nLine + nLinT ,nCol + nColD-4 + nSpacT	 	, "Corte na linha pontilhada"   , oFont07:oFont)
 			nLine += (nSalto / 2)
 		   	oPrint:Say(nLine,nCol,Replicate("_ ",76), oFont11n:oFont,,1)
-	
-	
-	
 	
 			// Inicio do Boleto
 		    nLine := 320
@@ -1617,12 +1477,9 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nColA + nSpacT, cAgCed         	   	, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + nColB + nSpacT, "R$"                	, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT, "001"          		, oFont11N:oFont)
-			//	oPrint:Say(nLine + nLinC ,nCol + nColD + nSpacT, cNossoNum           	, oFont11N:oFont)
+
 			oPrint:SayAlign(nLine + nLinT ,nCol + nColD + nSpacT	, cNossoNum     , oFont11N:oFont,075,0,2,1)
-	
-	
-			//	oPrint:Say(oPrint,nLine + nSpacT ,nCol + nColB + nSpacT, 1960, "Vencimento"                , oFont10:oFont)
-	
+		
 			// Numero Docto # CNPJ  # Vencimento # Valor
 			nLine += nSalto
 			oPrint:Box(nLine  ,  nCol 		  ,  nLine+nTamLin, nCol + nColA - 90, cTamGrid)
@@ -1641,7 +1498,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + nColA - 90 + nSpacT, TransForm(SM0->M0_CGC, "@R 99.999.999/9999-99")               , oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + nColA + 30 + nSpacT, Ano4Dig(SE1->E1_VENCTO)             , oFont11N:oFont)
 			oPrint:SayAlign(nLine + nLinT ,nCol + nColC + nSpacT	, Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99"))       , oFont11N:oFont,120,0,2,1)
-	
 	
 			// Desconto # Deduções # Multa # Acrescimos # Valor cobrado
 			nLine += nSalto
@@ -1728,8 +1584,6 @@ For Nx := 1 To nBoletos
 
 		oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, PadL(cAgCed,nPadL)        , oFont11b:oFont)
 
-
-
 		// End Cedente 
 		nLine += nSalto
 		oPrint:Box(nLine  ,  nCol         ,  nLine+nTamLin, nCol + nColC , cTamGrid)
@@ -1740,11 +1594,6 @@ For Nx := 1 To nBoletos
 		oPrint:Say(nLine + nLinT ,nCol + nColC+ nSpacT	 	   		, "Nosso número"		  , oFont09:oFont)
 		oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT  		, PadL(cNossoNum,nPadL)      		  , oFont11b:oFont)
 
-//		oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
-//		oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   		, "2 (-) Desconto / Abatimentos" , oFont09:oFont)
-                                                                         
-
-
 		// Data Docto # Num Docto # Especie # Aceite # Data Processam # Nosso Numero
 		nLine += nSalto
 		oPrint:Box(nLine  ,  nCol         ,  nLine+nTamLin, nCol + (nColC/4) , cTamGrid)
@@ -1752,7 +1601,6 @@ For Nx := 1 To nBoletos
 		oPrint:Box(nLine  ,  nCol + (nColC/4*2) +20,  nLine+nTamLin, nCol + (nColC/4*3)-20 , cTamGrid)
 		oPrint:Box(nLine  ,  nCol + (nColC/4*3) -20,  nLine+nTamLin, nCol + nColC - 80 , cTamGrid)
 		oPrint:Box(nLine  ,  nCol + nColC - 80 ,  nLine+nTamLin, nCol + nColC , cTamGrid)
-//		oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
 		oPrint:FillRect({nLine,nCol + nColC,nLine+nTamLin, nCol + nColE},oBrush)
   
 
@@ -1761,7 +1609,6 @@ For Nx := 1 To nBoletos
 		oPrint:Say(nLine + nLinT ,nCol + (nColC/4*2) +20 + nSpacT	, "Espécie doc."		  , oFont09:oFont)
 		oPrint:Say(nLine + nLinT ,nCol + (nColC/4*3) -20 + nSpacT	, "Aceite"			      , oFont09:oFont)
 		oPrint:Say(nLine + nLinT ,nCol + nColC - 80 + nSpacT	 	, "Data processamento"	  , oFont09:oFont)
-//		oPrint:Say(nLine + nLinT ,nCol + nColC+ nSpacT	 	   		, "Nosso número"		  , oFont09:oFont)
 		oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   	   		, "1 (=) Valor documento" , oFont09:oFont)
 
 		oPrint:Say(nLine + nLinC ,nCol + nSpacT	 	   				, Ano4Dig(SE1->E1_EMISSAO), oFont11N:oFont)
@@ -1769,9 +1616,7 @@ For Nx := 1 To nBoletos
 		oPrint:Say(nLine + nLinC ,nCol + (nColC/4*2) +20 + nSpacT	, "DM"					  , oFont11N:oFont)
 		oPrint:Say(nLine + nLinC ,nCol + (nColC/4*3) -20 + nSpacT	, "N"				      , oFont11N:oFont)
 		oPrint:Say(nLine + nLinC ,nCol + nColC - 80 + nSpacT	 	, Ano4Dig(dDataBase)	  , oFont11N:oFont)
- //		oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT  		, PadL(cNossoNum,nPadL)      		  , oFont11b:oFont)
 		oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, Padl(Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99")),nPadL)       , oFont11b:oFont)
-
 
 		// Uso Banco # Carteira # Especie #Quant # Valor # Valor
 		nLine += nSalto
@@ -1805,7 +1650,6 @@ For Nx := 1 To nBoletos
 			oPrint:Box(nLine  ,  nCol + (nColC/4*3)+20 	,  nLine+nTamLin, nCol + nColC , cTamGrid)
 			oPrint:Box(nLine  ,  nCol + nColC 			,  nLine+nTamLin, nCol + nColE , cTamGrid)
 			// Box Cinza
-//			oPrint:FillRect({nLine,nCol + nColC,nLine+nTamLin, nCol + nColE},oBrush)
 			oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
 		
 			oPrint:Say(nLine + nLinT ,nCol + nSpacT	 	   					, "Uso do banco"		, oFont09:oFont)
@@ -1814,7 +1658,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinT ,nCol + (nColC/4) +70 + nSpacT	   		, "Espécie"   		  	, oFont09:oFont)
 			oPrint:Say(nLine + nLinT ,nCol + (nColC/4*3)-50 + nSpacT		, "Quantidade"	    	, oFont09:oFont)
 			oPrint:Say(nLine + nLinT ,nCol + (nColC/4*3)+20 + nSpacT		, "Valor documento"     , oFont09:oFont)
-//			oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   	   		, "1 (=) Valor documento" , oFont09:oFont)
 			oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   			, "2 (-) Desconto / Abatimentos" , oFont09:oFont)
 
 			oPrint:Say(nLine + nLinC ,nCol + nSpacT	 	   				, cUsoBco				, oFont11N:oFont)
@@ -1822,9 +1665,6 @@ For Nx := 1 To nBoletos
 			oPrint:Say(nLine + nLinC ,nCol + (nColC/4) + nSpacT	 	   	, cDescCart		    	, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + (nColC/4) +70 + nSpacT	 	, "R$"		   		  	, oFont11N:oFont)
 			oPrint:Say(nLine + nLinC ,nCol + (nColC/4*3)-50 + nSpacT	, cQTBco		    	, oFont11N:oFont)
-//			oPrint:Say(nLine + nLinC ,nCol + (nColC/4*3)+20 + nSpacT	, Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99"))     , oFont11N:oFont)
-//			oPrint:Say(nLine + nLinC ,nCol + nColC + nSpacT	, Padl(Alltrim(Transform(SE1->E1_VALOR, "@E 999,999,999.99")),nPadL)       , oFont11b:oFont)
-
 		EndIf
 		
 		// Instruções
@@ -1840,13 +1680,6 @@ For Nx := 1 To nBoletos
 		oPrint:Say(nLine + (nLinW*2)+(nLinW)   ,nCol + nSpacT	, aBolText[05]		, oFont11N:oFont)
 		oPrint:Say(nLine + (nLinW*3)+(nLinW/2) ,nCol + nSpacT	, aBolText[06]		, oFont11N:oFont)
 
-/*
-		oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
-		oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   		, "2 (-) Desconto / Abatimentos" , oFont09:oFont)
-
-		nLine += nSalto     
-*/		
-		
 		oPrint:Box(nLine  ,  nCol + nColC ,  nLine+nTamLin, nCol + nColE , cTamGrid)
 		oPrint:Say(nLine + nLinT ,nCol + nColC + nSpacT	 	   		, "3 (-) Outras Deduções" , oFont09:oFont)
 
@@ -1887,11 +1720,6 @@ For Nx := 1 To nBoletos
 
 		cFontBar := "Times New Roman"
 		cTypeBar := "INT25"
-
-	//	oPrint:FWMSBAR("INT25" /*cTypeBar*/,64/*nRow*/ ,3/*nCol*/, AllTrim(aCB_RN_NN[1]) /*cCode*/,oPrint/*oPrint*/,.T./*lCheck*/,/*Color*/,.T./*lHorz*/,0.0165/*nWidth*/,0.8/*nHeigth*/,.F./*lBanner*/,"Arial"/*cFont*/,NIL/*cMode*/,.F./*lPrint*/,1.5/*nPFWidth*/,2/*nPFHeigth*/,.F./*lCmtr2Pix*/)
-	//	oPrint:MSBAR("INT25" /*cTypeBar*/,64/*nRow*/ ,3/*nCol*/, AllTrim(aCB_RN_NN[1]) /*cCode*/,oPrint/*oPrint*/,.T./*lCheck*/,/*Color*/,.T./*lHorz*/,0.0165/*nWidth*/,0.8/*nHeigth*/,.F./*lBanner*/,cFontBar/*cFont*/,NIL/*cMode*/,.F./*lPrint*/,1.5/*nPFWidth*/,2/*nPFHeigth*/,.F./*lCmtr2Pix*/)
-	//	MSBAR3("INT25",6.5,0.3, AllTrim(aCB_RN_NN[1]),oPrint,/*lCheck*/,/*Color*/,/*lHorz*/,.00500,0.13,/*lBanner*/,/*cFont*/,"",.F.)
-	//	oPrint:Code128C(nLine+(nSalto*3),nCol+10,AllTrim(aCB_RN_NN[1]), 35 )
 
 		oBar:= CBBAR():New(cTypeBar,(nLine / 113) /*6.2*/,/*(nCol/60)*/0.2,AllTrim(aCB_RN_NN[1]) ,oPrint,.F.,/*Color*/,.T.,0.0165,1.2,.F.,cFontBar/*cFont*/,"A",.F.,0.1/*nPFWidth*/,0.5/*nPFHeigth*/,/*lCmtr2Pix*/)
 		oBar:nVertRes		:= 25 //3437 //3437 //nVert
@@ -1937,7 +1765,6 @@ If Len(aRecImp) > 0
 	DbGoTo(aRecImp[01])
 	
 	oPrint:Print()
-//	oPrint:Preview()
 Else
 	oPrint:Cancel()	
 EndIf	
@@ -2010,7 +1837,7 @@ Static Function DefineBanco( cBanco )
 			cNomeBco := "Cidade"
 		Case cBanco == "341"
 			cDvBco   := "7"
-			cNomeBco := "Itaú" //+ __ANSI
+			cNomeBco := "Itaú" 
 		Case cBanco == "353"
 			cDvBco   := "0"
 			cNomeBco := "Santander"
@@ -2232,7 +2059,6 @@ cLinDig += SubStr(cSgCpo,1,5) + "." + SubStr(cSgCpo,6,5) + cDvSgCpo + " "   //se
 cLinDig += SubStr(cTrCpo,1,5) + "." + SubStr(cTrCpo,6,5) + cDvTrCpo + " "   //terceiro campo
 cLinDig += " " + cDvGeral              //dig verificador geral
 cLinDig += "  " + SubStr(cCodBarra,6,4)+SubStr(cCodBarra,10,10)  // fator de vencimento e valor nominal do titulo
-//cLinDig += "  " + cFatVenc +blvalorfinal  // fator de vencimento e valor nominal do titulo
 
 Return({cCodBarra,cLinDig,cNossoNum})
 
@@ -2388,11 +2214,7 @@ Return(D)
 Static Function CBarBB(cBanco,nNrConvenio,nNrBancario,nValor,dVencto,nDVNrBanc,nCarteira)
 
 Local cValorFinal := strzero(nValor*100,10)
-//Local nDvnn			:= 0
 Local nDvcb			:= 0
-//Local nDv			:= 0
-//Local cNN			:= ''
-//Local cRN			:= ''
 Local cCB			:= ''
 Local cS			:= ''
 Local cFator      	:= strzero(dVencto - ctod("07/10/97"),4)
@@ -3170,15 +2992,6 @@ nRet := Max(Len(aRet),1)
 Return(nRet)
                 
 
-
-
-
-
-
-
-
-
-
 Static Function AjustaSX1( cPerg )
 
 	Local aCposSX1	:= {}
@@ -3304,8 +3117,8 @@ Static Function BcoByFil()
 						AllTrim((cTbA6)->A6_NUMCON)								,; 		// [4]Conta Corrente
 						Substr((cTbA6)->A6_NUMCON,Len(AllTrim((cTbA6)->A6_NUMCON)),1),; // [5]Dígito da conta corrente
 				  		(cTbA6)->A6_CARTEIR										,;  	// [6]Codigo da Carteira
-						0					 									}		// [7]Tx de Mora Diaria
-
+						0					 									,;		// [7]Tx de Mora Diaria
+						(cTbA6)->A6_XFILBOL										}		// [8]Filial da Conta					
 		EndIf	     
 		(cTbA6)->(DbSkip())		
 	EndDo
@@ -3444,31 +3257,16 @@ User Function xxbol()
 	DbSetOrder(1)
 	DbGoTo(686532)
 
-//	U_OUROXBOL()
-
-
 	aLabel := {}
 	Aadd(aLabel,{SE1->E1_NUM,SE1->E1_PREFIXO,SE1->E1_PREFIXO,SE1->E1_PARCELA,SE1->E1_CLIENTE,SE1->E1_LOJA, "02"})
 	U_MYBOLPDF(aLabel,.T.)
   
-/*
-	SE1->(DbSkip())
-	aLabel := {}	
-	Aadd(aLabel,{SE1->E1_NUM,SE1->E1_PREFIXO,SE1->E1_PREFIXO,SE1->E1_PARCELA,SE1->E1_CLIENTE,SE1->E1_LOJA, "02"})
-	U_MYBOLPDF(aLabel,.F.)
-	
-	SE1->(DbSkip())
-	aLabel := {}
-	Aadd(aLabel,{SE1->E1_NUM,SE1->E1_PREFIXO,SE1->E1_PREFIXO,SE1->E1_PARCELA,SE1->E1_CLIENTE,SE1->E1_LOJA, "02"})
-	U_MYBOLPDF(aLabel,.F.)
-*/		
 Return( nil )	
 
 
 User Function MyMod11( cCod , nInd )
 	Local cRet 		:= ""             
 	Local Nx 		:= 0
-	//.Local Ny 		:= 0
 	Local nRes1		:= 0
 	Local nRes2		:= 0
 	Local cRegua	:= "4329876543298765432987654329876543298765432"
@@ -3508,7 +3306,6 @@ Static Function GetEndFil( cCodFil )
 
 	DbSelectArea("SM0")
 	If DbSeek(cEmpAnt+cCodFil)
-//		cRet := AllTrim(SM0->M0_ENDENT) + " - "+ AllTrim(SM0->M0_BAIRENT) +" - "+ AllTrim(SM0->M0_CIDENT)+"/"+AllTrim(SM0->M0_ESTENT)
 		cRet := AllTrim(SM0->M0_ENDCOB) + " - " +AllTrim(SM0->M0_BAIRCOB) +" - "+ AllTrim(SM0->M0_CIDCOB)+"/"+SM0->M0_ESTCOB
 	EndIf  
 
@@ -3533,27 +3330,16 @@ User Function xSetBol( oMainBol, oMark )
 	Local lRet 		:= .T.             
 	Local oArea		:= FWLayer():New()
 	Local aCoord	:= {0,0,550,1300}
-	//.Local lMDI		:= oAPP:lMDI
 	Local oSubBol
-	
-	//.Local cCodCart  := ""
-	//.Local nOpcA		:= 0
-	//.Local bOk		:= {|| Alert("Ok")}
 	Local bGeraBol	:= {|| U_xSetBolW( oLbx, @aTit ), oLbx:Refresh() }
 	Local bBusca	:= {|| U_xSetBolX( oLbx, @aTit ), oLbx:Refresh() }
 	Local bCancel	:= {|| oSubBol:End() }
-	//.Local aButtons	:= {}
-	//.Local aTamCpo	:= {}
 	Local aLin		:= {}
 	Local nLin      := 0
-	//.Local nTamLin	:= 15	    
-    
 	Local aTit		:= {}
 	Local oFont		:= TFont():New("Arial",08,12,,.T.,,,,.T.)
-
 	Private oOk 	:= LoadBitmap(GetResources(),"ENABLE")
 	Private oNo 	:= LoadBitmap(GetResources(),"DISABLE")
-
 	Private cPref 	:= Space(TamSx3("E1_PREFIXO")[01])
 	Private cTit  	:= Space(TamSx3("E1_NUM")[01])
 	Private cCodCli	:= Space(TamSx3("E1_CLIENTE")[01])
@@ -3755,7 +3541,6 @@ Chamada pela função xSetBol
 /*/ 
 User Function xSetBolW( oLbx, aTit ) 
 	Local aArea 	:= GetArea()                       
-	//.Local cKeyE1    := ""
 	Local Nx 		:= 0       
 	Local nPosRec	:= Len( aTit[01] )
 	Local aLabel	:= {}                      
