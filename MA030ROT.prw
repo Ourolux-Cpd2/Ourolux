@@ -2,20 +2,25 @@
 /*--------------------*/
 User Function MA030ROT()
 /*--------------------*/
-	Local aRot 		:= {}   
+	  Local aRot 		   := {}   
     Local aRotSerasa := {}
-    Local cUserCCB	:= AllTrim(SuperGetMv("SE_CCBACES", .F., ""))
-    
+    Local aRotCisp   := {}
+    Local cUserCCB	 := AllTrim(SuperGetMv("SE_CCBACES", .F., ""))
+   
     //Caso tenha sido definido usuários no parâmetro, deverá verificar se o usuário possuirá acesso as rotinas
     If !Empty(cUserCCB) .And. AllTrim(Upper(cUserName)) $ Upper(cUserCCB)
-		AADD(aRot, {"Consulta CCB","U_SEFINA03(SA1->A1_COD,SA1->A1_LOJA)",0,4} )
-      	AADD(aRot, {"Risk Rating", "U_VERISK(SA1->A1_COD)",0,3} )
-      	AADD(aRotSerasa, {'Consulta*'          ,'U_SEFINA05() ',0,2,0,}) 
-		AADD(aRotSerasa, {'Buscar Cred.BUREAU*','U_FINA05AT(1)',0,2,0,}) 
-		AADD(aRotSerasa, {'Buscar CREDNET*'    ,'U_FINA05AT(2)',0,2,0,})
-		AADD(aRotSerasa, {'Buscar RELATO*'     ,'U_FINA05AT(3)',0,2,0,})
-		AADD(aRot,{"SERASA*", aRotSerasa, 0, Len(aRot)+1})		
+        AADD(aRot, {"Consulta CCB","U_SEFINA03(SA1->A1_COD,SA1->A1_LOJA)",0,4} )
+        AADD(aRot, {"Risk Rating", "U_VERISK(SA1->A1_COD)",0,3} )
+            AADD(aRotSerasa, {'Consulta*'          ,'U_SEFINA05() ',0,2,0,}) 
+            AADD(aRotSerasa, {'Buscar Cred.BUREAU*','U_FINA05AT(1)',0,2,0,}) 
+            AADD(aRotSerasa, {'Buscar CREDNET*'    ,'U_FINA05AT(2)',0,2,0,})
+            AADD(aRotSerasa, {'Buscar RELATO*'     ,'U_FINA05AT(3)',0,2,0,})
+        AADD(aRot,{"SERASA*", aRotSerasa, 0, Len(aRot)+1})		
+            Aadd(aRotCisp,{OemToAnsi("Avalia��o Cr�dito"),"u_dfsM450Cli", 0 , 4})
+            Aadd(aRotCisp,{OemToAnsi("Consulta Cadastro"),"u_dfsMtcCnpj", 0 , 4})
+        AADD(aRot,{"CISP*", aRotCisp, 0, Len(aRot)+1})		
     EndIf
+    
     AADD(aRot, {"Incluir Contato","AxInclui('SU5',,3,,,,'U_AssCC()',,,,,,.T.)",0,3} )
 Return aRot
 
