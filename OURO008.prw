@@ -324,7 +324,8 @@ Static Function OURO08B()
     Local nLin          := 0
     Local nPosD         := 0
     Local nPosF         := 0
-
+    Local nMedia        := 0
+    
     If Empty(cCaminho) .OR. Empty(aParam)
         Return(.T.)
     EndIf
@@ -455,6 +456,12 @@ Static Function OURO08B()
                 aLinha[nLin][POS_EX_PAS3] := aMovPas[nlx][3]
             EndIf
         Next
+
+        nMedia := 0
+        nMedia := Iif(!Empty(aLinha[nLin][POS_EX_PAS1]),aLinha[nLin][POS_EX_PAS1],0) + Iif(!Empty(aLinha[nLin][POS_EX_PAS2]),aLinha[nLin][POS_EX_PAS2],0) + Iif(!Empty(aLinha[nLin][POS_EX_PAS3]),aLinha[nLin][POS_EX_PAS3],0)
+        nMedia := nMedia / 3
+        
+        aLinha[nLin][POS_EX_MED] := nMedia
 
         aMovPas := {}
 
