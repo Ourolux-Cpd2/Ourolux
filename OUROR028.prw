@@ -26,6 +26,7 @@
 #DEFINE POS_NOME_GRUPO  13
 #DEFINE POS_DATA_LIB    14
 #DEFINE POS_APROVADOR   15
+#DEFINE POS_PROCESSO    16
 
 /*
 Rotina: OUROR028
@@ -51,6 +52,7 @@ Static Function OUROR28()
     Local cCor1         := "#F0F8FF"
     Local cCor2         := "#87CEFA"
     Local nTotPed       := 0
+    Local cPedVez       := ""
     Private cCaminho    := ""
     Private aParam      := {}
 
@@ -71,6 +73,7 @@ Static Function OUROR28()
     cQuery += " 	   SC7.C7_QUANT, "
     cQuery += " 	   SC7.C7_PRECO, "
     cQuery += " 	   SC7.C7_TOTAL, "
+    cQuery += " 	   SC7.C7_XHAWB, "
     cQuery += " 	   (SELECT TOP(1)SD1.D1_VUNIT "
     cQuery += " 		 FROM " + RetSqlName("SD1") + " SD1 "
     cQuery += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
@@ -137,7 +140,8 @@ Static Function OUROR28()
                     PEDAPR->CR_GRUPO,; 
                     PEDAPR->NOME_GRUPO,; 
                     DTOC(STOD(PEDAPR->CR_DATALIB)),; 
-                    Alltrim(GetAdvFVal("SAK","AK_NOME",xFilial("SAK")+PEDAPR->CR_LIBAPRO,1,""))})
+                    Alltrim(GetAdvFVal("SAK","AK_NOME",xFilial("SAK")+PEDAPR->CR_LIBAPRO,1,"")),;
+                    PEDAPR->C7_XHAWB })
         
        PEDAPR->(dbSkip())
     EndDo
@@ -154,6 +158,7 @@ Static Function OUROR28()
     oFWMsExcel:AddTable( aWorkSheet[x], aWorkSheet[x] ) 
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "FILIAL"         ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "PEDIDO" 	    ,1,1,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "PROCESSO" 	    ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "EMISSAO"   	    ,1,4,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "FORNECEDOR"	    ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "PRODUTO"        ,1,1,.F.)
@@ -179,22 +184,17 @@ Static Function OUROR28()
             cPedVez := aLinha[nlx][POS_PEDIDO]
 
             oFWMsExcel:SetCelBold(.T.)
-            oFWMsExcel:SetCelBgColor(cCor)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15} )
+            oFWMsExcel:SetCelBgColor(cCor2)
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16} )
             
             nTotPed := 0
         EndIf
 
-        If lLinha
-            cCor := cCor1   
-        else
-            cCor := cCor2
-        endIf
-
         oFWMsExcel:SetCelBold(.F.)
-        oFWMsExcel:SetCelBgColor(cCor)
+        oFWMsExcel:SetCelBgColor(cCor1)
         oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], { aLinha[nlx][POS_FILIAL],;
                                                           aLinha[nlx][POS_PEDIDO],;
+                                                          aLinha[nlx][POS_PROCESSO],;
                                                           aLinha[nlx][POS_EMISSAO],;
                                                           aLinha[nlx][POS_FORNECEDOR],;
                                                           aLinha[nlx][POS_PRODUTO],;
@@ -208,14 +208,14 @@ Static Function OUROR28()
                                                           aLinha[nlx][POS_NOME_GRUPO],;
                                                           aLinha[nlx][POS_DATA_LIB],;
                                                           aLinha[nlx][POS_APROVADOR]},;
-                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15})
+                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16})
         
         nTotPed += aLinha[nlx][POS_TOTAL]
 
         If nlx == Len(alinha)
             oFWMsExcel:SetCelBold(.T.)
-            oFWMsExcel:SetCelBgColor(cCor)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15} )
+            oFWMsExcel:SetCelBgColor(cCor2)
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16} )
         EndIf
     Next
 
