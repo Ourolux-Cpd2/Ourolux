@@ -556,7 +556,11 @@ Static Function OURO08B()
             aLinha[nLin][POS_EX_PEDCOM] := PCX->TOTAL
         EndIf
 
-        aLinha[nLin][POS_EX_ESTFIM] := ((aLinha[nLin][POS_EX_SALDO] + aLinha[nLin][POS_EX_PEDCOM]) - aLinha[nLin][POS_EX_PREV])
+        If Empty(aLinha[nLin][POS_EX_FOR1])
+            aLinha[nLin][POS_EX_FOR1] := 0
+        EndIf
+
+        aLinha[nLin][POS_EX_ESTFIM] := ((aLinha[nLin][POS_EX_SALDO] + aLinha[nLin][POS_EX_PEDCOM]) - Iif(aLinha[nLin][POS_EX_FOR1] - aLinha[nLin][POS_EX_PREV] <= 0, 0,aLinha[nLin][POS_EX_FOR1] - aLinha[nLin][POS_EX_PREV]))
         
         CONOUT("RODRIGO-" )
         CONOUT(aLinha[nLin][POS_EX_COD])
@@ -568,7 +572,7 @@ Static Function OURO08B()
                      Iif(ValType(aLinha[nLin][POS_EX_FOR2]) == "C", Val(aLinha[nLin][POS_EX_FOR2]), aLinha[nLin][POS_EX_FOR2]) +;
                      Iif(ValType(aLinha[nLin][POS_EX_FOR3]) == "C", Val(aLinha[nLin][POS_EX_FOR3]), aLinha[nLin][POS_EX_FOR3])) / 3)
 
-        aLinha[nLin][POS_EX_COB] :=  Round((aLinha[nLin][POS_EX_ESTFIM] / nValAux),1)
+        aLinha[nLin][POS_EX_COB] :=  Round((aLinha[nLin][POS_EX_ESTFIM] / nValAux),2)
         
         PROD->(dbSkip())
     EndDo
@@ -667,31 +671,29 @@ Static Function OURO08B()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], aDataFor[2]          ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], aDataFor[3]          ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Saldo Atual"        ,1,2,.F.)
-    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Prev venda mês"     ,1,2,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Venda Acumulada mês",1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Pedidos compra mês" ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Estoque final mês"  ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "Cobertura prevista" ,1,2,.F.)
 
     For nlx := 1 to Len(aLinha)
-        If lLinha
-            cCor := cCor1   
-        else
-            cCor := cCor2
-        endIf
-        
-        oFWMsExcel:SetCelBgColor(cCor)
-        oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][1],aLinha[nlx][2],aLinha[nlx][3],aLinha[nlx][4],aLinha[nlx][5],aLinha[nlx][6],aLinha[nlx][7],aLinha[nlx][8],aLinha[nlx][9],aLinha[nlx][10],aLinha[nlx][11],aLinha[nlx][12],aLinha[nlx][13],aLinha[nlx][14],aLinha[nlx][15]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15} )
-        
-        lLinha := !lLinha
-        
+        If aLinha[nlx][POS_EX_COB] >= aParam[POS_COBERTURA]
+            If lLinha
+                cCor := cCor1   
+            else
+                cCor := cCor2
+            endIf
+            
+            oFWMsExcel:SetCelBgColor(cCor)
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {aLinha[nlx][POS_EX_COD],aLinha[nlx][POS_EX_DES],aLinha[nlx][POS_EX_UM],aLinha[nlx][POS_EX_PAS1],aLinha[nlx][POS_EX_PAS2],aLinha[nlx][POS_EX_PAS3],aLinha[nlx][POS_EX_MED],aLinha[nlx][POS_EX_FOR1],aLinha[nlx][POS_EX_FOR2],aLinha[nlx][POS_EX_FOR3],aLinha[nlx][POS_EX_SALDO],aLinha[nlx][POS_EX_PREV],aLinha[nlx][POS_EX_PEDCOM],aLinha[nlx][POS_EX_ESTFIM],aLinha[nlx][POS_EX_COB]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15} )
+                                                                                                                                                                                                        
+            lLinha := !lLinha
+        EndIf
     Next
 
     oFWMsExcel:Activate()
     oFWMsExcel:GetXMLFile(cCaminho + cNome)
-    //oExcel := MsExcel():New()
-    //oExcel:WorkBooks:Open(cCaminho + cNome)
-    //oExcel:SetVisible(.T.)
-    //oExcel:Destroy()
+
     shellExecute( "Open", cCaminho + cNome, "", "", 1 )
     msgalert("Planilha Gerada em: "+(cCaminho + cNome))  
 Return
