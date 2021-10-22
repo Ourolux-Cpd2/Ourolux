@@ -733,6 +733,7 @@ Local cNoImp    	:= ""
 Local aRecImp   	:= {}
 Local cCedente 		:= AllTrim(SM0->M0_NOMECOM) 
 Local xcParcela		:= ""	
+Local nPercJur		:= SuperGetMv("ES_PERJUR",.F.,2)
 Private nHori				:= 3.5 
 Private nVert				:= 3.60
 Private oPrint              := oLabel  
@@ -1078,7 +1079,7 @@ For Nx := 1 To nBoletos
                         
 	cEndBenef := GetEndFil( "01" )     
 	
-	cStr	:= AllTrim(Transform((SE1->E1_VALOR *(10/100)),"@E 9,999,999.99"))
+	cStr	:= AllTrim(Transform((SE1->E1_VALOR *(nPercJur/100)),"@E 9,999,999.99"))
 	aBolText[2] := "Multa de R$ "+cStr+" após o vencimento"
 
 	IF nTxPer > 0
