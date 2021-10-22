@@ -10,6 +10,7 @@
 #DEFINE PAR_PEDIDO_ATE  6
 #DEFINE PAR_GRUPO_DE    7
 #DEFINE PAR_GRUPO_ATE   8
+#DEFINE PAR_BAIXADO     9
 
 #DEFINE POS_FILIAL      1
 #DEFINE POS_PEDIDO      2
@@ -206,6 +207,11 @@ Static Function OUROR28()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "APROVADOR"      ,1,1,.F.)
         
     For nlx := 1 to Len(aLinha)
+        If aParam[PAR_BAIXADO] == 1 .AND. Empty(aLinha[nlx][POS_DATA_PGTO])
+            Loop
+        ElseIf aParam[PAR_BAIXADO] == 2 .AND. !Empty(aLinha[nlx][POS_DATA_PGTO])
+            Loop
+        EndIf
 
         If Empty(cPedVez)
             cPedVez := aLinha[nlx][POS_PEDIDO]
@@ -277,6 +283,7 @@ Static Function PergPara()
 Local aRet	 := {}
 Local aPergs := {}
 local tmp    := getTempPath()
+Local aCombo := {"Baixados","Em aberto","Ambos"}
 
 aAdd(aPergs, {1, "Filial de"  ,Space(2) ,"","","SM0","",20,.F.})
 aAdd(aPergs, {1, "Filial ate" ,"ZZ"     ,"","","SM0","",20,.T.})
@@ -289,6 +296,8 @@ aAdd(aPergs, {1, "Pedido ate" ,"ZZZZZZ" ,"","","SC5","",50,.T.})
 
 aAdd(aPergs, {1, "Grupo de"  ,Space(6) ,"","","SAL","",50,.F.})
 aAdd(aPergs, {1, "Grupo ate" ,"ZZZZZZ" ,"","","SAL","",50,.T.})
+
+aAdd(aPergs, {2, "Considera Pedidos" ,3 ,aCombo ,100,""   ,.T.})
 
 If ParamBox(aPergs,"Impressao",@aRet)
 	aParam   := AjRetParam(aRet,aPergs)
