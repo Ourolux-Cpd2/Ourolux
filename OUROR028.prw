@@ -27,6 +27,8 @@
 #DEFINE POS_DATA_LIB    14
 #DEFINE POS_APROVADOR   15
 #DEFINE POS_PROCESSO    16
+#DEFINE POS_COND_PGTO   17
+#DEFINE POS_DATA_PGTO   18
 
 /*
 Rotina: OUROR028
@@ -67,6 +69,7 @@ Static Function OUROR28()
     cQuery += " 	   SC7.C7_ITEM, "
     cQuery += " 	   SC7.C7_EMISSAO, "
     cQuery += " 	   SC7.C7_FORNECE, "
+    cQuery += "        SC7.C7_LOJA, "
     cQuery += "        SA2.A2_NREDUZ, "
     cQuery += " 	   SC7.C7_PRODUTO, "
     cQuery += " 	   SC7.C7_DESCRI, "
@@ -74,6 +77,10 @@ Static Function OUROR28()
     cQuery += " 	   SC7.C7_PRECO, "
     cQuery += " 	   SC7.C7_TOTAL, "
     cQuery += " 	   SC7.C7_XHAWB, "
+    cQuery += " 	   (SELECT TOP(1) E4_DESCRI FROM " + RetSqlName("SE4")
+    cQuery += " 	     WHERE E4_CODIGO = SC7.C7_COND "
+    cQuery += " 	     AND D_E_L_E_T_ = '' "
+    cQuery += "        ) AS COND_PGTO, "
     cQuery += " 	   (SELECT TOP(1)SD1.D1_VUNIT "
     cQuery += " 		 FROM " + RetSqlName("SD1") + " SD1 "
     cQuery += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
@@ -126,7 +133,28 @@ Static Function OUROR28()
     DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'PEDAPR', .T., .F.)
 
     While PEDAPR->(!EOF())
-       AADD(aLinha,{PEDAPR->C7_FILIAL,;
+        cQuery := " SELECT TOP(1) E2_BAIXA FROM " + RetSqlName("SE2")
+        cQuery += " WHERE E2_NUM = (SELECT TOP(1) D1_DOC FROM " + RetSqlName("SD1")
+        cQuery += "     		 WHERE D1_FILIAL = '"+PEDAPR->C7_FILIAL+"' "
+        cQuery += "     		 AND D1_PEDIDO = '"+PEDAPR->C7_NUM+"' "
+        cQuery += "     		 AND D_E_L_E_T_ = '') "
+        cQuery += " AND E2_PREFIXO = (SELECT TOP(1) D1_SERIE FROM " + RetSqlName("SD1")
+        cQuery += "    		          WHERE D1_FILIAL = '"+PEDAPR->C7_FILIAL+"' "
+        cQuery += "    		          AND D1_PEDIDO = '"+PEDAPR->C7_NUM+"' "
+        cQuery += "    		          AND D_E_L_E_T_ = '') "
+        cQuery += " AND E2_FORNECE = '"+PEDAPR->C7_FORNECE+"' "
+        cQuery += " AND E2_LOJA = '"+PEDAPR->C7_LOJA+"' "
+        cQuery += " AND E2_BAIXA <> '' "
+        cQuery += " AND D_E_L_E_T_ = '' "
+        cQuery += " ORDER BY E2_PARCELA DESC "
+
+        If Select("PGTOX") > 0
+            PGTOX->(dbCloseArea())
+        EndIf
+
+        DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'PGTOX', .T., .F.)
+        
+        AADD(aLinha,{PEDAPR->C7_FILIAL,;
                     PEDAPR->C7_NUM,; 
                     DTOC(STOD(PEDAPR->C7_EMISSAO)),; 
                     PEDAPR->A2_NREDUZ,; 
@@ -141,7 +169,9 @@ Static Function OUROR28()
                     PEDAPR->NOME_GRUPO,; 
                     DTOC(STOD(PEDAPR->CR_DATALIB)),; 
                     Alltrim(GetAdvFVal("SAK","AK_NOME",xFilial("SAK")+PEDAPR->CR_LIBAPRO,1,"")),;
-                    PEDAPR->C7_XHAWB })
+                    PEDAPR->C7_XHAWB,;
+                    PEDAPR->COND_PGTO,;
+                    Iif(!Empty(PGTOX->E2_BAIXA),STOD(PGTOX->E2_BAIXA),"") })
         
        PEDAPR->(dbSkip())
     EndDo
@@ -166,6 +196,8 @@ Static Function OUROR28()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "QUANTIDADE"     ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "PREÇO UNIT."    ,1,3,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "VALOR TOTAL"    ,1,3,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "CONDICAO PGTO"  ,1,1,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DATA PAGAMENTO" ,1,4,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DT.ULT.COMPRA"  ,1,4,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "ULT.PRECO"      ,1,3,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "GRUPO"          ,1,1,.F.)
@@ -185,7 +217,7 @@ Static Function OUROR28()
 
             oFWMsExcel:SetCelBold(.T.)
             oFWMsExcel:SetCelBgColor(cCor2)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16} )
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18} )
             
             nTotPed := 0
         EndIf
@@ -202,20 +234,22 @@ Static Function OUROR28()
                                                           /*Transform(*/aLinha[nlx][POS_QUANTIDADE]/*,PesqPict("SC7","C7_QUANT"))*/,;
                                                           /*Transform(*/aLinha[nlx][POS_PRECO_UNT]/*,PesqPict("SC7","C7_PRECO"))*/,;
                                                           /*Transform(*/aLinha[nlx][POS_TOTAL]/*,PesqPict("SC7","C7_TOTAL"))*/,;
+                                                          aLinha[nlx][POS_COND_PGTO],;
+                                                          aLinha[nlx][POS_DATA_PGTO],;
                                                           aLinha[nlx][POS_ULT_COMPRA],;
                                                           /*Transform(*/aLinha[nlx][POS_ULT_PRECO]/*,PesqPict("SD1","D1_VUNIT"))*/,;
                                                           aLinha[nlx][POS_GRUPO],;
                                                           aLinha[nlx][POS_NOME_GRUPO],;
                                                           aLinha[nlx][POS_DATA_LIB],;
                                                           aLinha[nlx][POS_APROVADOR]},;
-                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16})
+                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18})
         
         nTotPed += aLinha[nlx][POS_TOTAL]
 
         If nlx == Len(alinha)
             oFWMsExcel:SetCelBold(.T.)
             oFWMsExcel:SetCelBgColor(cCor2)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16} )
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18} )
         EndIf
     Next
 
