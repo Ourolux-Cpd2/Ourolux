@@ -39,7 +39,7 @@ Data: 02/09/2021
 */
 User Function OUROR028()
 
-    Processa({|| OUROR28()},"Gerando relatório de Pedidos de Comoras aprovados...")
+    Processa({|| OUROR28()},"Gerando Relatório de Pedidos de Compras Aprovados...")
 
 Return
 
@@ -283,7 +283,7 @@ Static Function PergPara()
 Local aRet	 := {}
 Local aPergs := {}
 local tmp    := getTempPath()
-Local aCombo := {"Baixados","Em aberto","Ambos"}
+Local aCombo := {"Pagos","Em aberto","Ambos"}
 
 aAdd(aPergs, {1, "Filial de"  ,Space(2) ,"","","SM0","",20,.F.})
 aAdd(aPergs, {1, "Filial ate" ,"ZZ"     ,"","","SM0","",20,.T.})
@@ -297,7 +297,7 @@ aAdd(aPergs, {1, "Pedido ate" ,"ZZZZZZ" ,"","","SC5","",50,.T.})
 aAdd(aPergs, {1, "Grupo de"  ,Space(6) ,"","","SAL","",50,.F.})
 aAdd(aPergs, {1, "Grupo ate" ,"ZZZZZZ" ,"","","SAL","",50,.T.})
 
-aAdd(aPergs, {2, "Considera Pedidos" ,3 ,aCombo ,100,""   ,.T.})
+aAdd(aPergs, {2, "Considera Pagamentos" ,3 ,aCombo ,100,""   ,.T.})
 
 If ParamBox(aPergs,"Impressao",@aRet)
 	aParam   := AjRetParam(aRet,aPergs)
