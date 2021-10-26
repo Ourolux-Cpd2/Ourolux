@@ -19,9 +19,10 @@ User Function Excmg21n(cTexto,aCabec,aDados,mvpar)
 	Local aCabec1:= {}
 	Local aDados2:= {}
 	Local aTemp	 := {}
+	Local x,y	 := 0
 
 	If !ApOleClient("MSExcel") // testa a interação com o excel.
-		MsgAlert("Microsoft Excel não instalado!")
+		Alert("Microsoft Excel não instalado!")
 		Return Nil
 	EndIf
 
