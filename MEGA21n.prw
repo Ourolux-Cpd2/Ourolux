@@ -740,11 +740,11 @@ Static Function RptDetail()
 			If SB1->B1_MSBLQL == '1'
 				SB1->(dbSkip())
 			Else  // new
-				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 6 )
+				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 7 )
 				@ _nLin,008 PSAY Substr( SB1->B1_Desc, 1, 50 )
 				//@ _nLin,049 PSAY SB1->B1_UM
 			
-				AADD(aDados1,Substr( SB1->B1_Cod , 1, 6 ))
+				AADD(aDados1, Alltrim(SB1->B1_Cod))
 				AADD(aDados1,Substr( SB1->B1_Desc, 1, 50))
 				AADD(aDados1,SB1->B1_UM)
 			
