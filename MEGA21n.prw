@@ -980,14 +980,15 @@ Static Function RptDetail()
 			AADD(aDados1,"CUBAGEM")
 			AADD(aDados1,"")
 			
-			For Nw := 1 To _nMeses
+			For Nw := 2 To _nMeses
 				AADD(aDados1,"")
 			Next
 						
 			AADD(aDados1,nAllCub)
 			AADD(aDados1,nMedCub)
 			AADD(aDados1,nAtuCub)
-	  		
+	  		AADD(aDados1,"")
+			  
 			For Nw := 1 To Len( aCub )
 				AADD(aDados1,aCub[Nw][2])
 			Next
