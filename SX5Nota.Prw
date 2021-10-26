@@ -72,9 +72,9 @@ If SC5->C5_NUM <> SC9->C9_PEDIDO
 EndIf
 
 If SM0->M0_CODIGO == '01'
-	If (cChaveX5 $ '5  .ETC.NFS') .And. (SM0->M0_CODFIL == '01')
+	If (cChaveX5 $ '5  .NFS') .And. (SM0->M0_CODFIL == '01')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '4  .ETP') .And. (SM0->M0_CODFIL == '02')
+	ElseIf (cChaveX5 $ '4  ') .And. (SM0->M0_CODFIL == '02')
 		_lRet := .T.
 	ElseIf (cChaveX5 $ '6  ') .And. (SM0->M0_CODFIL == '03')
 		_lRet := .T.
