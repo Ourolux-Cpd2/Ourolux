@@ -1087,9 +1087,10 @@ Static Function RptDetail()
 				AADD(aDados1,"")
 			Next
 						
-			AADD(aDados1,nAllCub)
+			//AADD(aDados1,nAllCub)
 			AADD(aDados1,nMedCub)
 			AADD(aDados1,nAtuCub)
+			AADD(aDados1,"")
 	  		
 			For Nw := 1 To Len( aCub )
 				AADD(aDados1,aCub[Nw][2])
@@ -1100,6 +1101,21 @@ Static Function RptDetail()
 				AADD(aDados1,"")
 			Next
 
+			AADD(aDados1,"")
+			AADD(aDados1,"CUBAGEM VENDIDA")
+			AADD(aDados1,"")
+			AADD(aDados1,nAllCub )
+			AADD(aDados1,"")
+			AADD(aDados1,"")
+
+			For Nw := 1 To (Len( _CabExc ) - 6)
+				AADD(aDados1,"")
+			Next
+			
+			For Nw := 1 To Len( _CabExc )
+				AADD(aDados1,"")
+			Next
+			
 			AADD(aDados1,"")
 			AADD(aDados1,"CUBAGEM PREVISTA")
 			AADD(aDados1,"")
