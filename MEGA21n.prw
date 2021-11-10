@@ -980,11 +980,11 @@ Static Function RptDetail()
 			AADD(aDados1,"CUBAGEM")
 			AADD(aDados1,"")
 			
-			For Nw := 2 To _nMeses
+			For Nw := 1 To _nMeses
 				AADD(aDados1,"")
 			Next
 						
-			AADD(aDados1,nAllCub)
+			//AADD(aDados1,nAllCub)
 			AADD(aDados1,nMedCub)
 			AADD(aDados1,nAtuCub)
 	  		AADD(aDados1,"")
@@ -993,7 +993,22 @@ Static Function RptDetail()
 				AADD(aDados1,aCub[Nw][2])
 			Next
 			AADD(aDados1,"")
-   			    
+   			
+			For Nw := 1 To Len( _CabExc )
+				AADD(aDados1,"")
+			Next
+
+			AADD(aDados1,"")
+			AADD(aDados1,"CUBAGEM VENDIDA")
+			AADD(aDados1,"")
+			AADD(aDados1,nAllCub )
+			AADD(aDados1,"")
+			AADD(aDados1,"")
+
+			For Nw := 1 To (Len( _CabExc ) - 6)
+				AADD(aDados1,"")
+			Next
+			
 			For Nw := 1 To Len( _CabExc )
 				AADD(aDados1,"")
 			Next
@@ -1136,7 +1151,7 @@ Static Function ImpRodape(cProds)
 	// Mauricio Aureliano - 05/04/2018
 	// Inicio da alteracao - Chamado I1711-323
 	//*****************************************
-		@ _nLin,000 PSAY "C U B A G E M  (M" + Trim(Chr(179)) + ") U N I T  R I A ---> "
+		@ _nLin,000 PSAY "C U B A G E M  (M" + Trim(Chr(179)) + ") U N I T A R I A ---> "
 	
 		For a := 1 To Len(_aTotCom)
 			_nTotCub += _aTotCom[ a ][ 2 ]

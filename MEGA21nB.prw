@@ -6,7 +6,7 @@
 	#DEFINE PSAY SAY
 #ENDIF
 
-#DEFINE COMP_DATE "20191209"
+#DEFINE COMP_DATE "20211103"
 #DEFINE PICT_CUB  "@E 99,999,999.99"
 
 /*/
@@ -150,6 +150,7 @@ Static Function RptDetail()
 	Local cCodiW7 	:= ""
 	Local cProds	:= ""
 	Local cFornec	:= ""
+	Local cLogName	:= ""
 
 	Private cArqTrb1 := CriaTrab(NIL,.F.) // Alterado por Claudino, 30/08/12.
 	Private cArqTrb2 := CriaTrab(NIL,.F.) // Alterado por Claudino, 30/08/12.
@@ -491,6 +492,7 @@ Static Function RptDetail()
 
 				EndIf
 				
+				DbSelectArea(cSWN)
 				(cSWN)->(DbCloseArea())
 			// I1706-074 - Fim
 			Else
@@ -517,130 +519,87 @@ Static Function RptDetail()
 
 	PutLog( "Gravando SWNTRB - Fim :" +Time() )
 	
-			//Seleciona as movimentações
-			_cQry := " SELECT Codigo, Periodo, SUM(Qde) Qde, Loc  FROM("
-
-			_cQry := " SELECT	SD2.D2_COD AS Codigo, "
-			_cQry += " 		  	SUBSTRING(SD2.D2_EMISSAO, 1, 6) AS Periodo, "
-			_cQry += " 		  	SUM(SD2.D2_QUANT) AS Qde, "
-			_cQry += " 		  	SD2.D2_LOCAL AS Loc "
-			_cQry += " FROM " + RetSqlName("SD2") +" SD2 "
-			_cQry += " 		INNER JOIN SB1010 SB1 "
-			_cQry += " 			ON SB1.B1_FILIAL = '' "
-			_cQry += " 			AND SB1.B1_COD = SD2.D2_COD "
-			_cQry += " 		INNER JOIN " + RetSqlName("SF2") +" SF2 "
-			_cQry += " 			ON SF2.F2_FILIAL = SD2.D2_FILIAL "
-			_cQry += " 			AND SF2.F2_SERIE = SD2.D2_SERIE "
-			_cQry += " 			AND SF2.F2_DOC = SD2.D2_DOC "
-			_cQry += " 			AND SF2.F2_CLIENTE = SD2.D2_CLIENTE "
-			_cQry += " 			AND SF2.F2_LOJA = SD2.D2_LOJA "
-			_cQry += " 		INNER JOIN " + RetSqlName("SF4") +" SF4 "
-			_cQry += " 			ON SF4.F4_CODIGO = SD2.D2_TES "
-			_cQry += " WHERE SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-			_cQry += " AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
-			_cQry += " AND SD2.D_E_L_E_T_ <> '*' "
-			_cQry += " AND SD2.D2_TIPO = 'N' "
-
-			If !Empty(MV_par11)
-				_cQry += " AND SD2.D2_COD IN (" + cCodiW7 + ") "
-			EndIf
+	_cQry := " SELECT CODIGO, "
+	_cQry += "        LOC, "
+	_cQry += "        QDE, "
+	_cQry += "        G1_COMP, "
+	_cQry += "        G1_QUANT, "
+	_cQry += "        G1_QUANT * QDE, "
+	_cQry += "        PERIODO "
+	_cQry += " FROM  (SELECT CODIGO, "
+	_cQry += "               LOC, "
+	_cQry += "               Sum(TOTAL770) QDE, "
+	_cQry += "               PERIODO "
+	_cQry += "        FROM  (SELECT CODIGO_B2, "
+	_cQry += "                      G1_COMP        CODIGO, "
+	_cQry += "                      LOC, "
+	_cQry += "                      G1_QUANT       QTD_770, "
+	_cQry += "                      QDE, "
+	_cQry += "                      G1_QUANT * QDE TOTAL770, "
+	_cQry += "                      PERIODO "
+	_cQry += "               FROM  (SELECT D2_COD                      CODIGO_B2, "
+	_cQry += "                             Substring(D2_EMISSAO, 1, 6) PERIODO, "
+	_cQry += "                             Sum(D2_QUANT)               QDE, "
+	_cQry += "                             D2_LOCAL                    LOC "
+	_cQry += "                      FROM " + RetSqlName("SD2") + " SD2 "
+	_cQry += "                             INNER JOIN " + RetSqlName("SB1") + " SB1 "
+	_cQry += "                                     ON B1_FILIAL = '' "
+	_cQry += "                                        AND B1_COD = D2_COD "
+	_cQry += "                             INNER JOIN " + RetSqlName("SF2") + " SF2 "
+	_cQry += "                                     ON F2_FILIAL = D2_FILIAL "
+	_cQry += "                                        AND F2_SERIE = D2_SERIE "
+	_cQry += "                                        AND F2_DOC = D2_DOC "
+	_cQry += "                                        AND F2_CLIENTE = D2_CLIENTE "
+	_cQry += "                                        AND F2_LOJA = D2_LOJA "
+	_cQry += "                             INNER JOIN " + RetSqlName("SF4") + " SF4 "
+	_cQry += "                                     ON F4_CODIGO = D2_TES "
+	_cQry += "                      WHERE  SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
+	_cQry += "                             AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
 	
-			_cQry += " AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-			_cQry += " AND SD2.D2_TIPO = SF2.F2_TIPO "
-			_cQry += " AND SB1.D_E_L_E_T_ <> '*' "
-			_cQry += " AND SF2.D_E_L_E_T_ <> '*' "
-			_cQry += " AND B1_MSBLQL <> '1' "
-		
-			If Len(cQAdd) > 2
-				_cQry += " AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
-			EndIf
-		
-			_cQry += " AND SF4.D_E_L_E_T_ <> '*' "
-			_cQry += " AND F4_ESTOQUE = 'S' "
-			_cQry += " GROUP  BY SD2.D2_COD, SUBSTRING(SD2.D2_EMISSAO, 1, 6), SD2.D2_LOCAL "
+	If !Empty(MV_par11)
+		_cQry += " 						   AND SD2.D2_COD IN (" + cCodiW7 + ") "
+	EndIf
+	
+	_cQry += "                             AND SD2.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND SD2.D2_TIPO = 'N' "
+	_cQry += "                             AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
+	_cQry += "                             AND SD2.D2_TIPO = SF2.F2_TIPO "
+	_cQry += "                             AND SB1.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND SF2.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND B1_MSBLQL <> '1' "
 
+	If Len(cQAdd) > 2
+		_cQry += " 						   AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
+	Endif
+	
+	_cQry += "                             AND SF4.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND F4_ESTOQUE = 'S' "
+	_cQry += "                      GROUP  BY SD2.D2_COD, "
+	_cQry += "                                Substring(SD2.D2_EMISSAO, 1, 6), "
+	_cQry += "                                SD2.D2_LOCAL) PAI " 
+	_cQry += "                     INNER JOIN SG1010 SG1 "
+	_cQry += "                             ON G1_COD = CODIGO_B2) TOT770 "
+	_cQry += "        GROUP  BY CODIGO, "
+	_cQry += "                  LOC, " 
+	_cQry += "                  PERIODO) COMP_770 "
+	_cQry += "       INNER JOIN SG1010 SG1A " 
+	_cQry += "               ON CODIGO = G1_COD "
+	_cQry += " ORDER BY 1 "
 
-//NOVA REGRA - Incluir opção da Abertura do KIT pela Estrutura ATUAL
-//Sol. Sr.Roberto / Otavio - Setor Vendas - Autor Andre Salgado - 24/08/2020
-			_cQry += " 	UNION ALL"
-			_cQry += " 	SELECT COMP Codigo, Periodo,SUM(QTD) Qde, Loc  FROM("
-			_cQry += " 	SELECT COMP, Periodo, Loc, ROUND(QDE*QTDCOMP,2) QTD FROM("
-			_cQry += " 	SELECT	SD2.D2_COD AS Codigo, "
-			_cQry += " 			SUBSTRING(SD2.D2_EMISSAO, 1, 6) AS Periodo,"
-			_cQry += " 			SUM(SD2.D2_QUANT) AS Qde,"
-			_cQry += " 			SD2.D2_LOCAL AS Loc"
-			_cQry += " 			FROM  SD2010 SD2 "
-			_cQry += " 			INNER JOIN SB1010 SB1 ON SB1.B1_FILIAL = '' AND SB1.B1_COD = SD2.D2_COD"
-			_cQry += " 			INNER JOIN SF2010 SF2 ON SF2.F2_FILIAL = SD2.D2_FILIAL AND SF2.F2_SERIE = SD2.D2_SERIE"
-			_cQry += " 					AND SF2.F2_DOC = SD2.D2_DOC"
-			_cQry += " 					AND SF2.F2_CLIENTE = SD2.D2_CLIENTE"
-			_cQry += " 					AND SF2.F2_LOJA = SD2.D2_LOJA"
-			_cQry += " 			INNER JOIN  SF4010 SF4 ON SF4.F4_CODIGO = SD2.D2_TES"
-			_cQry += " WHERE SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-			_cQry += " AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
-			_cQry += " 		AND SD2.D_E_L_E_T_ <> '*'"
-			_cQry += " 		AND SD2.D2_TIPO = 'N'"
+	cLogName   := "MEGA21NB"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+	MemoWrite("\INTRJ\" + cLogName,_cQry)
 
-			If !Empty(MV_par11)
-				_cQry += " AND SD2.D2_COD IN (" + cCodiW7 + ") "
-			EndIf
+	PutLog( "Montando Query SM0 - Qry - Inicio :" +Time() +CRLF+_cQry)
 
-			_cQry += " AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-			_cQry += " 		AND SD2.D2_TIPO = SF2.F2_TIPO"
-			_cQry += " 		AND SB1.D_E_L_E_T_ <> '*'"
-			_cQry += " 		AND SF2.D_E_L_E_T_ <> '*'"
-			_cQry += " 		AND B1_MSBLQL <> '1'"
+	If Select("QRY") > 0
+		QRY->(DbCloseArea())
+	EndIf
+
+	dbUseArea( .T., "TOPCONN", TCGENQRY(,,_cQry), 'QRY' )
 			
-			If Len(cQAdd) > 2
-				_cQry += " 		AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
-			Endif
-			
-			_cQry += " 		AND SF4.D_E_L_E_T_ <> '*'"
-			_cQry += " 		AND F4_ESTOQUE = 'S' "
-			_cQry += " 	GROUP  BY SD2.D2_COD, SUBSTRING(SD2.D2_EMISSAO, 1, 6), SD2.D2_LOCAL"
-			_cQry += " 	)A "
-			_cQry += "	INNER JOIN "
-			_cQry += " 	(SELECT G1_COD, COMP, SUM(QTD) QTDCOMP"
-			_cQry += " 	FROM("
-            _cQry += " SELECT G1.G1_COD, B1.B1_DESC PRODUZ, G1.G1_COMP COMP, G1.G1_QUANT QTD, '01' NIVEL, '' PROD_NIV"
-			_cQry += " FROM SB1010 B1 "
-			_cQry += " INNER  JOIN SG1010 G1 ON B1_COD=G1.G1_COD AND G1.D_E_L_E_T_=' ' "
-			_cQry += " WHERE B1.D_E_L_E_T_=' ' AND B1_GRUPO='2520'"
-			_cQry += " UNION ALL"
-			_cQry += " SELECT G1.G1_COD, B1.B1_DESC PRODUZ, G2.G1_COMP COMP, G2.G1_QUANT QTD, '02' NIVEL, G2.G1_COD PROD_NIV"
-			_cQry += " FROM SB1010 B1 "
-			_cQry += " INNER  JOIN SG1010 G1 ON B1_COD=G1.G1_COD AND G1.D_E_L_E_T_=' ' "
-			_cQry += " INNER  JOIN SG1010 G2 ON G1.G1_COMP=G2.G1_COD AND G2.D_E_L_E_T_=' ' "
-			_cQry += " WHERE B1.D_E_L_E_T_=' ' AND B1_GRUPO='2520'"
-			_cQry += " UNION ALL"
-			_cQry += " SELECT G1.G1_COD, B1.B1_DESC PRODUZ, G3.G1_COMP COMP, G3.G1_QUANT QTD, '03' NIVEL, G3.G1_COD PROD_NIV"
-			_cQry += " FROM SB1010 B1 "
-			_cQry += " INNER  JOIN SG1010 G1 ON B1_COD=G1.G1_COD AND G1.D_E_L_E_T_=' ' "
-			_cQry += " INNER  JOIN SG1010 G2 ON G1.G1_COMP=G2.G1_COD AND G2.D_E_L_E_T_=' ' "
-			_cQry += " INNER  JOIN SG1010 G3 ON G2.G1_COMP=G3.G1_COD AND G3.D_E_L_E_T_=' ' "
-			_cQry += " WHERE B1.D_E_L_E_T_=' ' AND B1_GRUPO='2520'"
-			_cQry += " )A GROUP BY G1_COD, COMP"
-			_cQry += " )ESTR ON CODIGO=G1_COD"
-			_cQry += " )TOTAL GROUP BY COMP, Periodo, Loc"
-		//Final da Melhoria de Abertura
-
-			//_cQry += " )A GROUP BY CODIGO, Periodo, Loc"
-			_cQry += " ORDER BY 1, 4 "
-			_cQry := UPPER(_cQry)
-
-			MEMOWRITE("C:\ANDRE\TESTESQL.SQL",_cQry)
-
-			PutLog( "Montando Query SM0 - Qry - Inicio :" +Time() +CRLF+_cQry)
-
-			If Select("QRY") > 0
-				QRY->(DbCloseArea())
-			EndIf
-
-			dbUseArea( .T., "TOPCONN", TCGENQRY(,,_cQry), 'QRY' )
-			
- 			PutLog( "Montando Query SM0 - Fim :" +Time() )
+	PutLog( "Montando Query SM0 - Fim :" +Time() )
 					
-			_EmpAtu:=  "02"
+	_EmpAtu:=  "02"
 			
 	If Select("Prv") > 0
 		DbSelectArea("Prv")
@@ -650,7 +609,101 @@ Static Function RptDetail()
 	_nRegua := 0
 	DbSelectArea("QRY")
 	While QRY->(!Eof())
-		AADD(aMovtos,{QRY->CODIGO,QRY->PERIODO,QRY->QDE,QRY->LOC})
+		If aScan( aMovtos, { |x| x[1] == QRY->CODIGO } ) <= 0
+			AADD(aMovtos,{QRY->CODIGO,QRY->PERIODO,QRY->QDE,QRY->LOC})
+		EndIf
+
+		QRY->(dbSkip())
+		_nRegua ++
+	EndDo
+
+	_cQry := " SELECT CODIGO, "
+	_cQry += "        LOC, "
+	_cQry += "        QDE, "
+	_cQry += "        G1_COMP, "
+	_cQry += "        G1_QUANT, "
+	_cQry += "        G1_QUANT * QDE AS TOT_COMP, "
+	_cQry += "        PERIODO "
+	_cQry += " FROM  (SELECT CODIGO, "
+	_cQry += "               LOC, "
+	_cQry += "               Sum(TOTAL770) QDE, "
+	_cQry += "               PERIODO "
+	_cQry += "        FROM  (SELECT CODIGO_B2, "
+	_cQry += "                      G1_COMP        CODIGO, "
+	_cQry += "                      LOC, "
+	_cQry += "                      G1_QUANT       QTD_770, "
+	_cQry += "                      QDE, "
+	_cQry += "                      G1_QUANT * QDE TOTAL770, "
+	_cQry += "                      PERIODO "
+	_cQry += "               FROM  (SELECT D2_COD                      CODIGO_B2, "
+	_cQry += "                             Substring(D2_EMISSAO, 1, 6) PERIODO, "
+	_cQry += "                             Sum(D2_QUANT)               QDE, "
+	_cQry += "                             D2_LOCAL                    LOC "
+	_cQry += "                      FROM " + RetSqlName("SD2") + " SD2 "
+	_cQry += "                             INNER JOIN " + RetSqlName("SB1") + " SB1 "
+	_cQry += "                                     ON B1_FILIAL = '' "
+	_cQry += "                                        AND B1_COD = D2_COD "
+	_cQry += "                             INNER JOIN " + RetSqlName("SF2") + " SF2 "
+	_cQry += "                                     ON F2_FILIAL = D2_FILIAL "
+	_cQry += "                                        AND F2_SERIE = D2_SERIE "
+	_cQry += "                                        AND F2_DOC = D2_DOC "
+	_cQry += "                                        AND F2_CLIENTE = D2_CLIENTE "
+	_cQry += "                                        AND F2_LOJA = D2_LOJA "
+	_cQry += "                             INNER JOIN " + RetSqlName("SF4") + " SF4 "
+	_cQry += "                                     ON F4_CODIGO = D2_TES "
+	_cQry += "                      WHERE  SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
+	_cQry += "                             AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
+	
+	If !Empty(MV_par11)
+		_cQry += " 						   AND SD2.D2_COD IN (" + cCodiW7 + ") "
+	EndIf
+	
+	_cQry += "                             AND SD2.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND SD2.D2_TIPO = 'N' "
+	_cQry += "                             AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
+	_cQry += "                             AND SD2.D2_TIPO = SF2.F2_TIPO "
+	_cQry += "                             AND SB1.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND SF2.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND B1_MSBLQL <> '1' "
+
+	If Len(cQAdd) > 2
+		_cQry += " 						   AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
+	Endif
+	
+	_cQry += "                             AND SF4.D_E_L_E_T_ <> '*' "
+	_cQry += "                             AND F4_ESTOQUE = 'S' "
+	_cQry += "                      GROUP  BY SD2.D2_COD, "
+	_cQry += "                                Substring(SD2.D2_EMISSAO, 1, 6), "
+	_cQry += "                                SD2.D2_LOCAL) PAI " 
+	_cQry += "                     INNER JOIN SG1010 SG1 "
+	_cQry += "                             ON G1_COD = CODIGO_B2) TOT770 "
+	_cQry += "        GROUP  BY CODIGO, "
+	_cQry += "                  LOC, " 
+	_cQry += "                  PERIODO) COMP_770 "
+	_cQry += "       INNER JOIN SG1010 SG1A " 
+	_cQry += "               ON CODIGO = G1_COD "
+	_cQry += " ORDER BY 4 "
+
+	cLogName   := "MEGA21NB_COMP"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+	MemoWrite("\INTRJ\" + cLogName,_cQry)
+
+	PutLog( "Montando Query SM0 - Qry - Inicio :" +Time() +CRLF+_cQry)
+
+	If Select("QRY") > 0
+		QRY->(DbCloseArea())
+	EndIf
+
+	dbUseArea( .T., "TOPCONN", TCGENQRY(,,_cQry), 'QRY' )
+			
+	While QRY->(!Eof())
+		nPosM := aScan( aMovtos, { |x| x[1] == QRY->G1_COMP } )
+		
+		If nPosM <= 0
+			AADD(aMovtos,{QRY->G1_COMP,QRY->PERIODO,QRY->TOT_COMP,QRY->LOC})
+		else
+			aMovtos[nPosM][3] += QRY->TOT_COMP
+		EndIf
+
 		QRY->(dbSkip())
 		_nRegua ++
 	EndDo
@@ -843,11 +896,11 @@ Static Function RptDetail()
 			If SB1->B1_MSBLQL == '1'
 				SB1->(dbSkip())
 			Else  // new
-				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 7 )
+				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 6 )
 				@ _nLin,008 PSAY Substr( SB1->B1_Desc, 1, 50 )
 				//@ _nLin,049 PSAY SB1->B1_UM
 			
-				AADD(aDados1,Alltrim(SB1->B1_Cod))
+				AADD(aDados1,Substr( SB1->B1_Cod , 1, 6 ))
 				AADD(aDados1,Substr( SB1->B1_Desc, 1, 50))
 				AADD(aDados1,SB1->B1_UM)
 			
@@ -1087,10 +1140,9 @@ Static Function RptDetail()
 				AADD(aDados1,"")
 			Next
 						
-			//AADD(aDados1,nAllCub)
+			AADD(aDados1,nAllCub)
 			AADD(aDados1,nMedCub)
 			AADD(aDados1,nAtuCub)
-			AADD(aDados1,"")
 	  		
 			For Nw := 1 To Len( aCub )
 				AADD(aDados1,aCub[Nw][2])
@@ -1101,21 +1153,6 @@ Static Function RptDetail()
 				AADD(aDados1,"")
 			Next
 
-			AADD(aDados1,"")
-			AADD(aDados1,"CUBAGEM VENDIDA")
-			AADD(aDados1,"")
-			AADD(aDados1,nAllCub )
-			AADD(aDados1,"")
-			AADD(aDados1,"")
-
-			For Nw := 1 To (Len( _CabExc ) - 6)
-				AADD(aDados1,"")
-			Next
-			
-			For Nw := 1 To Len( _CabExc )
-				AADD(aDados1,"")
-			Next
-			
 			AADD(aDados1,"")
 			AADD(aDados1,"CUBAGEM PREVISTA")
 			AADD(aDados1,"")
@@ -1436,6 +1473,7 @@ Static Function ImpRodape(cProds)
 	// EndIf 
 Return
 
+
 //-------------------------------------------------------------------------------------
 /*/{Protheus.doc} RetCub
 Retorna a cubagem de um item
@@ -1451,30 +1489,28 @@ Retorna a cubagem de um item
 Static Function RetCub( cProd, nQuant)
 	Local nCub 		:= 0
 	Local nQtEmb    := 0
+	Local lEEC		:= .F.
 	Local aArea 	:= GetArea()
     
 	Default cProd 	:= SB1->B1_COD
     
-	DbSelectArea("SB5")
-	If SB5->(DbSeek( xFilial("SB5")+cProd))
-		If !Empty(SB5->B5_EMB1)
-			DbSelectArea("EE5")
-			If EE5->(DbSeek(xFilial("EE5")+SB5->B5_EMB1))
-				nQtEmb	:= nQuant/SB1->B1_QE
-				nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
-			Else
-				nQtEmb	:= nQuant
-				nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
-			EndIf
-		EndIf
+	If lEEC
+		nQtEmb	:= nQuant/SB1->B1_QE
+		nCub	:= nQtEmb * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
 	Else
-		AADD( aNoCub , SB1->B1_COD )
+		DbSelectArea("SB5")
+		If SB5->(DbSeek( xFilial("SB5")+cProd))
+			nQtEmb	:= nQuant
+			nCub	:= nQtEmb * (SB5->B5_COMPR * SB5->B5_LARG * SB5->B5_ALTURA)
+		Else
+			AADD( aNoCub , SB1->B1_COD )
+		EndIf
 	EndIf
 	
 	RestArea( aArea )
 
 Return( nCub )
-
+  
 //-------------------------------------------------------------------------------------
 /*/{Protheus.doc} PutLog
 Geracao de log
@@ -1607,8 +1643,7 @@ Return nDiv
 */
 
 Static Function ValidP1(cPerg)
-Local i, j := 0
-
+Local i,j := 0
 dbSelectArea("SX1")
 dbSetOrder(1)
 
