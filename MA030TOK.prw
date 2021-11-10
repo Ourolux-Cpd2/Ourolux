@@ -47,7 +47,7 @@ User Function MA030TOK()
 			lRet := .F.
 	//		Aviso("MA030TOK",cMsgErro,{"Ok"},2,"Atenção")
 		//Amedeo (Ajuste para tratamento Portal de Vendas)
-			If !IsInCallStacj( "U_FBBXCLI" )
+			If !IsInCallStacj( "U_FBCLIENT" )
 				U_MyAviso("MA030TOK",cMsgErro,{"Ok"},2,"Atenção")
 			Else
 				Aviso( "MA030TOK", cMsgErro, {"Ok"}, 2, "Atenção" )
@@ -115,7 +115,7 @@ User Function MA030TOK()
 				lRet := .F.
 //			Aviso("MA030TOK",cMsgErro,{"Ok"},3,"Atenção") 
 			//Amedeo (Ajuste para tratamento Portal de Vendas)
-				If !IsInCallStacj( "U_FBBXCLI" )
+				If !IsInCallStacj( "U_FBCLIENT" )
 					U_MyAviso("[MA030TOK]",cMsgErro,{"Ok"},3)
 				Else
 					Aviso( "[MA030TOK]", cMsgErro, {"Ok"}, 3 )
@@ -156,7 +156,7 @@ EndIf
 				lRet := .F.
 			
 			//Amedeo (Ajuste para tratamento Portal de Vendas)
-				If !IsInCallStacj( "U_FBBXCLI" )
+				If !IsInCallStacj( "U_FBCLIENT" )
 					ApMsgStop("Favor preencher o campo Contribuinte igual a Sim, localizado na ABA Fiscais.","MA030TOK")
 				Else
 					Aviso( "MA030TOK", "Favor preencher o campo Contribuinte igual a Sim, localizado na ABA Fiscais.", {"Ok"}, 2 )
@@ -168,7 +168,7 @@ EndIf
 				lRet := .F.
 			
 			//Amedeo (Ajuste para tratamento Portal de Vendas)
-				If !IsInCallStacj( "U_FBBXCLI" )
+				If !IsInCallStacj( "U_FBCLIENT" )
 					ApMsgStop("Favor preencher o campo Inscrição Estadual, localizado na ABA Cadastrais.","MA030TOK")
 				Else
 					Aviso( "MA030TOK", "Favor preencher o campo Inscrição Estadual, localizado na ABA Cadastrais.", {"Ok"}, 2 )
@@ -185,7 +185,7 @@ EndIf
 //		ApMsgStop("Favor preencher o campo Cod CNAE, localizado na ABA Cadastrais.","MA030TOK")
 		
 		//Amedeo (Ajuste para tratamento Portal de Vendas)
-			If !IsInCallStacj( "U_FBBXCLI" )
+			If !IsInCallStacj( "U_FBCLIENT" )
 				U_MyAviso("[MA030TOK]","Favor preencher o campo Cod CNAE, localizado na ABA Cadastrais.",{"Ok"},3)
 			Else
 				Aviso( "[MA030TOK]","Favor preencher o campo Cod CNAE, localizado na ABA Cadastrais.", {"Ok"}, 3 )
@@ -277,7 +277,7 @@ EndIf
 		//			ApMsgStop("Já existe um cadastro com essa Raiz de CNPJ, por favor encaminhar o cadastro para o departamento financeiro.","MA030TOK")			
 					
 					//Amedeo (Ajuste para tratamento Portal de Vendas)
-						If !IsInCallStacj( "U_FBBXCLI" )
+						If !IsInCallStacj( "U_FBCLIENT" )
 							U_MyAviso("[MA030TOK]",cMsgAvis,{"Ok"},3)
 						Else
 							Aviso( "[MA030TOK]", cMsgAvis, {"Ok"}, 3)
@@ -296,7 +296,7 @@ EndIf
 			lRet := .F.
 		
 		//Amedeo (Ajuste para tratamento Portal de Vendas)
-			If !IsInCallStacj( "U_FBBXCLI" )
+			If !IsInCallStacj( "U_FBCLIENT" )
 				U_MyAviso("[MA030TOK]",cMsgAvis,{"Ok"},3)
 			Else
 				Aviso( "[MA030TOK]", cMsgAvis, {"Ok"}, 3 )
@@ -309,7 +309,7 @@ EndIf
 			lRet := .F.
 		
 		//Amedeo (Ajuste para tratamento Portal de Vendas)
-			If !IsInCallStacj( "U_FBBXCLI" )
+			If !IsInCallStacj( "U_FBCLIENT" )
 				U_MyAviso("[MA030TOK]",cMsgAvis,{"Ok"},3)
 			Else
 				Aviso( "[MA030TOK]", cMsgAvis, {"Ok"}, 3 )
@@ -327,7 +327,7 @@ EndIf
 		IF !EMPTY(SU7->U7_CODVEN) // SOMENTE SE FOR REPRESENTANTE
 		
 		//Amedeo (Ajuste para tratamento Portal de Vendas)
-			If !IsInCallStacj( "U_FBBXCLI" )
+			If !IsInCallStacj( "U_FBCLIENT" )
 				U_CConta(M->A1_COD,M->A1_LOJA)
 			EndIf
 
