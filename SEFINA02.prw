@@ -115,7 +115,15 @@ Static Function SEIni(cCliente, cLoja)
 	If !SEVer(oXml:_CONSULTA,  "_RECEITA")
 		SEReceita(oXml:_CONSULTA:_RECEITA, cCabec)
 	EndIf
-	                                        
+
+	If !SEVer(oXml:_CONSULTA,  "_SOCIOS")
+		SESocios(oXml:_CONSULTA:_SOCIOS, cCabec)
+	EndIf
+
+	If !SEVer(oXml:_CONSULTA,  "_DOCUMENTO")
+		SEDocumento(oXml:_CONSULTA:_DOCUMENTO, cCabec)
+	EndIf
+
 	If !SEVer(oXml:_CONSULTA,  "_COLIGADAS")
 		SEColigadas(oXml:_CONSULTA:_COLIGADAS, cCabec)
 	EndIf
@@ -163,7 +171,8 @@ Static Function SECabec(cXml, cStatus)
 	Local cRet := GetSxeNum("ZA1", "ZA1_CODIGO")
 	
 	SEProc("Salvando dados do cabeçalho...")
-  
+	
+	dbSelectArea("ZA1")
 	RecLock("ZA1", .T.)
 		ZA1->ZA1_FILIAL := xFilial("ZA1")
 		ZA1->ZA1_CODIGO := cRet
@@ -190,6 +199,7 @@ Static Function SECliente(oXmlCli, cCabec)
 		Return
 	EndIf
 
+	dbSelectArea("ZA2")	
 	Reclock("ZA2", .T.)
 		ZA2->ZA2_FILIAL := xFilial("ZA2")
 		ZA2->ZA2_CODIGO := cCabec
@@ -200,6 +210,24 @@ Static Function SECliente(oXmlCli, cCabec)
 		ZA2->ZA2_DTFUND := cToD(oXmlCli:_CLI_DTFUND:TEXT)
 		ZA2->ZA2_PEXP   := cToD(oXmlCli:_CLI_PEXP:TEXT)
 		ZA2->ZA2_ATU    := cToD(oXmlCli:_CLI_ATU:TEXT)
+		If !SEVer(@oXmlCli, "_CLI_DDD1")
+			ZA2->ZA2_DDD1	:= oXmlCli:_CLI_DDD1:TEXT
+		EndIf
+		If !SEVer(@oXmlCli, "_CLI_FONE1")
+			ZA2->ZA2_FONE1	:= oXmlCli:_CLI_FONE1:TEXT
+		EndIf
+		If !SEVer(@oXmlCli, "_CLI_DDD2")
+			ZA2->ZA2_DDD2	:= oXmlCli:_CLI_DDD2:TEXT
+		EndIF
+		If !SEVer(@oXmlCli, "_CLI_FONE2")
+			ZA2->ZA2_FONE2	:= oXmlCli:_CLI_FONE2:TEXT
+		EndIf
+		If !SEVer(@oXmlCli, "_CLI_EMAIL")
+			ZA2->ZA2_EMAIL	:= oXmlCli:_CLI_EMAIL:TEXT
+		EndIf
+		If !SEVer(@oXmlCli, "_CLI_CAPSOCIAL")
+			ZA2->ZA2_CSOCIA	:= Val(oXmlCli:_CLI_CAPSOCIAL:TEXT)
+		EndIf
 	MsUnlock()
 	
 Return
@@ -212,6 +240,7 @@ Static Function SEReceita(oXmlRec, cCabec)
 		Return
 	EndIf
 
+	dbSelectArea("ZA3")
 	Reclock("ZA3", .T.)
 		ZA3->ZA3_FILIAL := xFilial("ZA3")
 		ZA3->ZA3_CODIGO := cCabec
@@ -221,6 +250,12 @@ Static Function SEReceita(oXmlRec, cCabec)
 		ZA3->ZA3_NATJUR := oXmlRec:_REC_NATJUR:TEXT
 		ZA3->ZA3_SIT    := oXmlRec:_REC_SIT:TEXT
 		ZA3->ZA3_MOTSIT := oXmlRec:_REC_MOTSIT:TEXT
+		If SEVer(@oXmlRec, '_REC_DTSIT')
+			ZA3->ZA3_DTSIT	:= cToD(oXmlRec:_REC_DTSIT:TEXT)
+		EndIf
+		If SEVer(@oXmlRec, '_REC_CNAE')
+			ZA3->ZA3_CNAE	:= oXmlRec:_REC_CNAE:TEXT
+		EndIf
 	MsUnlock()
 	
 Return
@@ -250,6 +285,7 @@ Static Function SEColigadas(oXmlCol, cCabec)
 		cSequen := Val(cSequen)+1
 		cSequen := StrZero(cSequen, TamSX3("ZA4_SEQUEN")[1])
 		
+		dbSelectArea("ZA4")
 		Reclock("ZA4", .T.)
 			ZA4->ZA4_FILIAL := xFilial("ZA4")
 			ZA4->ZA4_CODIGO := cCabec
@@ -271,7 +307,8 @@ Static Function SERisco(oXmlRis, cCabec)
 	If SEVer(@oXmlRis, '_DT_RISCO')
 		Return
 	EndIf
-	
+
+	dbSelectArea("ZA5")
 	Reclock("ZA5", .T.)
 		ZA5->ZA5_FILIAL := xFilial("ZA5")
 		ZA5->ZA5_CODIGO := cCabec
@@ -288,12 +325,12 @@ Static Function SEExperiencia(oXmlExp, cCabec)
 	Local aMPMV   := {}
 	Local aMPAG   := {}
 	Local aTINF   := {}
-	Local aTCONS  := {}
+	//Local aTCONS  := {}
 	Local aMMFAT  := {}
 	Local aATRASO := {}
 	Local aTAVEMC := {}
 	Local aTVENCD := {}
-	Local aCONCOV := {}
+	//Local aCONCOV := {}
 	
 	SEProc("Salvando dados de resumo de informações dos últimos 12 meses...")
 	
@@ -317,6 +354,7 @@ Static Function SEExperiencia(oXmlExp, cCabec)
 		cSequen := Val(cSequen)+1
 		cSequen := StrZero(cSequen, TamSX3("ZA6_SEQUEN")[1])
 	
+		dbSelectArea("ZA6")
 		Reclock("ZA6", .T.)
 			ZA6->ZA6_FILIAL := xFilial("ZA6")
 			ZA6->ZA6_CODIGO := cCabec
@@ -392,6 +430,7 @@ Static Function SEInformacao(oXmlInf, cCabec)
 		cSequen := Val(cSequen)+1
 		cSequen := StrZero(cSequen, TamSX3("ZA7_SEQUEN")[1])
 			
+		dbSelectArea("ZA7")			
 		Reclock("ZA7", .T.)
 			ZA7->ZA7_FILIAL := xFilial("ZA7")
 			ZA7->ZA7_CODIGO := cCabec
@@ -415,6 +454,117 @@ Static Function SEInformacao(oXmlInf, cCabec)
 			ZA7->ZA7_PAG    := Val(aPAG[nX]:TEXT)
 			ZA7->ZA7_DTPAG  := cToD(aDTPAG[nX]:TEXT)
 			ZA7->ZA7_SIT    := aSIT[nX]:TEXT
+		MsUnlock()
+		
+	Next nX
+	
+Return
+
+Static Function SESocios(oXmlInf, cCabec) 
+
+	Local cSequen 	:= "0"
+	Local nX      	:= 0
+	Local aNome   	:= {}
+	Local aTipo  	:= {}
+	Local aQualif  	:= {}
+	Local aDtEntr 	:= {}
+	
+	SEProc("Salvando dados de informações relevantes...")      
+	
+	If SEVer(@oXmlInf, '_SOCIO_NOME')
+		Return
+	EndIf
+	
+	If SEVer(@oXmlInf, '_SOCIO_NOME')
+		aNome   := SEArray(oXmlInf:_SOCIO_NOME)
+	EndIf
+	If SEVer(@oXmlInf, '_SOCIO_TIPO')
+		aTipo  	:= SEArray(oXmlInf:_SOCIO_TIPO)
+	EndIf
+	If SEVer(@oXmlInf, '_SOCIO_QUALIF')		
+		aQualif := SEArray(oXmlInf:_SOCIO_QUALIF)
+	EndIf
+	If SEVer(@oXmlInf, '_SOCIO_DTENTR')		
+		aDtEntr := SEArray(oXmlInf:_SOCIO_DTENTR)
+	EndIf
+	For nX := 1 To Len(aNome)
+	
+		cSequen := Val(cSequen)+1
+		cSequen := StrZero(cSequen, TamSX3("ZAG_SEQ")[1])
+			
+		dbSelectArea("ZAG")
+		Reclock("ZAG", .T.)
+			ZAG->ZAG_FILIAL := xFilial("ZAG")
+			ZAG->ZAG_CODIGO := cCabec
+			ZAG->ZAG_SEQ    := cSequen
+			If !Empty(aNome)
+				ZAG->ZAG_NOME   := aNome[nX]:TEXT
+			EndIf
+			If !Empty(aTipo)
+				ZAG->ZAG_TIPO 	:= aTipo[nX]:TEXT
+			EndIf
+			If !Empty(aQualif)
+				ZAG->ZAG_QUALIF := aQualif[nX]:TEXT
+			EndIf
+			If !Empty(aDtEntr)
+				ZAG->ZAG_DTENTR := cToD(aDtEntr[nX]:TEXT)
+			EndIf
+		MsUnlock()
+		
+	Next nX
+	
+Return
+
+Static Function SEDocumento(oXmlInf, cCabec) 
+
+	Local cSequen 	:= "0"
+	Local nX      	:= 0
+	Local aDtCad   	:= {}
+	Local aDtDoc  	:= {}
+	Local aTpDoc  	:= {}
+	Local aDesc 	:= {}
+	
+	SEProc("Salvando dados de informações relevantes...")      
+	
+	If SEVer(@oXmlInf, '_DOC_DTDCAD')
+		Return
+	EndIf
+	
+	If SEVer(@oXmlInf, '_DOC_DTDCAD')
+		aDtCad  := SEArray(oXmlInf:_DOC_DTDCAD)
+	EndIf
+	If SEVer(@oXmlInf, '_DOC_DTDOC')
+		aDtDoc  := SEArray(oXmlInf:_DOC_DTDOC)
+	EndIf
+	If SEVer(@oXmlInf, '_DOC_TIPO')
+		aTpDoc 	:= SEArray(oXmlInf:_DOC_TIPO)
+	EndIf
+	If SEVer(@oXmlInf, '_DOC_DESC')		
+		aDesc	:= SEArray(oXmlInf:_DOC_DESC)
+	EndIf
+	
+	For nX := 1 To Len(aDtCad)
+	
+		cSequen := Val(cSequen)+1
+		cSequen := StrZero(cSequen, TamSX3("ZAF_SEQ")[1])
+			
+		dbSelectArea("ZAF")
+		Reclock("ZAF", .T.)
+			ZAF->ZAF_FILIAL := xFilial("ZAF")
+			ZAF->ZAF_CODIGO := cCabec
+			ZAF->ZAF_SEQ    := cSequen
+			If !Empty(aDtCad)
+				ZAF->ZAF_DTDCAD := cToD(aDtCad[nX]:TEXT)
+			EndIf
+			If !Empty(aDtDoc)
+				ZAF->ZAF_DTDOC 	:= cToD(aDtDoc[nX]:TEXT)
+			EndIf
+			If !Empty(aTpDoc)
+				ZAF->ZAF_TIPO 	:= aTpDoc[nX]:TEXT
+			EndIf
+			If !Empty(aDesc)
+				ZAF->ZAF_DESC 	:= aDesc[nX]:TEXT
+			EndIf
 		MsUnlock()
 		
 	Next nX
@@ -446,6 +596,7 @@ Static Function SEAlerta(oXmlAle, cCabec)
 		cSequen := Val(cSequen)+1
 		cSequen := StrZero(cSequen, TamSX3("ZA8_SEQUEN")[1])
 		
+		dbSelectArea("ZA8")
 		Reclock("ZA8", .T.)
 			ZA8->ZA8_FILIAL := xFilial("ZA8")
 			ZA8->ZA8_CODIGO := cCabec        
@@ -468,6 +619,7 @@ Static Function SEResumo(oXmlRes, cCabec)
 		Return
 	EndIf  
 
+	dbSelectArea("ZA9")
 	Reclock("ZA9", .T.)
 		ZA9->ZA9_FILIAL := xFilial("ZA9")
 		ZA9->ZA9_CODIGO := cCabec
@@ -500,6 +652,7 @@ Static Function SEAtualizacao(oXmlAtu, cCabec)
 		Return
 	EndIf  
 	
+	dbSelectArea("ZAA")
 	Reclock("ZAA", .T.)
 		ZAA->ZAA_FILIAL := xFilial("ZAA")
 		ZAA->ZAA_CODIGO := cCabec

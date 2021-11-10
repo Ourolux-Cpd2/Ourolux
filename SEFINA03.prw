@@ -13,7 +13,6 @@ User Function SEFINA03()
 	Local cSeek 	:= ""
 	Local aNoFields := {"ZA1_CLIENT", "ZA1_LOJA", "ZA1_STRXML"}
 	Local aButtons 	:= {}
-	Local aSize 	:= MsAdvSize()
 	Local aCols 	:= {}
 	Local aHeader 	:= {}
 	                 
@@ -277,6 +276,8 @@ Static Function SEPosiciona(cCodigo, oTFolder)
 	ZA8->(DbSeek(xFilial("ZA8")+ZA1->ZA1_CODIGO))
 	ZA9->(DbSeek(xFilial("ZA9")+ZA1->ZA1_CODIGO))
 	ZAA->(DbSeek(xFilial("ZAA")+ZA1->ZA1_CODIGO))
+	ZAF->(DbSeek(xFilial("ZAF")+ZA1->ZA1_CODIGO))
+	ZAG->(DbSeek(xFilial("ZAG")+ZA1->ZA1_CODIGO))
 	
 	If ValType(oTFolder) == "O"       
 	
@@ -330,54 +331,97 @@ Static Function SEFolders(oTFolder, nPasta)
 	SEAlerta(@oTFolder)
 	SEResumo(@oTFolder)
 	SEAtualizacao(@oTFolder)
+	SEDocumento(@oTFolder)
+	SESocios(@oTFolder)
 	
 	oTFolder:ShowPage(nPasta)
 	
 Return
 
 Static Function SECliente(oTFolder)
+	Local oScroll
+	Local oPanel
 
 	oTFolder:AddItem("Dados do cliente", .T.)
+	
+	oScroll:= TSCrollArea():New(oTFolder:aDialogs[Len(oTFolder:aDialogs)],01,01,100,100,.T.,.T.,.T.)
+	oScroll:Align := CONTROL_ALIGN_ALLCLIENT
+	
+	oPanel:= TPanel():Create(oScroll,01,100,"",,,,,,100,100)
+	oPanel:Align := CONTROL_ALIGN_ALLCLIENT
+	
+	oScroll:SetFrame(oPanel)
 							    
-	@ nLin+00, @nCol SAY RetTitle("ZA2_CNPJ") OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_CNPJ SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY RetTitle("ZA2_CNPJ") OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_CNPJ SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol+= nCBrea
 	
-	@ nLin+00, @nCol SAY RetTitle("ZA2_RAZAO") OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_RAZAO SIZE nLargura*3, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY RetTitle("ZA2_RAZAO") OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_RAZAO SIZE nLargura*3, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol:=nColIni
 	nLin+=nBreak 
 							    
-	@ nLin+00, @nCol SAY RetTitle("ZA2_CIDADE") OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_CIDADE SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY RetTitle("ZA2_CIDADE") OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_CIDADE SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol+= nCBrea   
 	
-	@ nLin+00, @nCol SAY RetTitle("ZA2_UF") OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET cUFTST := ZA2->ZA2_UF SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY RetTitle("ZA2_UF") OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET cUFTST := ZA2->ZA2_UF SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
+	
+	nCol+= nCBrea   
+
+	@ nLin+00, @nCol SAY "Data de fundação da empresa" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_DTFUND SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
+	
+	nCol+= nCBrea   
+
+	@ nLin+00, @nCol SAY "Data da primeira compra" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_PEXP SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol:=nColIni
 	nLin+=nBreak  
-								    
-	@ nLin+00, @nCol SAY "Data de fundação da empresa" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_DTFUND SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+
+	@ nLin+00, @nCol SAY "DDD 1" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_DDD1 SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol+= nCBrea   
 	
-	@ nLin+00, @nCol SAY "Data da primeira compra" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_PEXP SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY "Telefone 1" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_FONE1 SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
+	
+	nCol+= nCBrea   
+	
+	@ nLin+00, @nCol SAY "DDD 2" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_DDD2 SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
+	
+	nCol+= nCBrea   
+	
+	@ nLin+00, @nCol SAY "Telefone 2" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_FONE2 SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol:=nColIni
 	nLin+=nBreak       
 	
-	@ nLin+00, @nCol SAY "Data de atualização" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
-	@ nLin+10, @nCol MSGET ZA2->ZA2_ATU SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL When .F. HasButton
+	@ nLin+00, @nCol SAY "Capital Social" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_CSOCIA SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
+
+	
+	nCol+= nCBrea   
+	
+	@ nLin+00, @nCol SAY "E-Mail" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_EMAIL SIZE nLargura*3, nAltura OF oPanel PIXEL When .F. HasButton
+	
+	nCol:=nColIni
+	nLin+=nBreak 
+
+	@ nLin+00, @nCol SAY "Data de atualização" OF oPanel PIXEL
+	@ nLin+10, @nCol MSGET ZA2->ZA2_ATU SIZE nLargura, nAltura OF oPanel PIXEL When .F. HasButton
 	
 	nCol:=nColIni
 	nLin:=nLinIni
-	
 Return
 
 Static Function SEReceita(oTFolder) 
@@ -394,6 +438,16 @@ Static Function SEReceita(oTFolder)
 	@ nLin+00, @nCol SAY "Cadastrado na Receita Federal?" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
 	@ nLin+10, @nCol ComboBox oCombo SIZE nLargura, nAltura ITEMS {IIF(ZA3->ZA3_CAD == "S","Sim", "Não")} OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
 	
+	nCol+= nCBrea                                                                                                                   
+	
+	@ nLin+00, @nCol SAY "Data Situacao" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
+	@ nLin+10, @nCol MSGET  ZA3->ZA3_DTSIT  SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
+
+	nCol+= nCBrea                                                                                                                   
+	
+	@ nLin+00, @nCol SAY "CNAE" OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
+	@ nLin+10, @nCol MSGET ZA3->ZA3_CNAE SIZE nLargura, nAltura OF oTFolder:aDialogs[Len(oTFolder:aDialogs)] PIXEL
+
 	nCol:=nColIni
 	nLin+=nBreak 
 	
@@ -433,6 +487,36 @@ Static Function SEColigadas(oTFolder)
 		
 	oColigadas:= MsNewGetDados():New(0,0,0,0,GD_DELETE,,{},,,,,,,,oTFolder:aDialogs[Len(oTFolder:aDialogs)], aHeaderC, aColsC)
 	oColigadas:oBrowse:Align := CONTROL_ALIGN_ALLCLIENT
+	
+Return
+
+Static Function SEDocumento(oTFolder)  
+
+	Local oDocumento
+	Local aColsD := {}     
+	Local aHeaderD := {}
+                                  
+	oTFolder:AddItem("Documentos", .T.)
+	
+	SEZATAB("ZAF", @aHeaderD, @aColsD, @oDocumento)
+		
+	oDocumento:= MsNewGetDados():New(0,0,0,0,,,{},,,,,,,,oTFolder:aDialogs[Len(oTFolder:aDialogs)], aHeaderD, aColsD)
+	oDocumento:oBrowse:Align := CONTROL_ALIGN_ALLCLIENT
+	
+Return
+
+Static Function SESocios(oTFolder)  
+
+	Local oSocio
+	Local aColsS := {}     
+	Local aHeaderS := {}
+                                  
+	oTFolder:AddItem("Socios", .T.)
+	
+	SEZATAB("ZAG", @aHeaderS, @aColsS, @oSocio)
+		
+	oSocio:= MsNewGetDados():New(0,0,0,0,,,{},,,,,,,,oTFolder:aDialogs[Len(oTFolder:aDialogs)], aHeaderS, aColsS)
+	oSocio:oBrowse:Align := CONTROL_ALIGN_ALLCLIENT
 	
 Return
 
