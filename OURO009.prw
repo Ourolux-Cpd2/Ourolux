@@ -53,3 +53,39 @@ User Function OURO09A()
 
 Return lRet
 
+//--------------------------------------------------------------------
+/*/{Protheus.doc} OURO09A
+Valida se usuario é permitido alteração
+@author Rodrigo Nunes
+@since 01/11/2021
+/*/
+//--------------------------------------------------------------------
+User Function OURO09B()
+    Local cUsrAlt := SuperGetMV("ES_SOPUSR",.F.,"001857/002259/002307")
+    Local cCalcs  := SuperGetMv("ES_DTENTR",.F.,"")
+    Local aCalcs  := StrTokArr(cCalcs,"/")
+    Local cMsgCal := ""
+    
+    If __cUserID $ cUsrAlt
+        
+        If Len(aCalcs) == 7
+            cMsgCal := "TEMPO EM DIAS DAS FASES DO PROCESSO" + CRLF + CRLF
+            cMsgCal += " - Aprovacao Nivel 2.......= " + aCalcs[1] + CRLF
+            cMsgCal += " - Pagamento Sinal..........= " + aCalcs[2] + CRLF
+            cMsgCal += " - Fase de Producao.......= " + aCalcs[3] + CRLF
+            cMsgCal += " - Fase de PSI.................= " + aCalcs[4] + CRLF
+            cMsgCal += " - Fase de Embarque......= " + aCalcs[5] + CRLF
+            cMsgCal += " - Fase de Transito.........= " + aCalcs[6] + CRLF
+            cMsgCal += " - Fase Porto/CD.............= " + aCalcs[7] + CRLF + CRLF
+            cMsgCal += "PARA QUALQUER ALTERAÇÃO NOS VALORES APRESENTADOS, " + CRLF
+            cMsgCal += "SOLICITAR AO TIME DE TI A MANUTENÇÃO NOS PARAMERTOS: " +CRLF
+            cMsgCal += " - ES_DTLPRD - Calculo Limite Producao" + CRLF 
+            cMsgCal += " - ES_DTENTR - Calculo para Data de Entrega" + CRLF
+
+            Aviso("FASES DO PROCESSO",cMsgCal,{"&OK"},3)
+        else
+            Alert("Favor verificar com o TI o parametro ES_DTENTR esta apresentando " + CValToChar(Len(aCalcs) + " valores para calculo, corretão são 7" ))
+        EndIf        
+    EndIf
+
+Return 
