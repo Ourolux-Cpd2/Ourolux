@@ -268,7 +268,7 @@ User Function OUROXBOL()
 							"E1_FILIAL   = '"+xFilial("SE1")+"' .And. E1_SALDO > 0 .And. " + ;
 							"E1_XBOLETO <> ' '" 
 				If cFilAnt $ aBcoBol[8]
-					cFilter += " .And. E1_PORTADO = '" + aBcoBol[1] + "' "
+					cFilter += " .And. (E1_PORTADO = '" + aBcoBol[1] + "' .OR. E1_PORTADO = '   ') "
 				EndIf
 							
 				DbSelectArea("SE1")
