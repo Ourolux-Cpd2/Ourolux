@@ -193,6 +193,7 @@ Static Function PrintReport(oReport,oSection)
     cQryFin += "        AND SWN.WN_TIPO_NF IN ('1','3','5') " 
     cQryFin += "        AND SD1.D1_FILIAL BETWEEN '" + MV_PAR01 + "' AND '" + MV_PAR02 + "'"
     cQryFin += "        AND SC7.C7_NUMSC BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "'"
+    cQryFin += "        AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
     cQryFin += "        AND SWN.WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "'"
     cQryFin += "        AND SWN.WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "'"
     cQryFin += "        AND SWN.WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "'"
@@ -235,6 +236,7 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += " LEFT JOIN " + RetSqlName("SC7") + " SC7 "
     cQryAbe += " 	ON SC7.C7_NUMSC = SC1.C1_NUM "
     cQryAbe += "    AND SC7.C7_FILIAL = SC1.C1_FILIAL "
+    cQryAbe += "    AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
     cQryAbe += " 	AND SC7.D_E_L_E_T_ = '' "
     cQryAbe += " LEFT JOIN " + RetSqlName("SWN") + " SWN "
     cQryAbe += " 	ON SWN.WN_PRODUTO = SC7.C7_PRODUTO "
@@ -402,7 +404,7 @@ Static Function PrintReport(oReport,oSection)
             Wdt_FIMP	:= Stod(aResDatas[1][10])
         EndIf
 
-        dt_Sin  := ConsSin(AllTrim(SCPCNF->C7_PO_EIC))
+        dt_Sin  := ConsSin(AllTrim(SCPCNF->WN_HAWB))
         If MV_PAR21 == 2 .OR. MV_PAR21 == 3
             dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
             dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
