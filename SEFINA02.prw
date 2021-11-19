@@ -210,24 +210,12 @@ Static Function SECliente(oXmlCli, cCabec)
 		ZA2->ZA2_DTFUND := cToD(oXmlCli:_CLI_DTFUND:TEXT)
 		ZA2->ZA2_PEXP   := cToD(oXmlCli:_CLI_PEXP:TEXT)
 		ZA2->ZA2_ATU    := cToD(oXmlCli:_CLI_ATU:TEXT)
-		If !SEVer(@oXmlCli, "_CLI_DDD1")
-			ZA2->ZA2_DDD1	:= oXmlCli:_CLI_DDD1:TEXT
-		EndIf
-		If !SEVer(@oXmlCli, "_CLI_FONE1")
-			ZA2->ZA2_FONE1	:= oXmlCli:_CLI_FONE1:TEXT
-		EndIf
-		If !SEVer(@oXmlCli, "_CLI_DDD2")
-			ZA2->ZA2_DDD2	:= oXmlCli:_CLI_DDD2:TEXT
-		EndIF
-		If !SEVer(@oXmlCli, "_CLI_FONE2")
-			ZA2->ZA2_FONE2	:= oXmlCli:_CLI_FONE2:TEXT
-		EndIf
-		If !SEVer(@oXmlCli, "_CLI_EMAIL")
-			ZA2->ZA2_EMAIL	:= oXmlCli:_CLI_EMAIL:TEXT
-		EndIf
-		If !SEVer(@oXmlCli, "_CLI_CAPSOCIAL")
-			ZA2->ZA2_CSOCIA	:= Val(oXmlCli:_CLI_CAPSOCIAL:TEXT)
-		EndIf
+		ZA2->ZA2_DDD1	:= oXmlCli:_CLI_DDD1:TEXT
+		ZA2->ZA2_FONE1	:= oXmlCli:_CLI_FONE1:TEXT
+		ZA2->ZA2_DDD2	:= oXmlCli:_CLI_DDD2:TEXT
+		ZA2->ZA2_FONE2	:= oXmlCli:_CLI_FONE2:TEXT
+		ZA2->ZA2_EMAIL	:= oXmlCli:_CLI_EMAIL:TEXT
+		ZA2->ZA2_CSOCIA	:= Val(oXmlCli:_CLI_CAPSOCIAL:TEXT)
 	MsUnlock()
 	
 Return
@@ -250,12 +238,8 @@ Static Function SEReceita(oXmlRec, cCabec)
 		ZA3->ZA3_NATJUR := oXmlRec:_REC_NATJUR:TEXT
 		ZA3->ZA3_SIT    := oXmlRec:_REC_SIT:TEXT
 		ZA3->ZA3_MOTSIT := oXmlRec:_REC_MOTSIT:TEXT
-		If SEVer(@oXmlRec, '_REC_DTSIT')
-			ZA3->ZA3_DTSIT	:= cToD(oXmlRec:_REC_DTSIT:TEXT)
-		EndIf
-		If SEVer(@oXmlRec, '_REC_CNAE')
-			ZA3->ZA3_CNAE	:= oXmlRec:_REC_CNAE:TEXT
-		EndIf
+		ZA3->ZA3_DTSIT	:= cToD(oXmlRec:_REC_DTSIT:TEXT)
+		ZA3->ZA3_CNAE	:= oXmlRec:_REC_CNAE:TEXT
 	MsUnlock()
 	
 Return
@@ -475,18 +459,11 @@ Static Function SESocios(oXmlInf, cCabec)
 		Return
 	EndIf
 	
-	If SEVer(@oXmlInf, '_SOCIO_NOME')
-		aNome   := SEArray(oXmlInf:_SOCIO_NOME)
-	EndIf
-	If SEVer(@oXmlInf, '_SOCIO_TIPO')
-		aTipo  	:= SEArray(oXmlInf:_SOCIO_TIPO)
-	EndIf
-	If SEVer(@oXmlInf, '_SOCIO_QUALIF')		
-		aQualif := SEArray(oXmlInf:_SOCIO_QUALIF)
-	EndIf
-	If SEVer(@oXmlInf, '_SOCIO_DTENTR')		
-		aDtEntr := SEArray(oXmlInf:_SOCIO_DTENTR)
-	EndIf
+	aNome   := SEArray(oXmlInf:_SOCIO_NOME)
+	aTipo  	:= SEArray(oXmlInf:_SOCIO_TIPO)
+	aQualif := SEArray(oXmlInf:_SOCIO_QUALIF)
+	aDtEntr := SEArray(oXmlInf:_SOCIO_DTENTR)
+	
 	For nX := 1 To Len(aNome)
 	
 		cSequen := Val(cSequen)+1
@@ -530,18 +507,10 @@ Static Function SEDocumento(oXmlInf, cCabec)
 		Return
 	EndIf
 	
-	If SEVer(@oXmlInf, '_DOC_DTDCAD')
-		aDtCad  := SEArray(oXmlInf:_DOC_DTDCAD)
-	EndIf
-	If SEVer(@oXmlInf, '_DOC_DTDOC')
-		aDtDoc  := SEArray(oXmlInf:_DOC_DTDOC)
-	EndIf
-	If SEVer(@oXmlInf, '_DOC_TIPO')
-		aTpDoc 	:= SEArray(oXmlInf:_DOC_TIPO)
-	EndIf
-	If SEVer(@oXmlInf, '_DOC_DESC')		
-		aDesc	:= SEArray(oXmlInf:_DOC_DESC)
-	EndIf
+	aDtCad  := SEArray(oXmlInf:_DOC_DTDCAD)
+	aDtDoc  := SEArray(oXmlInf:_DOC_DTDOC)
+	aTpDoc 	:= SEArray(oXmlInf:_DOC_TIPO)
+	aDesc	:= SEArray(oXmlInf:_DOC_DESC)
 	
 	For nX := 1 To Len(aDtCad)
 	
