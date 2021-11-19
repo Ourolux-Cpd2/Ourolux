@@ -10,6 +10,9 @@
 | Relatorio Lead Time Import.         	                    |
 ------------------------------------------------------------*/
 
+
+
+//**************DESCONTINUADO**************** SEGUE OUROR029
 User Function OUROR020()
 
     Local oReport
