@@ -6,7 +6,7 @@
 	#DEFINE PSAY SAY
 #ENDIF
 
-#DEFINE COMP_DATE "20211103"
+#DEFINE COMP_DATE "20211122"
 #DEFINE PICT_CUB  "@E 99,999,999.99"
 
 /*/
@@ -63,7 +63,7 @@ User Function MEGA21nB()
 	Private cDesc3 	 := PADC("                                                              ",75)
 	Private aReturn  := { "Especial" , 1, "Diretoria" , 2, 2, 1,"", 0 }
 	Private nomeprog := "MEGA21nB"
-	Private cPerg    := "MEGA21n"
+	Private cPerg    := "MEGA21nB"
 	Private nLastKey := 0
 	Private Li       := 0
 	Private xPag     := 1
@@ -81,17 +81,17 @@ User Function MEGA21nB()
 	
 
 	//NOTA Explicativa do Conteudo do Relatorio	- Sempre Será apresentado ao Usuario !
-	cTxt := "Este Relatorio é uma copia do Relatorio Consumo Mensal x Previsao da Entrega"+ Chr(13) + Chr(10)
-	cTxt += "Foi aberto neste relatorio os Produtos fabricados por Componente que estiver na Estrutura"+ Chr(13) + Chr(10)+ Chr(13) + Chr(10)
-	cTxt += "Exemplo:"+ Chr(13) + Chr(10)
-	cTxt += "Codigo 71030 - GER SOLAR 1,98KW - Foi Vendido Qtd (001)"+ Chr(13) + Chr(10)
-	cTxt += "Na estrutura deste produto tem:"+ Chr(13) + Chr(10)
-	cTxt += " 70010 - MODULO FOTOVOLTAICO 330W CANADIAN   (Qtd 006)"+ Chr(13) + Chr(10)
-	cTxt += " 70110 - INVERSOR FOTOVOLTAICO 1,5KW MONO GW (Qtd 001)"+ Chr(13) + Chr(10)
-	cTxt += " ..."+ Chr(13) + Chr(10)+ Chr(13) + Chr(10)
-	cTxt += "<font color='#FF0000'>Será Multiplicado o valor de Venda do Produto X Qtd de Componentes da Estrutura </font>"+ Chr(13) + Chr(10)
-	cTxt += "Este resultado será somado ao proprio codigo do Componente"
-	MsgInfo('<h1>Informação deste Relatorio:</h1>'+cTxt, "Programa - MEGA21nB")
+	//cTxt := "Este Relatorio é uma copia do Relatorio Consumo Mensal x Previsao da Entrega"+ Chr(13) + Chr(10)
+	//cTxt += "Foi aberto neste relatorio os Produtos fabricados por Componente que estiver na Estrutura"+ Chr(13) + Chr(10)+ Chr(13) + Chr(10)
+	//cTxt += "Exemplo:"+ Chr(13) + Chr(10)
+	//cTxt += "Codigo 71030 - GER SOLAR 1,98KW - Foi Vendido Qtd (001)"+ Chr(13) + Chr(10)
+	//cTxt += "Na estrutura deste produto tem:"+ Chr(13) + Chr(10)
+	//cTxt += " 70010 - MODULO FOTOVOLTAICO 330W CANADIAN   (Qtd 006)"+ Chr(13) + Chr(10)
+	//cTxt += " 70110 - INVERSOR FOTOVOLTAICO 1,5KW MONO GW (Qtd 001)"+ Chr(13) + Chr(10)
+	//cTxt += " ..."+ Chr(13) + Chr(10)+ Chr(13) + Chr(10)
+	//cTxt += "<font color='#FF0000'>Será Multiplicado o valor de Venda do Produto X Qtd de Componentes da Estrutura </font>"+ Chr(13) + Chr(10)
+	//cTxt += "Este resultado será somado ao proprio codigo do Componente"
+	//MsgInfo('<h1>Informação deste Relatorio:</h1>'+cTxt, "Programa - MEGA21nB")
 
 
 	MemoWrite(cFileLog,"LOG - "+titulo )
@@ -120,8 +120,8 @@ Return
 
 Static Function RptDetail()
 
-	Local aStrS 	:= {} // Alterado por Claudino, 30/08/12.
-	Local aStrQ 	:= {} // Alterado por Claudino, 30/08/12.
+	Local aStrS 	:= {} 
+	Local aStrQ 	:= {} 
 	Local QryPrv	:= ""
 	Local nAno 		:= nMes := 0
 	Local cIni		:= cFim := ""
@@ -137,9 +137,9 @@ Static Function RptDetail()
 	Local cQrySld  	:= ""
 	Local _CabExc  	:= {}
 	Local aDados1 	:= {}
-	Local _nReg     := 0 // Alterado por Claudino, 30/08/12.
-	Local _QtdPrev  := 0 // Alterado por Claudino, 30/08/12.
-	Local _nQtdPrv  := 0 // Alterado por Claudino, 14/01/16.
+	Local _nReg     := 0 
+	Local _QtdPrev  := 0 
+	Local _nQtdPrv  := 0 
 	Local lNewQry	:= .T.// Roberto Souza 29/06/2017
 	Local Nw        := 0
 	Local nX
@@ -151,19 +151,23 @@ Static Function RptDetail()
 	Local cProds	:= ""
 	Local cFornec	:= ""
 	Local cLogName	:= ""
+	Local nlx		:= 0
 
-	Private cArqTrb1 := CriaTrab(NIL,.F.) // Alterado por Claudino, 30/08/12.
-	Private cArqTrb2 := CriaTrab(NIL,.F.) // Alterado por Claudino, 30/08/12.
+	Private cArqTrb1 := CriaTrab(NIL,.F.) 
+	Private cArqTrb2 := CriaTrab(NIL,.F.) 
 
-	Private _aTotCom := {} // Alterado por Claudino, 12/01/16.
-	Private _aTotVen := {} // Alterado por Claudino, 12/01/16.
-	Private _nSldTot := 0  // Alterado por Claudino, 12/01/16.
-	Private _qMedTot := 0  // Alterado por Claudino, 12/01/16.
+	Private _aTotCom := {} 
+	Private _aTotVen := {} 
+	Private _nSldTot := 0  
+	Private _qMedTot := 0  
 	
-	Private _nTotPrv := 0  // Alterado por Claudino, 08/04/16 - I1603-1376
-	Private _nTotSF  := 0  // Alterado por Claudino, 08/04/16 - I1603-1376
-	Private _nTotSM  := 0  // Alterado por Claudino, 08/04/16 - I1603-1376
+	Private _nTotPrv := 0  
+	Private _nTotSF  := 0  
+	Private _nTotSM  := 0  
 
+	Private nAllEmp  := 0
+	Private nAllDisp := 0
+	Private nAllOP	 := 0
 	Private nAllCub  := 0
 	Private nMedCub  := 0
 	Private nAtuCub  := 0
@@ -177,7 +181,12 @@ Static Function RptDetail()
 	Private _nTotCub	:= 0  // Alterado por Mauricio, 30/08/12. - Chamado: I1711-323
 	Private _nPerCub	:= 0  // Alterado por Mauricio, 30/08/12. - Chamado: I1711-323
 	Private _nIndCub	:= 0  // Alterado por Mauricio, 30/08/12. - Chamado: I1711-323
+
+	Private nOpQtd		:= 0
+	Private nEmpQtd		:= 0
+	Private nDispQtd	:= 0
 	
+	Private aMovNac     := {}
 	
 
 	cTitulo := "Consumo Mensal x Previsao Entrega do Produto  [" + Alltrim(Mv_Par01) + "]  Ate  [" + Alltrim(Mv_Par02) + "] -"
@@ -199,6 +208,7 @@ Static Function RptDetail()
 	cPar += "-mv_par09 : " + cValToChar(mv_par09) + CRLF
 	cPar += "-mv_par10 : " + cValToChar(mv_par10) + CRLF
 	cPar += "-mv_par11 : " + mv_par11 + CRLF
+	cPar += "-mv_par12 : " + cValtoChar(mv_par12) + CRLF
 
 	PutLog( cPar )
 
@@ -272,7 +282,6 @@ Static Function RptDetail()
 		Sld2->(DbCloseArea())
 	EndIf
 
-	//>-- Alterado por Claudino, 30/08/12.
 	If Select("SWNTRB") > 0
 		DbSelectArea("SWNTRB")
 		SWNTRB->(DbCloseArea())
@@ -289,7 +298,7 @@ Static Function RptDetail()
 
 	dbcreate(cArqTrb1,aStrS)
 	dbUseArea(.T.,,cArqTrb1,"SWNTRB",.F.,.F.)
-
+		
 	aAdd(aStrQ,{"CODPROD" ,"C",15,0}) // CODIGO PRODUTO
 	aAdd(aStrQ,{"QTDPREV" ,"N",20,0}) // QUANTIDADE PREVISTA POR PROCESSO
 	aAdd(aStrQ,{"PERIODO" ,"C",06,0}) // PERIODO
@@ -298,7 +307,8 @@ Static Function RptDetail()
 	
 	dbcreate(cArqTrb2,aStrQ)
 	dbUseArea(.T.,,cArqTrb2,"QPRVTRB",.F.,.F.)
-	
+	DBCreateIndex('PR_PROD', 'CODPROD+PERIODO', { || 'CODPROD+PERIODO' })
+
 	PutLog( "QPRVTRB - Fim da criacao: " +Time() )
 
 	SM0->(dbSetOrder(1))
@@ -349,10 +359,15 @@ Static Function RptDetail()
 	cDtFim := Dtos(LASTDAY(mv_par04))
 
 	If MV_par10 == 1 //Imprime Saldo x Previsão? (1 = Nao) -  Chamado: I1711-323 - 06.04.2018
-		nMesPrv := 12 - _nMeses // 05.07.2011
+		nMesPrv := 09 - _nMeses // 05.07.2011
 	Else
-		nMesPrv := 11 - _nMeses // We can display a maximum of 13 fields (consumo + previsao) // Alterado por Claudino, 08/04/16 - I1603-1376
+		nMesPrv := 08 - _nMeses // We can display a maximum of 13 fields (consumo + previsao) 6
 	EndIf
+
+//.If MV_PAR12 == 2
+//	nMesPrv--
+//EndIf
+
 	nAno 	:= IIf (Month(mv_par03) - 1 == 0, Year(mv_par03) - 1,Year(mv_par03))
 	nMes 	:= IIf (Month(mv_par03) - 1 == 0, 12,Month(mv_par03))
 	cIni 	:= strzero(nAno,4) + strzero(nMes,2)
@@ -434,7 +449,6 @@ Static Function RptDetail()
 	
 	PutLog( "Montando Query - Prv - Fim :" +Time() )
 
-	//>---- Alteração feita por Claudino, 30/08/12. 
 	dbSelectArea("SWN")
 	dbSetOrder(3)
 
@@ -520,72 +534,47 @@ Static Function RptDetail()
 	PutLog( "Gravando SWNTRB - Fim :" +Time() )
 	
 	_cQry := " SELECT CODIGO, "
-	_cQry += "        LOC, "
+	_cQry += "        QTD_OP, "
 	_cQry += "        QDE, "
-	_cQry += "        G1_COMP, "
-	_cQry += "        G1_QUANT, "
-	_cQry += "        G1_QUANT * QDE, "
+	_cQry += "        B2_QATU           QTD_ATU, "
+	_cQry += "        B2_QEMP           EMPENHO, "
+	_cQry += "        B2_QATU - B2_QEMP DISPONIVEL, "
 	_cQry += "        PERIODO "
 	_cQry += " FROM  (SELECT CODIGO, "
-	_cQry += "               LOC, "
-	_cQry += "               Sum(TOTAL770) QDE, "
-	_cQry += "               PERIODO "
-	_cQry += "        FROM  (SELECT CODIGO_B2, "
-	_cQry += "                      G1_COMP        CODIGO, "
-	_cQry += "                      LOC, "
-	_cQry += "                      G1_QUANT       QTD_770, "
-	_cQry += "                      QDE, "
-	_cQry += "                      G1_QUANT * QDE TOTAL770, "
-	_cQry += "                      PERIODO "
-	_cQry += "               FROM  (SELECT D2_COD                      CODIGO_B2, "
-	_cQry += "                             Substring(D2_EMISSAO, 1, 6) PERIODO, "
-	_cQry += "                             Sum(D2_QUANT)               QDE, "
-	_cQry += "                             D2_LOCAL                    LOC "
-	_cQry += "                      FROM " + RetSqlName("SD2") + " SD2 "
-	_cQry += "                             INNER JOIN " + RetSqlName("SB1") + " SB1 "
-	_cQry += "                                     ON B1_FILIAL = '' "
-	_cQry += "                                        AND B1_COD = D2_COD "
-	_cQry += "                             INNER JOIN " + RetSqlName("SF2") + " SF2 "
-	_cQry += "                                     ON F2_FILIAL = D2_FILIAL "
-	_cQry += "                                        AND F2_SERIE = D2_SERIE "
-	_cQry += "                                        AND F2_DOC = D2_DOC "
-	_cQry += "                                        AND F2_CLIENTE = D2_CLIENTE "
-	_cQry += "                                        AND F2_LOJA = D2_LOJA "
-	_cQry += "                             INNER JOIN " + RetSqlName("SF4") + " SF4 "
-	_cQry += "                                     ON F4_CODIGO = D2_TES "
-	_cQry += "                      WHERE  SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-	_cQry += "                             AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
-	
+	_cQry += "               QTD_OP, " 
+	_cQry += "               Sum(D2_QUANT) QDE, "
+	_cQry += "        		 PERIODO "
+	_cQry += "        FROM   (SELECT D3_COD        CODIGO, "
+	_cQry += "                       Sum(D3_QUANT) QTD_OP, "
+	_cQry += "                       SUBSTRING(D3_EMISSAO, 1, 6) PERIODO "
+	_cQry += "                FROM " + RetSqlName("SD3") + " SD3 "
+	_cQry += "                WHERE  D3_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
+	_cQry += "                       AND D3_CF = 'RE1' "
+	_cQry += "                       AND SD3.D_E_L_E_T_ = '' "
+	_cQry += "                       AND D3_ESTORNO = '' "
+	_cQry += "                GROUP  BY D3_COD,
+	_cQry += "                			SUBSTRING(D3_EMISSAO, 1, 6)) PRODUCAO " 
+	_cQry += "               LEFT OUTER JOIN " + RetSqlName("SD2") + " SD2 "
+	_cQry += "                            ON CODIGO = D2_COD "
+	_cQry += "							  AND SUBSTRING(D2_EMISSAO, 1, 6)  = PERIODO "
 	If !Empty(MV_par11)
-		_cQry += " 						   AND SD2.D2_COD IN (" + cCodiW7 + ") "
+		_cQry += "					   	  AND SD2.D2_COD IN (" + cCodiW7 + ") "
 	EndIf
-	
-	_cQry += "                             AND SD2.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND SD2.D2_TIPO = 'N' "
-	_cQry += "                             AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-	_cQry += "                             AND SD2.D2_TIPO = SF2.F2_TIPO "
-	_cQry += "                             AND SB1.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND SF2.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND B1_MSBLQL <> '1' "
-
 	If Len(cQAdd) > 2
-		_cQry += " 						   AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
+		_cQry += " 						   AND SD2.D2_CLIENTE NOT IN ('008360','020793') "
 	Endif
-	
-	_cQry += "                             AND SF4.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND F4_ESTOQUE = 'S' "
-	_cQry += "                      GROUP  BY SD2.D2_COD, "
-	_cQry += "                                Substring(SD2.D2_EMISSAO, 1, 6), "
-	_cQry += "                                SD2.D2_LOCAL) PAI " 
-	_cQry += "                     INNER JOIN SG1010 SG1 "
-	_cQry += "                             ON G1_COD = CODIGO_B2) TOT770 "
 	_cQry += "        GROUP  BY CODIGO, "
-	_cQry += "                  LOC, " 
-	_cQry += "                  PERIODO) COMP_770 "
-	_cQry += "       INNER JOIN SG1010 SG1A " 
-	_cQry += "               ON CODIGO = G1_COD "
-	_cQry += " ORDER BY 1 "
-
+	_cQry += "                  QTD_OP, "
+	_cQry += "                  PERIODO) MVTO "
+	_cQry += "       INNER JOIN " + RetSqlName("SB2") + " SB2 "
+	_cQry += "               ON CODIGO = B2_COD "
+	_cQry += "                  AND B2_LOCAL = '"+MV_PAR05+"' "
+	_cQry += "                  AND B2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
+	_cQry += "                  AND B2_QATU-B2_QEMP <> 0 "
+	_cQry += " ORDER BY CODIGO, PERIODO " 
+	
+	_cQry := ChangeQuery(_cQry)
+	
 	cLogName   := "MEGA21NB"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
 	MemoWrite("\INTRJ\" + cLogName,_cQry)
 
@@ -609,104 +598,21 @@ Static Function RptDetail()
 	_nRegua := 0
 	DbSelectArea("QRY")
 	While QRY->(!Eof())
-		If aScan( aMovtos, { |x| x[1] == QRY->CODIGO } ) <= 0
-			AADD(aMovtos,{QRY->CODIGO,QRY->PERIODO,QRY->QDE,QRY->LOC})
-		EndIf
-
-		QRY->(dbSkip())
-		_nRegua ++
-	EndDo
-
-	_cQry := " SELECT CODIGO, "
-	_cQry += "        LOC, "
-	_cQry += "        QDE, "
-	_cQry += "        G1_COMP, "
-	_cQry += "        G1_QUANT, "
-	_cQry += "        G1_QUANT * QDE AS TOT_COMP, "
-	_cQry += "        PERIODO "
-	_cQry += " FROM  (SELECT CODIGO, "
-	_cQry += "               LOC, "
-	_cQry += "               Sum(TOTAL770) QDE, "
-	_cQry += "               PERIODO "
-	_cQry += "        FROM  (SELECT CODIGO_B2, "
-	_cQry += "                      G1_COMP        CODIGO, "
-	_cQry += "                      LOC, "
-	_cQry += "                      G1_QUANT       QTD_770, "
-	_cQry += "                      QDE, "
-	_cQry += "                      G1_QUANT * QDE TOTAL770, "
-	_cQry += "                      PERIODO "
-	_cQry += "               FROM  (SELECT D2_COD                      CODIGO_B2, "
-	_cQry += "                             Substring(D2_EMISSAO, 1, 6) PERIODO, "
-	_cQry += "                             Sum(D2_QUANT)               QDE, "
-	_cQry += "                             D2_LOCAL                    LOC "
-	_cQry += "                      FROM " + RetSqlName("SD2") + " SD2 "
-	_cQry += "                             INNER JOIN " + RetSqlName("SB1") + " SB1 "
-	_cQry += "                                     ON B1_FILIAL = '' "
-	_cQry += "                                        AND B1_COD = D2_COD "
-	_cQry += "                             INNER JOIN " + RetSqlName("SF2") + " SF2 "
-	_cQry += "                                     ON F2_FILIAL = D2_FILIAL "
-	_cQry += "                                        AND F2_SERIE = D2_SERIE "
-	_cQry += "                                        AND F2_DOC = D2_DOC "
-	_cQry += "                                        AND F2_CLIENTE = D2_CLIENTE "
-	_cQry += "                                        AND F2_LOJA = D2_LOJA "
-	_cQry += "                             INNER JOIN " + RetSqlName("SF4") + " SF4 "
-	_cQry += "                                     ON F4_CODIGO = D2_TES "
-	_cQry += "                      WHERE  SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-	_cQry += "                             AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
-	
-	If !Empty(MV_par11)
-		_cQry += " 						   AND SD2.D2_COD IN (" + cCodiW7 + ") "
-	EndIf
-	
-	_cQry += "                             AND SD2.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND SD2.D2_TIPO = 'N' "
-	_cQry += "                             AND SF2.F2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-	_cQry += "                             AND SD2.D2_TIPO = SF2.F2_TIPO "
-	_cQry += "                             AND SB1.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND SF2.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND B1_MSBLQL <> '1' "
-
-	If Len(cQAdd) > 2
-		_cQry += " 						   AND SF2.F2_CLIENTE NOT IN ('008360','020793') "
-	Endif
-	
-	_cQry += "                             AND SF4.D_E_L_E_T_ <> '*' "
-	_cQry += "                             AND F4_ESTOQUE = 'S' "
-	_cQry += "                      GROUP  BY SD2.D2_COD, "
-	_cQry += "                                Substring(SD2.D2_EMISSAO, 1, 6), "
-	_cQry += "                                SD2.D2_LOCAL) PAI " 
-	_cQry += "                     INNER JOIN SG1010 SG1 "
-	_cQry += "                             ON G1_COD = CODIGO_B2) TOT770 "
-	_cQry += "        GROUP  BY CODIGO, "
-	_cQry += "                  LOC, " 
-	_cQry += "                  PERIODO) COMP_770 "
-	_cQry += "       INNER JOIN SG1010 SG1A " 
-	_cQry += "               ON CODIGO = G1_COD "
-	_cQry += " ORDER BY 4 "
-
-	cLogName   := "MEGA21NB_COMP"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
-	MemoWrite("\INTRJ\" + cLogName,_cQry)
-
-	PutLog( "Montando Query SM0 - Qry - Inicio :" +Time() +CRLF+_cQry)
-
-	If Select("QRY") > 0
-		QRY->(DbCloseArea())
-	EndIf
-
-	dbUseArea( .T., "TOPCONN", TCGENQRY(,,_cQry), 'QRY' )
-			
-	While QRY->(!Eof())
-		nPosM := aScan( aMovtos, { |x| x[1] == QRY->G1_COMP } )
+		//If aScan( aMovtos, { |x| x[1] == QRY->CODIGO } ) <= 0
+			AADD(aMovtos,{QRY->CODIGO,QRY->PERIODO,QRY->QDE,QRY->QTD_OP,QRY->EMPENHO,QRY->DISPONIVEL})
+		//EndIf
 		
-		If nPosM <= 0
-			AADD(aMovtos,{QRY->G1_COMP,QRY->PERIODO,QRY->TOT_COMP,QRY->LOC})
-		else
-			aMovtos[nPosM][3] += QRY->TOT_COMP
+		nAllOP += QRY->QTD_OP
+		
+		If aScan( aMovtos, { |x| x[1] == QRY->CODIGO } ) <= 0
+			nAllEmp += QRY->EMPENHO
+			nAllDisp += QRY->DISPONIVEL
 		EndIf
 
 		QRY->(dbSkip())
 		_nRegua ++
 	EndDo
+
 	SetRegua( _nRegua )
 
 	_EmpAtu := "01"
@@ -755,7 +661,44 @@ Static Function RptDetail()
 		DbSelectArea("SWNTRB")
 		SWNTRB->(DbCloseArea())
 	EndIf
-	//>----
+	
+	cQNac := " SELECT 	C7_PRODUTO              	AS Codigo, "
+	cQNac += " 			Substring(C7_DATPRF, 1, 6)	AS Periodo, "
+	cQNac += " 			SUM(C7_QUANT)	            AS QtdPrd "
+	cQNac += " FROM " +	RetSqlName("SC7") + " SC7 "
+	cQNac += " 		INNER JOIN " + RetSqlName("SB1") + " SB1 "
+	cQNac += " 			ON SC7.C7_PRODUTO = B1_COD "
+	cQNac += " WHERE  SC7.C7_FILIAL BETWEEN '"+MV_PAR06+"' AND '"+MV_PAR07+"'
+	cQNac += " 	   AND SC7.C7_PRODUTO BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"'
+	cQNac += " 	   AND C7_DATPRF BETWEEN '" + cIni + "01' AND '" + cFim + "31' "
+	cQNac += " 	   AND SC7.C7_CONAPRO = 'L' "
+	cQNac += " 	   AND SC7.C7_PO_EIC = '' "
+	cQNac += " 	   AND SB1.B1_XREVEND = 'S' "
+	cQNac += " 	   AND SB1.B1_MSBLQL <> '1' "
+	cQNac += " 	   AND SC7.D_E_L_E_T_ = ' ' "
+	cQNac += "        AND SB1.D_E_L_E_T_ = ' ' "
+	cQNac += " GROUP  BY C7_PRODUTO, "
+	cQNac += "           Substring(C7_DATPRF, 1, 6) "
+	cQNac += " ORDER  BY C7_PRODUTO, "
+	cQNac += "           Substring(C7_DATPRF, 1, 6) "
+
+	cQNac := ChangeQuery(cQNac)
+	
+	cLogName   := "MEGA21NB_QNAC"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+	MemoWrite("\INTRJ\" + cLogName,cQNac)
+
+	PutLog( "Montando Query Pedidos nacionais - QNAC - Inicio :" +Time() +CRLF+cQNac)
+
+	If Select("QNAC") > 0
+		QNAC->(DbCloseArea())
+	EndIf
+
+	dbUseArea( .T., "TOPCONN", TCGENQRY(,,cQNac), 'QNAC' )
+
+	While QNAC->(!EOF())
+		AADD(aMovNac,{QNAC->CODIGO, QNAC->PERIODO, QNAC->QTDPRD})
+		QNAC->(dbSkip())
+	EndDo
 
 	//Acumula os Saldos dos produtos de acordo com as empresas selecionadas.
 		
@@ -804,13 +747,23 @@ Static Function RptDetail()
 	_cAno   := Str( _cAno, 4 )
 
 	//Cabec2  := 'CODIGO  DESCRICAO                                UM  '
-	Cabec2  := 'CODIGO  DESCRICAO                                    '
+	If MV_PAR12 == 2
+		Cabec2  := 'CODIGO  DESCRICAO                                        QTD CONSUMIDA  '
+	Else
+		Cabec2  := 'CODIGO  DESCRICAO                                                       '
+	EndIf
+
 	AADD(_CabExc,{"CODIGO"})
 	AADD(_CabExc,{"DESCRICAO"})
 	AADD(_CabExc,{"UM"})
+	
+	If MV_PAR12 == 2
+		AADD(_CabExc,{"QTD CONSUMIDA"})
+	EndIf
+
 	Cabec1  :=  Replicate (" ",len(Cabec2))
 	Cabec1  += "CONSUMO MENSAL"
-
+ 
 	For i = 1 To _nMeses
 		aAdd( _aMeses, _aMesExt[ _nMes ] + '/' + _cAno + '   ')
 		Cabec2 += _aMeses[ i ]
@@ -827,10 +780,12 @@ Static Function RptDetail()
 		End
 	Next
 	
-	Cabec2 += '     MEDIA  SLD. ATUAL  Sld/Mes'
+	Cabec2 += ' MEDIA  SLD.ATUAL  EMPENHO  SLD.DISP.  Sld/Mes'
 
 	AADD(_CabExc,{"MEDIA"})
 	AADD(_CabExc,{"SLD. ATUAL"})
+	AADD(_CabExc,{"SLD. EMPENHO"})
+	AADD(_CabExc,{"SLD. DISPONIVEL"})
 	AADD(_CabExc,{"SLD/MES"})
 
 	AT('ATUAL',Cabec2)
@@ -859,8 +814,8 @@ Static Function RptDetail()
 	M_Pag := 1
 
 	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
-		Cabec2 += "   Sld/Futuro"       // Alterado por Claudino, 08/04/16 - I1603-1376
-		AADD(_CabExc,{"SLD. FUTURO"})   // Alterado por Claudino, 08/04/16 - I1603-1376
+		Cabec2 += "   Sld/Futuro"       
+		AADD(_CabExc,{"SLD. FUTURO"})   
 	EndIf
 	
 	@ 0,0 PSAY Chr( 27 ) + '@' + Chr( 27 ) + 'M' + Chr( 15 )
@@ -896,13 +851,13 @@ Static Function RptDetail()
 			If SB1->B1_MSBLQL == '1'
 				SB1->(dbSkip())
 			Else  // new
-				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 6 )
-				@ _nLin,008 PSAY Substr( SB1->B1_Desc, 1, 50 )
+				@ _nLin,001 PSAY Substr( SB1->B1_Cod , 1, 6 )			//1
+				@ _nLin,008 PSAY Substr( SB1->B1_Desc, 1, 50 )			//2
 				//@ _nLin,049 PSAY SB1->B1_UM
 			
-				AADD(aDados1,Substr( SB1->B1_Cod , 1, 6 ))
-				AADD(aDados1,Substr( SB1->B1_Desc, 1, 50))
-				AADD(aDados1,SB1->B1_UM)
+				AADD(aDados1,Substr( SB1->B1_Cod , 1, 6 )) 
+				AADD(aDados1,Substr( SB1->B1_Desc, 1, 50)) 
+				AADD(aDados1,SB1->B1_UM) 
 			
 				_nMes 	:= Month( mv_par03 )
 				_qMes 	:= {}
@@ -913,9 +868,9 @@ Static Function RptDetail()
 				For i = 1 To _nMeses
 				
 					aAdd( _qMes  , { _nMes, 0, 0 } )
-					If Len(_aTotCom) < _nMeses                    // Alterado por Claudino, 12/01/16.
-						aAdd( _aTotCom , { _nMes , 0 , 0 , 0 } )  // Alterado por Claudino, 12/01/16.
-					EndIf                                         // Alterado por Claudino, 12/01/16.
+					If Len(_aTotCom) < _nMeses                    
+						aAdd( _aTotCom , { _nMes , 0 , 0 , 0 } )  
+					EndIf                                         
 					_nMes ++
 				
 					If _nMes > 12
@@ -929,12 +884,16 @@ Static Function RptDetail()
 				For i = 1 To nMesPrv
 					nMes := IIf (Month(mv_par04)  + (i-1) > 12,Month(mv_par04) + (i-1)- 12,Month(mv_par04)+(i-1))
 					aAdd( aQtdPrv  , {nMes, 0} )
-					If Len(_aTotVen) < nMesPrv                  // Alterado por Claudino, 12/01/16.
-						aAdd( _aTotVen , { nMes , 0 , 0 } )		// Alterado por Claudino, 12/01/16.
-					EndIf                                       // Alterado por Claudino, 12/01/16.
+					If Len(_aTotVen) < nMesPrv                  
+						aAdd( _aTotVen , { nMes , 0 , 0 } )		
+					EndIf                                       
 				Next
 			
 				aSort(aMovtos)
+
+				nOpQtd	 := 0	
+				nEmpQtd	 := 0
+				nDispQtd := 0
 			
 				For n:= 1 To Len(aMovtos)
 					
@@ -946,29 +905,45 @@ Static Function RptDetail()
 							_nMes := Substr( aMovtos[n][2], 5, 2 )
 							_nMes := Val( _nMes )
 							_nLen := aScan( _qMes, { |x| x[ 1 ] = _nMes } )
-						
-							_qMes[_nLen][2] += aMovtos[n][3]
-							_qMed += aMovtos[n][3]
-						
+
+							If MV_PAR12 == 1						
+								_qMes[_nLen][2] += (aMovtos[n][3] + aMovtos[n][4])
+								_qMed += (aMovtos[n][3] + aMovtos[n][4])
+							Else
+								_qMes[_nLen][2] += aMovtos[n][3] 
+								_qMed += aMovtos[n][3] 
+							EndIf
+
+							nOpQtd	 += aMovtos[n][4]
+							nEmpQtd	 := aMovtos[n][5]
+							nDispQtd := aMovtos[n][6]
 						EndIf
 						_vCod := _cCod
 					EndIf
 				
 				Next
 				
+				If MV_PAR12 == 2
+					AADD(aDados1,nOpQtd)
+				EndIF
+
 				IncRegua()
 				
 		//		End
-			
-				_nCol := 51
+
+				If MV_PAR12 == 2
+					@ _nLin, 60 PSAY nOpQtd Picture '@E 99,999,999'  //3...
+				EndIf
+
+				_nCol := 68	
 				_nMes := Month( mv_par03 )
 			
 				For i = 1 To _nMeses
 				
 					_nCol += 1
-					@ _nLin, _nCol PSAY _qMes[  i ][ 2 ] Picture '@E 99,999,999'
-					_aTotCom[ i ][ 2 ] += _qMes[  i ][ 2 ] // Alterado por Claudino, 12/01/16.
-					_aTotCom[ i ][ 4 ] := _nCol            // Alterado por Claudino, 12/01/16.
+					@ _nLin, _nCol PSAY _qMes[  i ][ 2 ] Picture '@E 99,999,999'  //3...
+					_aTotCom[ i ][ 2 ] += _qMes[  i ][ 2 ] 
+					_aTotCom[ i ][ 4 ] := _nCol            
 					AADD(aDados1,_qMes[  i ][ 2 ] )
 					_nCol += 10
 				
@@ -987,16 +962,16 @@ Static Function RptDetail()
 				Next
 			
 				_qMed /= _nMeses
-				_nCol += 3
+				//_nCol -= 2
 								
 				// CUBAGEM
 				nMedCub += RetCub( ,_qMed)
 			
 			
-				@ _nLin, _nCol PSAY _qMed        Picture '@E 99,999,999'
-				_qMedTot += _qMed    // Alterado por Claudino, 12/01/16.
+				@ _nLin, _nCol PSAY _qMed        Picture '@E 99,999,999' //4
+				_qMedTot += _qMed    
 				AADD(aDados1,_qMed)
-				_nCol += 12
+				_nCol += 10
 			
 				For n:= 1 To Len(aSlds)
 					
@@ -1013,7 +988,7 @@ Static Function RptDetail()
 				If QPRVTRB->CODPROD == SB1->B1_COD
 				
 					cCod := QPRVTRB->CODPROD
-				
+
 					While cCod == QPRVTRB->CODPROD
 						nPos := aScan( aQtdPrv, { |x| x[1] == Val(Substr(QPRVTRB->PERIODO,5,2)) })
 						If nPos != 0
@@ -1023,25 +998,31 @@ Static Function RptDetail()
 					EndDo
 				
 				EndIf
-			
-				For i := 1 To nMesPrv
-					_nQtdPrv += aQtdPrv[i][2]
-				Next i
-				//-- Alterado por Claudino, 14/01/16 -- Fim 
-				
+					
 				// CUBAGEM
 				nAtuCub += RetCub( ,nSldAtu)
 				
-				@ _nLin, _nCol PSAY nSldAtu Picture '@E 99,999,999'
+				@ _nLin, _nCol PSAY nSldAtu Picture '@E 99,999,999' //5
 				AADD(aDados1,nSldAtu)
-				_nSldTot += nSldAtu // Alterado por Claudino, 12/01/16.
+				AADD(aDados1,nEmpQtd)
+				AADD(aDados1,nDispQtd)
+
+				_nCol += 09
+							
+				@ _nLin, _nCol PSAY nEmpQtd Picture '@E 99,999,999' //empenho
+				
 				_nCol += 10
-			
-				_nCol += 2
+							
+				@ _nLin, _nCol PSAY nDispQtd Picture '@E 99,999,999' //qtd disponivel
+
+				_nSldTot += nSldAtu 
+				_nCol += 12
+							
+				//@ _nLin, _nCol PSAY NOROUND(nSldAtu / _qMed, 1) Picture '@E 99999.9'
+				@ _nLin, _nCol PSAY NOROUND(nDispQtd / _qMed, 1) Picture '@E 99999.9' //6
 				
-				@ _nLin, _nCol PSAY NOROUND(nSldAtu / _qMed, 1) Picture '@E 99999.9'
-				
-				AADD(aDados1,NOROUND(nSldAtu / _qMed,1))
+				//AADD(aDados1,NOROUND(nSldAtu / _qMed,1))
+				AADD(aDados1,NOROUND(nDispQtd / _qMed,1))
 					
 				_nCol   += 5
 				
@@ -1059,31 +1040,47 @@ Static Function RptDetail()
 					EndDo
 				
 				EndIf
-				//-- 
-			
+								 
+				If aScan( aMovNac, { |x| Alltrim(x[1]) == Alltrim(SB1->B1_COD)}) > 0
+					For nlx := 1 to len(aMovNac)
+						If Alltrim(aMovNac[nlx][1]) == Alltrim(SB1->B1_COD) 
+							nPosM := aScan( aQtdPrv, { |x| x[1] == Val(Substr(aMovNac[nlx][2],5,2))}) 
+							If nPosM > 0
+								aQtdPrv[nPosM][2] += aMovNac[nlx][3]
+							EndIf
+						EndIf
+					Next
+				EndIf
+		
 				_nCol += 2
 				For i = 1 To nMesPrv
 					_nCol += 1
-					@ _nLin, _nCol PSAY aQtdPrv[i][2] Picture '@E 99,999,999'//tm(aQtdPrv[i][2],10,2)//
-					_aTotVen[ i ][ 2 ] += aQtdPrv[  i ][ 2 ]  // Alterado por Claudino, 12/01/16.
-					_aTotVen[ i ][ 3 ] := _nCol               // Alterado por Claudino, 12/01/16.
+					@ _nLin, _nCol PSAY aQtdPrv[i][2] Picture '@E 99,999,999'//tm(aQtdPrv[i][2],10,2)//   //7...
+					_aTotVen[ i ][ 2 ] += aQtdPrv[  i ][ 2 ]  
+					_aTotVen[ i ][ 3 ] := _nCol               
 					AADD(aDados1,aQtdPrv[i][2])
 					_nCol += 10
 					aCub[i][02]+= IIf( aQtdPrv[i][2] > 0, RetCub(,aQtdPrv[i][2]), 0 )
 					nTotCubPrev += IIf( aQtdPrv[i][2] > 0, RetCub(,aQtdPrv[i][2]), 0 )
 				Next
 				
+				For i := 1 To nMesPrv
+					_nQtdPrv += aQtdPrv[i][2]
+				Next i
+						
 				If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
 					_nCol += 6
 				
-					@ _nLin, _nCol PSAY NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9'
-					AADD(aDados1,NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1))
+					//@ _nLin, _nCol PSAY NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9'
+					//AADD(aDados1,NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1))
+					@ _nLin, _nCol PSAY NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9' //8
+					AADD(aDados1,NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 1))
 				EndIf
 				
 				_nLin ++
 				
 				nSldAtu := 0
-				_nQtdPrv := 0 // Alterado por Claudino, 14/01/16.
+				_nQtdPrv := 0 
 				
 				SB1->(dbSkip())
 			EndIf  // 
@@ -1094,46 +1091,66 @@ Static Function RptDetail()
 		
 		
 		If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
-			ASIZE(aDados1,Len(aDados1)+3)          	// Alterado por Claudino, 12/01/16.
 			
-			For x:= 1 to Len(_aTotCom)             	// Alterado por Claudino, 12/01/16.
-				AADD(aDados1,_aTotCom[x][2])   		// Alterado por Claudino, 12/01/16.
-			Next x                                 	// Alterado por Claudino, 12/01/16.
+			If MV_PAR12 == 1 //Imprime coluna de OP separada
+				ASIZE(aDados1,Len(aDados1)+3)          	
+			Else
+				ASIZE(aDados1,Len(aDados1)+3)          	
+				AADD(aDados1,nAllOP)
+			EndIf
+		
+			For x:= 1 to Len(_aTotCom)             	
+				AADD(aDados1,_aTotCom[x][2])   		
+			Next x                                 	
 			
-			AADD(aDados1,_qMedTot)                 	// Alterado por Claudino, 12/01/16.
-			AADD(aDados1,_nSldTot)			        // Alterado por Claudino, 08/04/16 - I1603-1376
+			AADD(aDados1,_qMedTot)                 	
+			AADD(aDados1,_nSldTot)			        
+			AADD(aDados1,nAllEmp)			        
+			AADD(aDados1,nAllDisp)
+
+			//_nTotSM := _nSldTot/_qMedTot            
+			_nTotSM := nAllDisp/_qMedTot            
+			AADD(aDados1,_nTotSM)			        
 			
-			_nTotSM := _nSldTot/_qMedTot            // Alterado por Claudino, 12/01/16.
-			AADD(aDados1,_nTotSM)			        // Alterado por Claudino, 08/04/16 - I1603-1376
-			
-			For y:= 1 to Len(_aTotVen)		        // Alterado por Claudino, 12/01/16.
-				AADD(aDados1,_aTotVen[y][2])	    // Alterado por Claudino, 12/01/16.
+			For y:= 1 to Len(_aTotVen)		        
+				AADD(aDados1,_aTotVen[y][2])	    
 				_nTotPrv += _aTotVen[ y ][ 2 ]
-			Next y					                // Alterado por Claudino, 12/01/16.
+			Next y					                
 			
-			_nTotSF := (_nSldTot + _nTotPrv) / _qMedTot  // Alterado por Claudino, 08/04/16 - I1603-1376
-			AADD(aDados1,_nTotSF)                        // Alterado por Claudino, 08/04/16 - I1603-1376
+			_nTotSF := (_nSldTot + _nTotPrv) / _qMedTot  
+			AADD(aDados1,_nTotSF)                        
 			
-			_nTotSM  := 0 // Alterado por Claudino, 08/04/16 - I1603-1376
-			_nTotPrv := 0 // Alterado por Claudino, 08/04/16 - I1603-1376
-			_nTotSF  := 0 // Alterado por Claudino, 08/04/16 - I1603-1376
+			_nTotSM  := 0 
+			_nTotPrv := 0 
+			_nTotSF  := 0 
 		Else
-			ASIZE(aDados1,Len(aDados1)+3)          // Alterado por Claudino, 12/01/16.
-			For x:= 1 to Len(_aTotCom)             // Alterado por Claudino, 12/01/16.
-				AADD(aDados1,_aTotCom[x][2])   // Alterado por Claudino, 12/01/16.
-			Next x                                 // Alterado por Claudino, 12/01/16.
-			AADD(aDados1,_qMedTot)                 // Alterado por Claudino, 12/01/16.
-			AADD(aDados1,_nSldTot)                 // Alterado por Claudino, 12/01/16.
-			ASIZE(aDados1,Len(aDados1)+1)          // Alterado por Claudino, 12/01/16.
-			For y:= 1 to Len(_aTotVen)             // Alterado por Claudino, 12/01/16.
-				AADD(aDados1,_aTotVen[y][2])   // Alterado por Claudino, 12/01/16.
-			Next y                                 // Alterado por Claudino, 12/01/16.
+			If MV_PAR12 == 1 //Imprime coluna de OP separada
+				ASIZE(aDados1,Len(aDados1)+3)          	
+			Else
+				ASIZE(aDados1,Len(aDados1)+3)          	
+				AADD(aDados1,nAllOP)
+			EndIf
+		
+		
+			For x:= 1 to Len(_aTotCom)             
+				AADD(aDados1,_aTotCom[x][2])   
+			Next x                                 
+			AADD(aDados1,_qMedTot)                 
+			AADD(aDados1,_nSldTot)         
+			AADD(aDados1,nAllEmp)			        
+			AADD(aDados1,nAllDisp)
+        
+			ASIZE(aDados1,Len(aDados1)+1)          
+			For y:= 1 to Len(_aTotVen)             
+				AADD(aDados1,_aTotVen[y][2])   
+			Next y                                 
 		EndIf
 
 		If lCubagem
 		
 			AADD(aDados1,"")
 			AADD(aDados1,"CUBAGEM")
+			AADD(aDados1,"")
 			AADD(aDados1,"")
 			
 			For Nw := 1 To _nMeses
@@ -1142,6 +1159,8 @@ Static Function RptDetail()
 						
 			AADD(aDados1,nAllCub)
 			AADD(aDados1,nMedCub)
+			AADD(aDados1,"")
+			AADD(aDados1,"")
 			AADD(aDados1,nAtuCub)
 	  		
 			For Nw := 1 To Len( aCub )
@@ -1165,7 +1184,7 @@ Static Function RptDetail()
    			
 		EndIf
 		
-		U_Excmg21n(titulo,_CabExc,aDados1)
+		Excmg21n(titulo,_CabExc,aDados1)
 	EndIf
 
 	PutLog( "Imprimindo - Fim :" +Time())
@@ -1195,14 +1214,12 @@ Static Function RptDetail()
 		Sld2->(DbCloseArea())
 	EndIf
 
-	//>-- Alterado por Claudino, 30/08/12
 	If Select("QPRVTRB") > 0
 		DbSelectArea("QPRVTRB")
 		QPRVTRB->(DbCloseArea())
 	EndIf
-	//>--
 
-	ImpRodape(cProds) // Alterado por Claudino, 12/01/16.
+	ImpRodape(cProds) 
 		
 	Eject
 
@@ -1251,16 +1268,16 @@ Static Function ImpRodape(cProds)
 	
 	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
 	
-		_nTotSM := _nSldTot / _qMedTot                                              // Alterado por Claudino, 08/04/16 - I1603-1376
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+36 PSAY _nTotSM Picture '@E 99999.9' // Alterado por Claudino, 08/04/16 - I1603-1376
+		_nTotSM := _nSldTot / _qMedTot                                              
+		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+36 PSAY _nTotSM Picture '@E 99999.9' 
 	
 		For y := 1 To Len(_aTotVen)
 			@ _nLin,_aTotVen[ y ][ 3 ]-1 PSAY _aTotVen[ y ][ 2 ] Picture '@E 99,999,999'
-			_nTotPrv += _aTotVen[ y ][ 2 ]                                          // Alterado por Claudino, 08/04/16 - I1603-1376
+			_nTotPrv += _aTotVen[ y ][ 2 ]                                          
 		Next y
 	
-		_nTotSF := (_nSldTot + _nTotPrv) / _qMedTot                                 // Alterado por Claudino, 08/04/16 - I1603-1376
-		@ _nLin,211 PSAY _nTotSF Picture '@E 99999.9'                                 // Alterado por Claudino, 03/03/17
+		_nTotSF := (_nSldTot + _nTotPrv) / _qMedTot                                 
+		@ _nLin,211 PSAY _nTotSF Picture '@E 99999.9'                                 
 	
 		_nLin := _nLin + 1
 	
@@ -1280,43 +1297,7 @@ Static Function ImpRodape(cProds)
 	
 		@ _nLin,000 PSAY Replicate("_",220)
 		_nLin := _nLin + 2
-	EndIf
-	//*************************************************
-	// Retirado - Roberto Santiago - Ethosx - 14.02.19
-	//*************************************************
-	/*
-	If MV_PAR15 == 2
-	//***************************************** 
-	// Maurício Aureliano - 05/04/2018
-	// Início da alteração - Chamado I1711-323
-	//*****************************************
-		@ _nLin,000 PSAY "C U B A G E M  (M" + Trim(Chr(179)) + ") U N I T Á R I A ---> "
-	
-		For a := 1 To Len(_aTotCom)
-			_nTotCub += _aTotCom[ a ][ 2 ]
-		Next a
-    
-		For b := 1 To Len(_aTotCom)
-			_nPerCub := (_aTotCom[ b ][ 2 ] / _nTotCub) * 100
-			_nIndCub := (nAllCub * _nPerCub) / 100
-			@ _nLin,_aTotCom[ b ][ 4 ]-2 PSAY _nIndCub Picture PICT_CUB
-		Next b
-    
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+10 PSAY nMedCub Picture PICT_CUB
-   	
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+22 PSAY nAtuCub Picture PICT_CUB
-	
-		For y := 1 To Min(Len(aCub),Len(_aTotVen))
-			@ _nLin,_aTotVen[ y ][ 3 ]-2 PSAY aCub[ y ][2] Picture PICT_CUB
-		Next y
-
-		_nLin := _nLin + 1
-
-		@ _nLin,000 PSAY Replicate("_",220)
-		@ _nLin+0.5,000 PSAY Replicate("_",220)
-	
-	  
-	 _nLin := _nLin + 2 */	                                       
+	EndIf       
 
 	 @ _nLin,000 PSAY "Q T D E.   P A L L E T S   T O T A L:  --->    "
 
@@ -1362,115 +1343,6 @@ Static Function ImpRodape(cProds)
 		_nLin := _nLin + 2
 	EndIf
 
-	/*
-	If MV_PAR16 = 1 // Cons. Qtd. Palletes Tot.? = Sim
-
-		@ _nLin,000 PSAY "Q T D E.   P A L L E T S   D I S P.:  --->    "
-
-		For x := 1 To Len(_aTotCom)
-			@ _nLin,_aTotCom[ x ][ 4 ] PSAY (_aTotCom[ x ][ 2 ]/nDiv)- Picture '@E 99,999,999'
-		Next
-		
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+13 PSAY (_qMedTot/nDiv )- Picture'@E 99,999,999'
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+25 PSAY (_nSldTot/nDiv )- Picture'@E 99,999,999'
-		
-		If MV_par10 == 2
-		
-			_nTotSM := _nSldTot / _qMedTot                                              
-			@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+37 PSAY (_nTotSM/nDiv)- Picture '@E 99999.9' 
-		
-			For y := 1 To Len(_aTotVen)
-				@ _nLin,_aTotVen[ y ][ 3 ] PSAY (_aTotVen[ y ][ 2 ]/nDiv)- Picture '@E 99,999,999'
-				_nTotPrv += _aTotVen[ y ][ 2 ]                                          
-			Next y
-		
-			_nTotSF := (_nSldTot + _nTotPrv) / _qMedTot                                 
-			@ _nLin,211 PSAY (_nTotSF/nDiv)- Picture '@E 99999.9'                               
-		
-			_nLin := _nLin + 1
-		
-			@ _nLin,000 PSAY Replicate("_",220)
-		
-		
-			_nLin := _nLin + 1
-		
-			@ _nLin,000 PSAY Replicate("_",220)
-			_nLin := _nLin + 2
-		Else
-			For y := 1 To Len(_aTotVen)
-				@ _nLin,_aTotVen[ y ][ 3 ] PSAY (_aTotVen[ y ][ 2 ]/nDiv)- Picture '@E 99,999,999'
-			Next y
-		
-			_nLin := _nLin + 1
-		
-			@ _nLin,000 PSAY Replicate("_",220)
-			_nLin := _nLin + 2
-		EndIf
-	EndIf*/
-
-	/*-----------------------------------------------
-	|removido - roberto santiago - ethosx 14.02.19
-	+-----------------------------------------------
-		For a := 1 To Len(_aTotCom)
-			_nTotCub += _aTotCom[ a ][ 2 ]
-		Next a
-    
-		For b := 1 To Len(_aTotCom)
-			_nPerCub := (_aTotCom[ b ][ 2 ] / _nTotCub) * 100
-			_nIndCub := (nAllCub * _nPerCub) / 100
-			@ _nLin,_aTotCom[ b ][ 4 ]-2 PSAY _nIndCub/2.16 Picture PICT_CUB
-		Next b
-    
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+10 PSAY nMedCub/2.16 Picture PICT_CUB
-   	
-		@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+22 PSAY nAtuCub/2.16 Picture PICT_CUB
-	
-		For y := 1 To Min(Len(aCub),Len(_aTotVen))
-			@ _nLin,_aTotVen[ y ][ 3 ]-2 PSAY aCub[ y ][2]/2.16 Picture PICT_CUB
-		Next y
-
-		_nLin := _nLin + 1
-
-	/*----------------------------------------------
-	| Retirado - Roberto Santiago - Ethosx 14.02.19
-	+-----------------------------------------------
-	// CUBAGEM	
-		If !Empty( aNoCub )
-
-			If _nLin > 60 //58
-				_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
-			EndIf
-	
-			nTotC := 0
-			aRetCub := AvisCub( aNoCub , @nTotC )
-
-			_nLin ++
-		
-			@ _nLin,000 PSAY Replicate("_",220)
-			_nLin ++
-			@ _nLin,001 PSAY "* * *  Existem [ " + StrZero(nTotC,6) + " ] produtos sem cadastro de cubagem!  * * * "
-		
-			For Nx := 1 To Len( aRetCub )
-				_nLin ++
-				If _nLin > 60 //58
-					_nLin := Cabec( ctitulo, cabec1, cabec2, nomeprog, tamanho, 1 )
-					_nLin += 2
-				EndIf
-	
-				@ _nLin,001 PSAY aRetCub[Nx]
-		
-			Next
-
-			_nLin := _nLin + 1
-	
-			@ _nLin,000 PSAY Replicate("_",220)
-		
-		Endif
-	*/
-	//****************************************
-	// Final da alteração - Chamado I1711-323
-	//****************************************
-	// EndIf 
 Return
 
 
@@ -1654,11 +1526,12 @@ aAdd(aRegs,{cPerg,"03","Data de ?                     "	,"","","mv_ch3" ,"D", 8,
 aAdd(aRegs,{cPerg,"04","Data ate ?                    "	,"","","mv_ch4" ,"D", 8,0,0,"G","NaoVazio()"											,"mv_par04","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"05","Almoxarifado ?                "	,"","","mv_ch5" ,"C", 2,0,0,"G",""														,"mv_par05","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"06","Da Filial ?                   "	,"","","mv_ch6" ,"C", 2,0,0,"G",""														,"mv_par06","","","","","","","","","","","","","","","","","","","","","","","","","SM0"	,"","","","","","","",""})
-aAdd(aRegs,{cPerg,"07","Ate a Filial ?                "	,"","","mv_ch7" ,"C", 2,0,0,"G","NaoVazio().And.MV_PAR06<=MV_PAR07"					,"mv_par07","","","","","","","","","","","","","","","","","","","","","","","","","SM0"	,"","","","","","","",""})
+aAdd(aRegs,{cPerg,"07","Ate a Filial ?                "	,"","","mv_ch7" ,"C", 2,0,0,"G","NaoVazio().And.MV_PAR06<=MV_PAR07"						,"mv_par07","","","","","","","","","","","","","","","","","","","","","","","","","SM0"	,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"08","Exporta p/ Excell ?           "	,"","","mv_ch8" ,"C", 1,0,0,"C",""														,"mv_par08","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )
 aAdd(aRegs,{cPerg,"09","Consolida Filial ?            "	,"","","mv_ch9" ,"C", 1,0,0,"C",""														,"mv_par09","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )
 aAdd(aRegs,{cPerg,"10","Imprime Saldo x Previsao ?    "	,"","","mv_cha" ,"C", 1,0,0,"C",""														,"mv_par10","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )
 aAdd(aRegs,{cPerg,"11","Fornecedor ?                  "	,"","","mv_chb" ,"C", 6,0,0,"G",""														,"mv_par11","","","","","","","","","","","","","","","","","","","","","","","","","SA2"	,"","","","","","","",""})
+aAdd(aRegs,{cPerg,"12","Apresenta Qtd em OP separado? "	,"","","mv_cha" ,"C", 1,0,1,"C",""														,"mv_par12","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )
 //aAdd(aRegs,{cPerg,"14","Loja ?                        "	,"","","mv_che" ,"C", 2,0,0,"G",""														,"mv_par14","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
 //aAdd(aRegs,{cPerg,"15","Mostra Cubagem ?              "	,"","","mv_chd" ,"C", 1,0,0,"C",""														,"mv_par13","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )
 //aAdd(aRegs,{cPerg,"16","Considera Qtd Pallets Total?  "	,"","","mv_chg" ,"N", 1,0,0,"C",""														,"mv_par16","Sim","Sim","Sim","","","Nao","Nao","Nao","","","","","","","","","","","","","","","","","","","","","","","","",""} )
@@ -1675,3 +1548,80 @@ For i:=1 to Len(aRegs)
 Next
                           
 Return(.T.)
+
+/*/
+ÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜÜ
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+±±ÉÍÍÍÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÑÍÍÍÍÍÍÍÍÍÍÍÍÍ»±±
+±±ºPrograma  ³Excell()  º Autor ³ Andre Bagatini     º Data ³  08/07/11   º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºDescricao ³Função com o objetivo de receber um array com dados ,outro  º±±
+±±º          ³com itens e exportar direto para o Excell sem salvar no C:/ º±±
+±±ÌÍÍÍÍÍÍÍÍÍÍØÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¹±±
+±±ºUso       ³ Eletromega                                                 º±±
+±±ÈÍÍÍÍÍÍÍÍÍÍÏÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍ¼±±
+±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±±
+ßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßßß
+/*/
+Static Function Excmg21n(cTexto,aCabec,aDados,mvpar)
+
+	Local aCabec1 := {}
+	Local aDados2 := {}
+	Local aTemp	  := {}
+	Local x,y	  := 0
+	Local nLimExc := 0
+
+	If !ApOleClient("MSExcel") // testa a interação com o excel.
+		Alert("Microsoft Excel não instalado!")
+		Return Nil
+	EndIf
+
+	If MV_PAR12 == 1
+		nLimExc := 17
+	else
+		nLimExc := 18
+	EndIf
+
+	For x:= 1 to Len(aCabec)
+
+		AADD(aCabec1,aCabec[x][1])
+
+	Next x
+
+	y:= 1
+
+	If mvpar = 2
+		For x:= 1 to Len(aDados)
+
+			While  x <= (nLimExc * y)
+				AADD(aTemp,aDados[x])
+				x++
+			End
+			If x > (nLimExc * y)
+				AADD(aDados2,aTemp)
+				aTemp := {}
+				y++
+			EndIf
+    		// 
+			x--
+		Next x
+	Else
+		For x:= 1 to Len(aDados)-1
+
+			While  x <= (nLimExc * y) .And. x <= Len(aDados)
+				AADD(aTemp,aDados[x])
+				x++
+			End
+			If x > (nLimExc * y)
+				AADD(aDados2,aTemp)
+				aTemp := {}
+				y++
+			EndIf
+    		// 
+			x--
+		Next x
+	Endif
+                                     
+	DlgToExcel({ {"ARRAY", cTexto, aCabec1,aDados2} }) // utiliza a função
+
+Return Nil
