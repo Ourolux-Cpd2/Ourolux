@@ -221,7 +221,6 @@ User Function WFSCRET(oProcess)
 	_cQuery += " AND SC1.C1_FILIAL = '" + cFilAnt + "' "
 	_cQuery += " AND C1_NUM = '" + _cNumSc + "' "
 	
-
 	If Select("SCRET") > 0
 		SCRET->(dbCloseArea())
 	EndIf
@@ -255,15 +254,15 @@ User Function WFSCRET(oProcess)
 
 		WFMAIL("APROVADO", Alltrim(SM0->M0_FILIAL), _cNumSc, cNomeApr , _cMailCom, cNomeCom)   
 
-	ElseIf _cAprov == "NAO" // Verifica se foi rejeitado
-	    
-		RastreiaWF(oProcess:fProcessID+"."+oProcess:fTaskID,"000003","10003")
-	    
-		oProcess:Finish()
-		oProcess:Free()
-		oProcess := Nil
-
-		WFMAIL("REJEITADO", Alltrim(SM0->M0_FILIAL), _cNumSc, cNomeApr , _cMailCom, cNomeCom)   
+	//ElseIf _cAprov == "NAO" // Verifica se foi rejeitado
+	//    
+	//	RastreiaWF(oProcess:fProcessID+"."+oProcess:fTaskID,"000003","10003")
+	//    
+	//	oProcess:Finish()
+	//	oProcess:Free()
+	//	oProcess := Nil
+	//
+	//	WFMAIL("REJEITADO", Alltrim(SM0->M0_FILIAL), _cNumSc, cNomeApr , _cMailCom, cNomeCom)   
 	EndIf
 	
 Return
@@ -355,7 +354,24 @@ Return
     
 ///////////////////////////////////////////////////////////////////////////////
 Static Function WFMAIL(_aprovado, _filial, _pedido, _aprovador,_email,_nomeCom)   
+	Local cTpLinha := ""
+	Local dDtLimte := CTOD("  /  /  ")
+	Local cQuery   := ""
+	Local lUrgente := .F.
+	Local cPMailSC := SuperGetMv("ES_MAILSC",.F.,"")
+	Local aMailSC  := StrTokArr(cPMailSC,"/")
+	Local cMailSC  := ""
+	Local nlx 	   := 0 
 
+	For nlx := 1 to len(aMailSC)
+		cMailSC += (aMailSC[nlx] + '@ourolux.com.br') + ";"
+	Next
+
+	cMailSC := SubStr(cMailSC,1,Len(Alltrim(cMailSC))-1)
+
+	conout("WFAPRVSC - INICIO ")
+	conout("WFAPRVSC - INICIO " + DTOC(dDataBase))
+	conout("WFAPRVSC - E-MAILS " +cMailSC+" "+ DTOC(dDataBase))
 	cData := dtoc(ddatabase)
 	cHora := TIME()
 
@@ -396,35 +412,86 @@ Static Function WFMAIL(_aprovado, _filial, _pedido, _aprovador,_email,_nomeCom)
 	    Return
 	EndIf                                  
 
-
-
 	conout("Usuario Aprovador: " + _aprovador)
-	    
-    cMensagem := ' <p align="center"><font face="arial" color="#0000FF" size="4"><b>Mensagem Eletronica - WorkFlow</b></font></p> '
-	cMensagem += ' <p align="left">Prezado, <strong>'+ _nomeCom +'</strong></p> '
+	        
+	if alltrim(_aprovado) == 'APROVADO'
+		cQuery := " SELECT BM_DESC FROM " + RetSqlName("SBM")
+		cQuery += " WHERE BM_GRUPO IN (SELECT B1_GRUPO FROM " + RetSqlName("SB1")
+		cQuery += " 				   WHERE B1_COD IN (SELECT C1_PRODUTO FROM " + RetSqlName("SC1")
+		cQuery += " 								    WHERE C1_FILIAL = '"+cFilAnt+"' "
+		cQuery += " 								    AND C1_NUM = '"+_pedido+"' "
+		cQuery += " 								    AND D_E_L_E_T_ = '') "
+		cQuery += " 					AND D_E_L_E_T_ = '') "
+		cQuery += " AND D_E_L_E_T_ = '' " 
 
-	if alltrim(_aprovado) == 'APROVADO' 
-		cMensagem += ' <p align="left">Solicitação: '+ _pedido +' Liberada!</p> '
-	elseif alltrim(_aprovado) == 'REJEITADO' 
-		cMensagem += ' <p align="left">Solicitação: '+ _pedido +' Rejeitada!</p> '
-    else
-        cMensagem += ' <p align="left">Solicitação: '+ _pedido +' Bloqueada!</p> '
-	endif
-	cMensagem += ' <p align="left">Data do Envio: <strong>' + cData + '.</strong></p> '
-	cMensagem += ' <p align="left">Hora: <strong>' + cHora + '.</strong></p> ' 
-    cMensagem += ' </body> '
+		conout("WFAPRVSC - QUERY " +cQuery+" "+ DTOC(dDataBase))
 	
-	SEND MAIL FROM cUserFrom TO _email CC "" SUBJECT cAssunto BODY cMensagem RESULT lResult  // ATTACHMENT cAnexo1 
+		If Select("XLIN") > 0
+			XLIN->(dbCloseArea())
+		EndIf
 
-	If !lResult
-	    GET MAIL ERROR cError
-   	    conout('Erro de Envio de e-mail: '+cError)
-	else
+		DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'XLIN', .T., .F.)
 
-		conout('eMail enviado!')
-	
+		While XLIN->(!EOF())
+			cTpLinha += Alltrim(BM_DESC) + ", "
+			XLIN->(dbSkip())
+		EndDo
+
+		conout("WFAPRVSC - LINHAS " +cTpLinha+" "+ DTOC(dDataBase))
+
+		cQuery := " SELECT TOP(1) C1_XDTPROG FROM " + RetSqlName("SC1")
+		cQuery += " WHERE C1_FILIAL = '"+cFilAnt+"' "
+		cQuery += " AND C1_NUM = '"+_pedido+"' "
+		cQuery += " AND D_E_L_E_T_ = '' "
+
+		If Select("CDTX") > 0
+			CDTX->(dbCloseArea())
+		EndIf
+
+		DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'CDTX', .T., .F.)
+
+		If CDTX->(!EOF())
+			If (STOD(CDTX->C1_XDTPROG) - 10) < dDatabase 
+				lUrgente := .T.
+				dDtLimte := dDatabase + 1
+			Else
+				lUrgente := .F.
+				dDtLimte := (STOD(CDTX->C1_XDTPROG) - 10)
+			EndIf
+		EndIf
+
+		conout("WFAPRVSC - DATA LIMITE " +DTOC(dDtLimte)+" "+ DTOC(dDataBase))
+
+		cMensagem := '<p align="left"><font face="arial" color="#ff0000" size="4"><b>Mensagem Eletronica - WorkFlow</b></font></p>
+		cMensagem += '<p align="left"><b>Prezados</b>,</p>
+		cMensagem += '<p align="left">Foi liberada a <b>SC '+_pedido+'</b> das linhas <b>'+cTpLinha+'</b> para cotação e compra.</p><br/>
+		cMensagem += '<p align="left"><b>Qualidade</b>,</p>
+		If lUrgente
+			cMensagem += '<p align="left">É obrigatório que a documentação seja atualizada, verificada e que fique disponível até a data limite: URGENTE (<b>'+DTOC(dDtLimte)+'</b>)</p><br/>
+		else
+			cMensagem += '<p align="left">É obrigatório que a documentação seja atualizada, verificada e que fique disponível até a data limite: <b>'+DTOC(dDtLimte)+'</b></p><br/>
+		EndIF
+		cMensagem += '<p align="left">A documentação inclui:</p>
+		cMensagem += '<p align="left">- Artes;</p>
+		cMensagem += '<p align="left">- Cadastro do produto (peso, cubagem, quantidade de peças por caixa, etc);</p>
+		cMensagem += '<p align="left">- Certificação do produto (R.O.).</p><br/>
+		cMensagem += '<p align="left">Obrigado</p>
+
+		conout("WFAPRVSC - CORPO EMAIL "+ DTOC(dDataBase))
+
+		CONOUT(cMensagem)
+
+		SEND MAIL FROM cUserFrom TO cMailSC CC "" SUBJECT cAssunto BODY cMensagem RESULT lResult  // ATTACHMENT cAnexo1 
+
+		If !lResult
+			GET MAIL ERROR cError
+			conout('WFAPRVSC -Erro de Envio de e-mail: '+cError)
+		else
+
+			conout('WFAPRVSC -eMail enviado!')
+		
+		EndIf
+
+		DISCONNECT SMTP SERVER
 	EndIf
-
-	DISCONNECT SMTP SERVER
-
 Return .T.
