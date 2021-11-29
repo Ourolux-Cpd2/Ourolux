@@ -296,7 +296,7 @@ If cFilAnt == cFilDe
 					AND C5_XNUMINT = %exp:Space(1)%
 					AND C9_BLEST   = %exp:Space(1)%
 					AND C9_BLCRED  = %exp:Space(1)%
-					AND C6_PEDCLI  <> %exp:Space(1)%
+					AND (C6_PEDCLI  <> %exp:Space(1)% OR C5_XPEDWEB <> %exp:Space(1)%)
 					AND C5_TABELA  NOT IN %exp:cTabDrto%
 					AND SC5.%NotDel%													
 					ORDER BY C6_NUM, C6_ITEM 										
