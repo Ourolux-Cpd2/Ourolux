@@ -90,29 +90,54 @@ If lVldImp
 	   msginfo("Atenção! A altura da embalagem " + SB5->B5_EMB1 + " está zerada no cadstro")
 	ENDIF
 	
-	If aCols[n,nPosUM] <> "CX"
+	If __cAlias == "SC1"
+		If aCols[n,nPosUM] <> "CX"
+			__nQtdEmba:=nquantidade/SB5->B5_QE1
+			lAjustouSW:=.F.
+			if __nQtdEmba - INT(__nQtdEmba) > 0.and. __cAlias <> "WK3" .and. _lAjusta
+				if  MsgYesNo("A quantidade digitada não é multipla da quantidade por embalagem, deseja ajuste automático?","Validação Quantidade")
+					nquantidade:= (int(nquantidade/SB5->B5_QE1)+1) * SB5->B5_QE1 
+					if __cAlias == "SW3" .or. __cAlias == "SW6"
+						lAjustouSw:=.t.
+					endif
+				endif
+			endif
+			__nQtdEmba:= int( nquantidade / SB5->B5_QE1 )
+			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
+		Else			
+			__nQtdEmba := nquantidade
+			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
+		EndIf
+	ElseIf __cAlias == "SW3"
+		If BUSCA_UM(WORK->WKCOD_I+WORK->WKFABR+WORK->WKFORN,WORK->WKCC+WORK->WKSI_NUM,WORK->W3_FABLOJ,WORK->W3_FORLOJ) <> "CX"
+			__nQtdEmba:=nquantidade/SB5->B5_QE1
+			lAjustouSW:=.F.
+			if __nQtdEmba - INT(__nQtdEmba) > 0.and. __cAlias <> "WK3" .and. _lAjusta
+				if  MsgYesNo("A quantidade digitada não é multipla da quantidade por embalagem, deseja ajuste automático?","Validação Quantidade")
+					nquantidade:= (int(nquantidade/SB5->B5_QE1)+1) * SB5->B5_QE1 
+					if __cAlias == "SW3" .or. __cAlias == "SW6"
+						lAjustouSw:=.t.
+					endif
+				endif
+			endif
+			__nQtdEmba:= int( nquantidade / SB5->B5_QE1 )
+			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
+		Else			
+			__nQtdEmba := nquantidade
+			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
+		EndIf
+	else
 		__nQtdEmba:=nquantidade/SB5->B5_QE1
 		lAjustouSW:=.F.
 		if __nQtdEmba - INT(__nQtdEmba) > 0.and. __cAlias <> "WK3" .and. _lAjusta
-		if  MsgYesNo("A quantidade digitada não é multipla da quantidade por embalagem, deseja ajuste automático?","Validação Quantidade")
-			nquantidade:= (int(nquantidade/SB5->B5_QE1)+1) * SB5->B5_QE1 
-			/*
-			if __cAlias == "SW3" .and. nquantidade > (M->W3_SEM_PED + M->W3_QTDE)
-				msginfo("A quantidade ajustada.: " + tran(nquantidade,'@E 999,999,999.999999') + ' é maior que a quantidade disponivel para esse pedido.: ' +;
-				tran(M->W3_SEM_PED + M->W3_QTDE,'@E 999,999,999.999999'))
-				return .f.
+			if  MsgYesNo("A quantidade digitada não é multipla da quantidade por embalagem, deseja ajuste automático?","Validação Quantidade")
+				nquantidade:= (int(nquantidade/SB5->B5_QE1)+1) * SB5->B5_QE1 
+				if __cAlias == "SW3" .or. __cAlias == "SW6"
+					lAjustouSw:=.t.
+				endif
 			endif
-			*/
-		
-			if __cAlias == "SW3" .or. __cAlias == "SW6"
-				lAjustouSw:=.t.
-			endif
-		endif
 		endif
 		__nQtdEmba:= int( nquantidade / SB5->B5_QE1 )
-		__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
-	else
-		__nQtdEmba := nquantidade
 		__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
 	EndIf
 	
