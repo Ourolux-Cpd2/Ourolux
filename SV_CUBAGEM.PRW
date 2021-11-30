@@ -122,7 +122,8 @@ If lVldImp
 			endif
 			__nQtdEmba:= int( nquantidade / SB5->B5_QE1 )
 			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
-		Else			
+		Else		
+			lAjustouSW:=.F.	
 			__nQtdEmba := nquantidade
 			__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
 		EndIf
