@@ -2,21 +2,6 @@
 #Include "TOTVS.CH"
 #Include "TOPCONN.CH"
 
-#DEFINE PAR_FIL_DE       1
-#DEFINE PAR_FIL_ATE      2
-#DEFINE PAR_DTLIB_DE     3
-#DEFINE PAR_DTLIB_ATE    4
-#DEFINE PAR_PROCESSO_DE  5
-#DEFINE PAR_PROCESSO_ATE 6
-#DEFINE PAR_PEDIDO_DE    7
-#DEFINE PAR_PEDIDO_ATE   8
-#DEFINE PAR_DTEMIS_DE    9
-#DEFINE PAR_DTEMIS_ATE   10
-#DEFINE PAR_GRUPO_DE     11
-#DEFINE PAR_GRUPO_ATE    12
-#DEFINE PAR_BAIXADO      13
-#DEFINE PAR_SATUS        14
-
 #DEFINE POS_FILIAL      1
 #DEFINE POS_PEDIDO      2
 #DEFINE POS_EMISSAO     3
@@ -26,20 +11,18 @@
 #DEFINE POS_QUANTIDADE  7
 #DEFINE POS_PRECO_UNT   8
 #DEFINE POS_TOTAL       9
-#DEFINE POS_ULT_COMPRA  10
-#DEFINE POS_ULT_PRECO   11
-#DEFINE POS_GRUPO       12
-#DEFINE POS_NOME_GRUPO  13
-#DEFINE POS_DATA_LIB    14
-#DEFINE POS_APROVADOR   15
-#DEFINE POS_PROCESSO    16
-#DEFINE POS_COND_PGTO   17
-#DEFINE POS_DATA_PGTO   18
-#DEFINE POS_STATUS      19
-#DEFINE POS_DATA_N1     20
-#DEFINE POS_APROVA_N1   21
-#DEFINE POS_DATA_N2     22
-#DEFINE POS_APROVA_N2   23
+#DEFINE POS_GRUPO       10
+#DEFINE POS_NOME_GRUPO  11
+#DEFINE POS_DATA_LIB    12
+#DEFINE POS_APROVADOR   13
+#DEFINE POS_PROCESSO    14
+#DEFINE POS_VENCIMENTO  15
+#DEFINE POS_DATA_PGTO   16
+#DEFINE POS_STATUS      17
+#DEFINE POS_DATA_N1     18
+#DEFINE POS_APROVA_N1   19
+#DEFINE POS_DATA_N2     20
+#DEFINE POS_APROVA_N2   21
 
 /*
 Rotina: OUROR028
@@ -68,12 +51,20 @@ Static Function OUROR28()
     Local cPedVez       := ""
     Local cQryFull      := ""
     Local nLin          := 0
+    Local cPerg         := "OUROR028  "
+    local tmp           := getTempPath()
     Private cCaminho    := ""
     Private aParam      := {}
 
-    PergPara()
+    PergPara(cPerg)
 
-    If Empty(cCaminho) .OR. Empty(aParam)
+    If !Pergunte(cPerg,.T.)
+		Return(.T.)
+    else
+        cCaminho := cGetFile( , 'Selecione a pasta de destino', , tmp, .F., GETF_LOCALHARD+GETF_RETDIRECTORY,.F.)
+	Endif
+
+    If Empty(cCaminho) 
         Return(.T.)
     EndIf
 
@@ -90,28 +81,6 @@ Static Function OUROR28()
     cQuery += " 	   SC7.C7_PRECO, "
     cQuery += " 	   SC7.C7_TOTAL, "
     cQuery += " 	   SC7.C7_XHAWB, "
-    cQuery += " 	   (SELECT TOP(1) E4_DESCRI FROM " + RetSqlName("SE4")
-    cQuery += " 	     WHERE E4_CODIGO = SC7.C7_COND "
-    cQuery += " 	     AND D_E_L_E_T_ = '' "
-    cQuery += "        ) AS COND_PGTO, "
-    cQuery += " 	   (SELECT TOP(1)SD1.D1_VUNIT "
-    cQuery += " 		 FROM " + RetSqlName("SD1") + " SD1 "
-    cQuery += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
-    cQuery += " 		 AND SD1.D1_COD = SC7.C7_PRODUTO "
-    cQuery += " 		 AND SD1.D1_TIPO = 'N' "
-    cQuery += " 		 AND SD1.D1_PEDIDO > '' "
-    cQuery += " 		 AND SD1.D_E_L_E_T_ = '' " 
-    cQuery += " 		 ORDER BY D1_DTDIGIT DESC "
-    cQuery += " 		) AS ULTIMO_PRECO, "
-    cQuery += " 		(SELECT TOP(1)SD1.D1_DTDIGIT "
-    cQuery += " 		 FROM " + RetSqlName("SD1") + " SD1 "
-    cQuery += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
-    cQuery += " 		 AND SD1.D1_COD = SC7.C7_PRODUTO "
-    cQuery += " 		 AND SD1.D1_TIPO = 'N' "
-    cQuery += " 		 AND SD1.D1_PEDIDO > '' "
-    cQuery += " 		 AND SD1.D_E_L_E_T_ = '' " 
-    cQuery += " 		 ORDER BY D1_DTDIGIT DESC "
-    cQuery += " 		) AS ULTIMA_COMPRA, "
     cQuery += "         SCR.CR_GRUPO, "
     cQuery += " 		(SELECT TOP(1)SAL.AL_DESC "
     cQuery += " 		 FROM " + RetSqlName("SAL") + " SAL "
@@ -131,14 +100,14 @@ Static Function OUROR28()
     cQuery += " AND SCR.CR_NIVEL = '02' "
     cQuery += " AND SCR.CR_LIBAPRO <> '' "
     cQuery += " AND SCR.CR_VALLIB > 0 "
-    cQuery += " AND SCR.CR_GRUPO BETWEEN '"+aParam[PAR_GRUPO_DE]+"' AND '"+aParam[PAR_GRUPO_ATE]+"' "
-    cQuery += " AND SCR.CR_DATALIB BETWEEN '"+DTOS(aParam[PAR_DTLIB_DE])+"' AND '"+DTOS(aParam[PAR_DTLIB_ATE])+"' "
+    cQuery += " AND SCR.CR_GRUPO BETWEEN '"+MV_PAR11+"' AND '"+MV_PAR12+"' "
+    cQuery += " AND SCR.CR_DATALIB BETWEEN '"+DTOS(MV_PAR03)+"' AND '"+DTOS(MV_PAR04)+"' "
     cQuery += " AND SCR.D_E_L_E_T_ = '' " 
     cQuery += " WHERE SC7.D_E_L_E_T_ = '' "
-    cQuery += " AND SC7.C7_FILIAL BETWEEN '"+aParam[PAR_FIL_DE]+"' AND '"+aParam[PAR_FIL_ATE]+"' "
-    cQuery += " AND SC7.C7_NUM BETWEEN '"+aParam[PAR_PEDIDO_DE]+"' AND '"+aParam[PAR_PEDIDO_ATE]+"' "
-    cQuery += " AND SC7.C7_XHAWB BETWEEN '"+aParam[PAR_PROCESSO_DE]+"' AND '"+aParam[PAR_PROCESSO_ATE]+"' "
-    cQuery += " AND SC7.C7_EMISSAO BETWEEN '"+DTOS(aParam[PAR_DTEMIS_DE])+"' AND '"+DTOS(aParam[PAR_DTEMIS_ATE])+"' "
+    cQuery += " AND SC7.C7_FILIAL BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"' "
+    cQuery += " AND SC7.C7_NUM BETWEEN '"+MV_PAR07+"' AND '"+MV_PAR08+"' "
+    cQuery += " AND SC7.C7_XHAWB BETWEEN '"+MV_PAR05+"' AND '"+MV_PAR06+"' "
+    cQuery += " AND SC7.C7_EMISSAO BETWEEN '"+DTOS(MV_PAR09)+"' AND '"+DTOS(MV_PAR10)+"' "
     cQuery += " AND SC7.C7_CONAPRO = 'L' "
     
     cQryPe := " SELECT SC7.C7_FILIAL, "
@@ -154,28 +123,6 @@ Static Function OUROR28()
     cQryPe += " 	   SC7.C7_PRECO, "
     cQryPe += " 	   SC7.C7_TOTAL, "
     cQryPe += " 	   SC7.C7_XHAWB, "
-    cQryPe += " 	   (SELECT TOP(1) E4_DESCRI FROM " + RetSqlName("SE4")
-    cQryPe += " 	     WHERE E4_CODIGO = SC7.C7_COND "
-    cQryPe += " 	     AND D_E_L_E_T_ = '' "
-    cQryPe += "        ) AS COND_PGTO, "
-    cQryPe += " 	   (SELECT TOP(1)SD1.D1_VUNIT "
-    cQryPe += " 		 FROM " + RetSqlName("SD1") + " SD1 "
-    cQryPe += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
-    cQryPe += " 		 AND SD1.D1_COD = SC7.C7_PRODUTO "
-    cQryPe += " 		 AND SD1.D1_TIPO = 'N' "
-    cQryPe += " 		 AND SD1.D1_PEDIDO > '' "
-    cQryPe += " 		 AND SD1.D_E_L_E_T_ = '' " 
-    cQryPe += " 		 ORDER BY D1_DTDIGIT DESC "
-    cQryPe += " 		) AS ULTIMO_PRECO, "
-    cQryPe += " 		(SELECT TOP(1)SD1.D1_DTDIGIT "
-    cQryPe += " 		 FROM " + RetSqlName("SD1") + " SD1 "
-    cQryPe += " 		 WHERE SD1.D1_FILIAL = SC7.C7_FILIAL "
-    cQryPe += " 		 AND SD1.D1_COD = SC7.C7_PRODUTO "
-    cQryPe += " 		 AND SD1.D1_TIPO = 'N' "
-    cQryPe += " 		 AND SD1.D1_PEDIDO > '' "
-    cQryPe += " 		 AND SD1.D_E_L_E_T_ = '' " 
-    cQryPe += " 		 ORDER BY D1_DTDIGIT DESC "
-    cQryPe += " 		) AS ULTIMA_COMPRA, "
     cQryPe += "         SCR.CR_GRUPO, "
     cQryPe += " 		(SELECT TOP(1)SAL.AL_DESC "
     cQryPe += " 		 FROM " + RetSqlName("SAL") + " SAL "
@@ -195,28 +142,32 @@ Static Function OUROR28()
     cQryPe += "                   AND SCR.CR_NIVEL = '01' "
     cQryPe += "                   AND SCR.CR_LIBAPRO <> '' "
     cQryPe += "                   AND SCR.CR_VALLIB > 0 "
-    cQryPe += "                   AND SCR.CR_GRUPO BETWEEN '"+aParam[PAR_GRUPO_DE]+"' AND '"+aParam[PAR_GRUPO_ATE]+"' "
+    cQryPe += "                   AND SCR.CR_GRUPO BETWEEN '"+MV_PAR11+"' AND '"+MV_PAR12+"' "
     cQryPe += "                   AND SCR.D_E_L_E_T_ = '' "
     cQryPe += " WHERE  SC7.D_E_L_E_T_ = '' "
-    cQryPe += "        AND SC7.C7_FILIAL BETWEEN '"+aParam[PAR_FIL_DE]+"' AND '"+aParam[PAR_FIL_ATE]+"' "
-    cQryPe += "        AND SC7.C7_NUM BETWEEN '"+aParam[PAR_PEDIDO_DE]+"' AND '"+aParam[PAR_PEDIDO_ATE]+"' "
-    cQryPe += "        AND SC7.C7_XHAWB BETWEEN '"+aParam[PAR_PROCESSO_DE]+"' AND '"+aParam[PAR_PROCESSO_ATE]+"' "
-    cQryPe += "        AND SC7.C7_EMISSAO BETWEEN '"+DTOS(aParam[PAR_DTEMIS_DE])+"' AND '"+DTOS(aParam[PAR_DTEMIS_ATE])+"' "
+    cQryPe += "        AND SC7.C7_FILIAL BETWEEN '"+MV_PAR01+"' AND '"+MV_PAR02+"' "
+    cQryPe += "        AND SC7.C7_NUM BETWEEN '"+MV_PAR07+"' AND '"+MV_PAR08+"' "
+    cQryPe += "        AND SC7.C7_XHAWB BETWEEN '"+MV_PAR05+"' AND '"+MV_PAR06+"' "
+    cQryPe += "        AND SC7.C7_EMISSAO BETWEEN '"+DTOS(MV_PAR09)+"' AND '"+DTOS(MV_PAR10)+"' "
     cQryPe += "        AND SC7.C7_CONAPRO = 'B' "
     
-
-    If aParam[PAR_SATUS] == 1
+    If MV_PAR14 == 1
         cQryFull := cQuery
         cQryFull += " UNION ALL "
         cQryFull += cQryPe
-        cQryFull += " ORDER BY C7_FILIAL, C7_NUM, C7_ITEM "
-    ElseIf aParam[PAR_SATUS] == 2
+    ElseIf MV_PAR14 == 2
         cQryFull := cQuery
-        cQryFull += " ORDER BY C7_FILIAL, C7_NUM, C7_ITEM "
-    ElseIf aParam[PAR_SATUS] == 3
+    ElseIf MV_PAR14 == 3
         cQryFull := cQryPe
-        cQryFull += " ORDER BY C7_FILIAL, C7_NUM, C7_ITEM "
     EndIf
+
+    If !Empty(MV_PAR05)
+        cQryFull += " ORDER BY C7_FILIAL, C7_XHAWB, C7_NUM, C7_ITEM "
+    ElseIf !Empty(MV_PAR07)
+        cQryFull += " ORDER BY C7_FILIAL, C7_NUM, C7_ITEM, C7_XHAWB "
+    Else
+        cQryFull += " ORDER BY C7_FILIAL, C7_XHAWB, C7_NUM, C7_ITEM "
+    EndIF
 
     If Select("PEDAPR") > 0
         PEDAPR->(dbCloseArea())
@@ -227,7 +178,7 @@ Static Function OUROR28()
     nLin := 0
 
     While PEDAPR->(!EOF())
-        cQuery := " SELECT TOP(1) E2_BAIXA FROM " + RetSqlName("SE2")
+        cQuery := " SELECT TOP(1) E2_VENCREA, E2_BAIXA FROM " + RetSqlName("SE2")
         cQuery += " WHERE E2_NUM = (SELECT TOP(1) D1_DOC FROM " + RetSqlName("SD1")
         cQuery += "     		 WHERE D1_FILIAL = '"+PEDAPR->C7_FILIAL+"' "
         cQuery += "     		 AND D1_PEDIDO = '"+PEDAPR->C7_NUM+"' "
@@ -259,14 +210,12 @@ Static Function OUROR28()
                     PEDAPR->C7_QUANT,; 
                     PEDAPR->C7_PRECO,; 
                     PEDAPR->C7_TOTAL,; 
-                    DTOC(STOD(PEDAPR->ULTIMA_COMPRA)),; 
-                    PEDAPR->ULTIMO_PRECO,; 
                     PEDAPR->CR_GRUPO,; 
                     PEDAPR->NOME_GRUPO,; 
                     DTOC(STOD(PEDAPR->CR_DATALIB)),; 
                     Alltrim(GetAdvFVal("SAK","AK_NOME",xFilial("SAK")+PEDAPR->CR_LIBAPRO,1,"")),;
                     PEDAPR->C7_XHAWB,;
-                    PEDAPR->COND_PGTO,;
+                    Iif(!Empty(PGTOX->E2_VENCREA),STOD(PGTOX->E2_VENCREA),""),;
                     Iif(!Empty(PGTOX->E2_BAIXA),STOD(PGTOX->E2_BAIXA),""),;
                     PEDAPR->C7_CONAPRO,;
                     DTOC(CTOD("  /  /  ")),; //DATA APROVA«√O N1
@@ -324,10 +273,8 @@ Static Function OUROR28()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "QUANTIDADE"     ,1,2,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "PRE«O UNIT."    ,1,3,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "VALOR TOTAL"    ,1,3,.F.)
-    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "CONDICAO PGTO"  ,1,1,.F.)
+    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DATA VENCIMENTO",1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DATA PAGAMENTO" ,1,4,.F.)
-    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DT.ULT.COMPRA"  ,1,4,.F.)
-    oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "ULT.PRECO"      ,1,3,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "GRUPO"          ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "NOME GRUPO"     ,1,1,.F.)
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "DT.LIBERACAO N1",1,4,.F.)
@@ -336,9 +283,9 @@ Static Function OUROR28()
     oFWMsExcel:AddColumn(aWorkSheet[x], aWorkSheet[x], "APROVADOR N2"   ,1,1,.F.)
         
     For nlx := 1 to Len(aLinha)
-        If aParam[PAR_BAIXADO] == 1 .AND. Empty(aLinha[nlx][POS_DATA_PGTO])
+        If MV_PAR13 == 1 .AND. Empty(aLinha[nlx][POS_DATA_PGTO])
             Loop
-        ElseIf aParam[PAR_BAIXADO] == 2 .AND. !Empty(aLinha[nlx][POS_DATA_PGTO])
+        ElseIf MV_PAR13 == 2 .AND. !Empty(aLinha[nlx][POS_DATA_PGTO])
             Loop
         EndIf
 
@@ -352,7 +299,7 @@ Static Function OUROR28()
 
             oFWMsExcel:SetCelBold(.T.)
             oFWMsExcel:SetCelBgColor(cCor2)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21} )
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19} )
             
             nTotPed := 0
         EndIf
@@ -370,24 +317,22 @@ Static Function OUROR28()
                                                           /*Transform(*/aLinha[nlx][POS_QUANTIDADE]/*,PesqPict("SC7","C7_QUANT"))*/,;
                                                           /*Transform(*/aLinha[nlx][POS_PRECO_UNT]/*,PesqPict("SC7","C7_PRECO"))*/,;
                                                           /*Transform(*/aLinha[nlx][POS_TOTAL]/*,PesqPict("SC7","C7_TOTAL"))*/,;
-                                                          aLinha[nlx][POS_COND_PGTO],;
+                                                          aLinha[nlx][POS_VENCIMENTO],;
                                                           aLinha[nlx][POS_DATA_PGTO],;
-                                                          aLinha[nlx][POS_ULT_COMPRA],;
-                                                          /*Transform(*/aLinha[nlx][POS_ULT_PRECO]/*,PesqPict("SD1","D1_VUNIT"))*/,;
                                                           aLinha[nlx][POS_GRUPO],;
                                                           aLinha[nlx][POS_NOME_GRUPO],;
                                                           aLinha[nlx][POS_DATA_N1],;
                                                           aLinha[nlx][POS_APROVA_N1],;
                                                           aLinha[nlx][POS_DATA_N2],;
                                                           aLinha[nlx][POS_APROVA_N2]},;
-                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21})
+                                                          {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19})
         
         nTotPed += aLinha[nlx][POS_TOTAL]
 
         If nlx == Len(alinha)
             oFWMsExcel:SetCelBold(.T.)
             oFWMsExcel:SetCelBgColor(cCor2)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21} )
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,,"TOTAL DO PEDIDO",,,nTotPed,,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19} )
         EndIf
     Next
 
@@ -402,72 +347,59 @@ Static Function OUROR28()
 
 Return
 
+
 //--------------------------------------------------------------------
 /*/{Protheus.doc} PergPara
 Rotina de Perguntas
 @author Rodrigo Nunes
-@since 02/09/2021
+@since 26/07/2021
 @version 1.0 
 @type function
 /*/
 //--------------------------------------------------------------------
-Static Function PergPara()
-Local aRet	 := {}
-Local aPergs := {}
-local tmp    := getTempPath()
-Local aCombo := {"Pagos","Em aberto","Ambos"}
-Local aComboP:= {"Ambos","Aprovados","Pendentes"}
+Static Function PergPara(cPerg)
+Local aArea	    := GetArea()
+Local aRegs		:= {}
+Local i
 
-aAdd(aPergs, {1, "Filial de"  ,Space(2) ,"","","SM0","",20,.F.})
-aAdd(aPergs, {1, "Filial ate" ,"ZZ"     ,"","","SM0","",20,.T.})
+AAdd(aRegs,{"01","Filial de............?","mv_ch1","C",02,0,0,"G","mv_par01",""          ,""   ,""      ,""         ,""         })
+AAdd(aRegs,{"02","Filial ate...........?","mv_ch2","C",02,0,0,"G","mv_par02","NaoVazio()",""   ,""      ,""         ,""         })
+AAdd(aRegs,{"03","Data Liberacao de....?","mv_ch3","D",08,0,0,"G","mv_par03","NaoVazio()",""   ,""      ,""         ,""         })
+AAdd(aRegs,{"04","Data Liberacao ate...?","mv_ch4","D",08,0,0,"G","mv_par04","NaoVazio()",""   ,""      ,""         ,""         })
+AAdd(aRegs,{"05","Processo de..........?","mv_ch5","C",17,0,0,"G","mv_par05",""          ,"SW6",""      ,""         ,""         })
+AAdd(aRegs,{"06","Processo ate.........?","mv_ch6","C",17,0,0,"G","mv_par06","NaoVazio()","SW6",""      ,""         ,""         })
+AAdd(aRegs,{"07","Pedido de............?","mv_ch7","C",06,0,0,"G","mv_par07",""          ,"SC7",""      ,""         ,""         })
+AAdd(aRegs,{"08","Pedido ate...........?","mv_ch8","C",06,0,0,"G","mv_par08","NaoVazio()","SC7",""      ,""         ,""         })
+AAdd(aRegs,{"09","Data Emissao de......?","mv_ch9","D",08,0,0,"G","mv_par09","NaoVazio()",""   ,""      ,""         ,""         })
+AAdd(aRegs,{"10","Data Emissao ate.....?","mv_cha","D",08,0,0,"G","mv_par10","NaoVazio()",""   ,""      ,""         ,""         })
+AAdd(aRegs,{"11","Grupo de.............?","mv_chb","C",06,0,4,"G","mv_par11",""          ,"SAK",""      ,""         ,""         })
+AAdd(aRegs,{"12","Grupo ate............?","mv_chc","C",06,0,4,"G","mv_par12","NaoVazio()","SAK",""      ,""         ,""         })
+AAdd(aRegs,{"13","Considera Pagamentos.?","mv_chd","C",01,0,3,"C","mv_par13",""          ,""   ,"Pagos" ,"Em aberto","Ambos"    })
+AAdd(aRegs,{"14","Considera Pedidos....?","mv_che","C",01,0,1,"C","mv_par14",""          ,""   ,"Ambos" ,"Aprovados","Pendentes"})
 
-aAdd(aPergs, {1, "Data Liberacao de"  ,CTOD("  /  /    ") ,"","","","",50,.T.})
-aAdd(aPergs, {1, "Data Liberacao ate" ,CTOD("  /  /    ") ,"","","","",50,.T.})
-
-aAdd(aPergs, {1, "Processo de"  ,Space(17) ,"","","SW6","",50,.F.})
-aAdd(aPergs, {1, "Processo ate" ,"ZZZZZZZZZZZZZZZZZ" ,"","","SW6","",50,.T.})
-
-aAdd(aPergs, {1, "Pedido de"  ,Space(6) ,"","","SC5","",50,.F.})
-aAdd(aPergs, {1, "Pedido ate" ,"ZZZZZZ" ,"","","SC5","",50,.T.})
-
-aAdd(aPergs, {1, "Data Emissao de"  ,CTOD("  /  /    ") ,"","","","",50,.T.})
-aAdd(aPergs, {1, "Data Emissao ate" ,CTOD("  /  /    ") ,"","","","",50,.T.})
-
-aAdd(aPergs, {1, "Grupo de"  ,Space(6) ,"","","SAL","",50,.F.})
-aAdd(aPergs, {1, "Grupo ate" ,"ZZZZZZ" ,"","","SAL","",50,.T.})
-
-aAdd(aPergs, {2, "Considera Pagamentos" ,3 ,aCombo ,100,""   ,.T.})
-
-aAdd(aPergs, {2, "Considera Pedidos" ,1 ,aComboP,100,""   ,.T.})
-
-If ParamBox(aPergs,"Impressao",@aRet)
-	aParam   := AjRetParam(aRet,aPergs)
-    cCaminho := cGetFile( , 'Selecione a pasta de destino', , tmp, .F., GETF_LOCALHARD+GETF_RETDIRECTORY,.F.)
-EndIf
-
+dbSelectArea("SX1")
+dbSetOrder(1)
+For i:=1 to Len(aRegs)
+	dbSeek(cPerg+aRegs[i][1])
+	If !Found() .or. aRegs[i][2]<>X1_PERGUNT
+		RecLock("SX1",!Found())
+           SX1->X1_GRUPO   := cPerg
+           SX1->X1_ORDEM   := aRegs[i][01]
+           SX1->X1_PERGUNT := aRegs[i][02]
+           SX1->X1_VARIAVL := aRegs[i][03]
+           SX1->X1_TIPO    := aRegs[i][04]
+           SX1->X1_TAMANHO := aRegs[i][05]
+           SX1->X1_DECIMAL := aRegs[i][06]
+           SX1->X1_PRESEL  := aRegs[i][07]
+           SX1->X1_GSC     := aRegs[i][08]
+           SX1->X1_VAR01   := aRegs[i][09]
+           SX1->X1_VALID   := aRegs[i][10]
+           SX1->X1_F3      := aRegs[i][11]
+           SX1->X1_DEF01   := aRegs[i][12]
+           SX1->X1_DEF02   := aRegs[i][13]
+           SX1->X1_DEF03   := aRegs[i][14]
+		MsUnlock()
+	Endif
+Next
+RestArea(aArea)
 Return
-
-//--------------------------------------------------------------------
-/*/{Protheus.doc} AjRetParam
-Func√£o de ajuste do conte√∫do da ParamBox.
-
-@author Rodrigo Nunes
-@since 26/07/2021
-/*/
-//--------------------------------------------------------------------
-Static Function AjRetParam(aRet,aParamBox)
-	Local nX		:= 0
-	
-	If ValType(aRet) == "A" .And. Len(aRet) == Len(aParamBox)
-		For nX := 1 to Len(aParamBox)
-			If aParamBox[nX][1] == 1
-				aRet[nX] := aRet[nX]
-			ElseIf aParamBox[nX][1] == 2 .And. ValType(aRet[nX]) == "C"
-				aRet[nX] := aScan(aParamBox[nX][4],{|x| AllTrim(x) == aRet[nX]})
-			ElseIf aParamBox[nX][1] == 2 .And. ValType(aRet[nX]) == "N"
-				aRet[nX] := aRet[nX]
-			EndIf
-		Next nX
-	EndIf
-	
-Return aRet
