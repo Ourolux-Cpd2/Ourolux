@@ -28,7 +28,7 @@ User Function MT094END()
 	Local _nTaxDol  := 0
 	Local _lLibera  := .F.
 	Local aArea     := GetArea()                     
-	Local cGrupo	:= SC7->C7_APROV
+	Local cGrupo	:= ""
 	Local cAprov	:= __cUserId 
 	Local nRecSC7   := 0 
 	Local x			:= 0
@@ -47,6 +47,13 @@ User Function MT094END()
 
 	// Força o posicionamento na P12	
 	If cVersao >= "12"     
+		If PADR(_cDocto,6) <> SC7->C7_NUM 
+			dbSelectArea("SC7")
+			SC7->(dbSeek(_cFilDoc+PADR(_cDocto,6)))
+			cGrupo	:= SC7->C7_APROV
+		else
+			cGrupo	:= SC7->C7_APROV
+		EndIf
 
 		DbSelectArea("SAL")
 		SAL->(DbSetOrder(4))//	AL_FILIAL+AL_COD+AL_USER                                                                                                                                  
