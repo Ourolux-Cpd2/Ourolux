@@ -2,6 +2,16 @@
 #Include "TOTVS.CH"
 #Include "TOPCONN.CH"
 
+#DEFINE POS_MTC      1
+#DEFINE POS_PESOB    2
+#DEFINE POS_CTN40HC  3
+#DEFINE POS_CTN40DR  4
+#DEFINE POS_CTN40RF  5
+#DEFINE POS_CTN20DR  6
+#DEFINE POS_CTN20RF  7
+#DEFINE POS_PARTLOT  8
+#DEFINE POS_CRITERIO 9
+
 /*
 Rotina: OUROR025
 Descricao: Relatorio para Cotacao de Frete Internacional
@@ -48,6 +58,7 @@ Static Function OUROR25()
     Local nPos          := 0
     Local cPerg		    := "OUROR025  "
     local tmp           := getTempPath()
+    Private aCTNTotal   := {}
     Private cCaminho    := ""
     
     PergPara(cPerg)
@@ -211,7 +222,10 @@ Static Function OUROR25()
             If cSCAtu <> aLinha[nlx][1]
                 oFWMsExcel:SetCelBold(.T.)
                 oFWMsExcel:SetCelBgColor(cCor2)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+                OURO25A(aCTNTotal)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                aCTNTotal := {}
                 nTotFil := 0
                 nTotPes := 0
                 cSCAtu := aLinha[nlx][1]
@@ -220,7 +234,10 @@ Static Function OUROR25()
             If cForAtu <> aLinha[nlx][4]
                 oFWMsExcel:SetCelBold(.T.)
                 oFWMsExcel:SetCelBgColor(cCor2)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+                OURO25A(aCTNTotal)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                aCTNTotal := {}
                 nTotFil := 0
                 nTotPes := 0
                 cForAtu := aLinha[nlx][4]
@@ -229,7 +246,10 @@ Static Function OUROR25()
             If cPorOAtu <> aLinha[nlx][6] .OR. cPorDAtu <> aLinha[nlx][7]
                 oFWMsExcel:SetCelBold(.T.)
                 oFWMsExcel:SetCelBgColor(cCor2)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+                OURO25A(aCTNTotal)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                aCTNTotal := {}
                 nTotFil := 0
                 nTotPes := 0
                 cForAtu := aLinha[nlx][4]
@@ -240,7 +260,10 @@ Static Function OUROR25()
             If cPorETA <> aLinha[nlx][8]
                 oFWMsExcel:SetCelBold(.T.)
                 oFWMsExcel:SetCelBgColor(cCor2)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+                OURO25A(aCTNTotal)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                aCTNTotal := {}
                 nTotFil := 0
                 nTotPes := 0
                 cPorETA := aLinha[nlx][8]
@@ -249,7 +272,10 @@ Static Function OUROR25()
             If cPorPO <> aLinha[nlx][3]
                 oFWMsExcel:SetCelBold(.T.)
                 oFWMsExcel:SetCelBgColor(cCor2)
-                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+                OURO25A(aCTNTotal)
+                oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+                aCTNTotal := {}
                 nTotFil := 0
                 nTotPes := 0
                 cPorPO := aLinha[nlx][3]
@@ -285,7 +311,10 @@ Static Function OUROR25()
         If nlx == Len(aLinha)
             oFWMsExcel:SetCelBold(.T.)
             oFWMsExcel:SetCelBgColor(cCor2)
-            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUB TOTAL",,nTotFil,nTotPes,,,,,,,},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+            AADD(aCTNTotal,{nTotFil,nTotPes,0,0,0,0,0,0,""})
+            OURO25A(aCTNTotal)
+            oFWMsExcel:AddRow(aWorkSheet[X], aWorkSheet[X], {,,,,,,"SUGESTÃO DE CTN POR TOTAL DE MT3/PESO",,aCTNTotal[1][POS_MTC],aCTNTotal[1][POS_PESOB],aCTNTotal[1][POS_CTN40HC],aCTNTotal[1][POS_CTN40DR],aCTNTotal[1][POS_CTN40RF],aCTNTotal[1][POS_CTN20DR],aCTNTotal[1][POS_CTN20RF],aCTNTotal[1][POS_PARTLOT],aCTNTotal[1][POS_CRITERIO]},{1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17} )
+            aCTNTotal := {}
             nTotFil := 0
             nTotPes := 0
             
@@ -357,4 +386,262 @@ For i:=1 to Len(aRegs)
 	Endif
 Next
 RestArea(aArea)
+Return
+
+//--------------------------------------------------------------------
+/*/{Protheus.doc} OURO07A
+Calculo de container por item
+@author Rodrigo Nunes
+@since 20/08/2021
+/*/
+//--------------------------------------------------------------------
+Static Function OURO25A(aCTNTotal)
+    Local cQuery  := ""
+    Local nTotCub := 0
+    Local nTotPBr := 0
+    Local lPorMTC := .F.
+    Local lPorPBR := .F.
+    Local aCTNVal := {}
+    Local aQtdCTN := {}
+    Local nResto  := 0
+    Local nlx     := 0
+    Local nRestoM := 0
+    Local nRestoP := 0
+    Local nMTUso  := 0
+    Local nPBUso  := 0    
+    Default nPos  := 0
+
+//POS_MTC      1
+//POS_PESOB    2
+//POS_CTN40HC  3
+//POS_CTN40DR  4
+//POS_CTN40RF  5
+//POS_CTN20DR  6
+//POS_CTN20RF  7
+//POS_PARTLOT  8
+//POS_CRITERIO 9
+
+    cQuery := " SELECT TOP(1) ZAC_MTC, ZAC_KG FROM " + RetSqlName("ZAC")
+    cQuery += " WHERE ZAC_ATIVO = 'S' "
+    cQuery += " AND D_E_L_E_T_ = '' "
+    cQuery += " ORDER BY ZAC_MTC DESC "
+
+    If Select("CALX") > 0
+        CALX->(dbCloseArea())
+    EndIf
+
+    DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'CALX', .T., .F.)
+
+    If CALX->(!EOF())
+        nTotCub := Round(aCTNTotal[1][POS_MTC] / CALX->ZAC_MTC,2)
+        nTotPBr := Round(aCTNTotal[1][POS_PESOB] / CALX->ZAC_KG,2)
+    EndIf
+
+    If nTotCub > nTotPBr
+        lPorMTC := .T.
+    Else
+        lPorPBR := .T.
+    EndIf
+
+    If lPorMTC
+        aCTNTotal[1][POS_CRITERIO] := "Volume"
+    ElseIf lPorPBR
+        aCTNTotal[1][POS_CRITERIO] := "Peso"
+    EndIf
+    
+    //varer todos os tipos de ctn para ver quantos precisa de cada unidade
+    cQuery := " SELECT ZAC_CTN, ZAC_MTC, ZAC_KG FROM " + RetSqlName("ZAC")
+    cQuery += " WHERE ZAC_ATIVO = 'S' "
+    If lPorMTC   
+        If nTotCub <= 1
+            cQuery += " AND ZAC_MTC >= '"+cValToChar(aCTNTotal[1][POS_MTC])+"' "
+        EndIf
+    else //lPorPBR
+        If nTotPBr <= 1
+            cQuery += " AND ZAC_KG >= '"+cValToChar(aCTNTotal[1][POS_PESOB])+"' "
+        EndIf
+    EndIf
+    cQuery += " AND D_E_L_E_T_ = '' "
+
+    If Select("CTNX") > 0
+        CTNX->(dbCloseArea())
+    EndIf
+
+    DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'CTNX', .T., .F.)
+
+    While CTNX->(!EOF())
+        If lPorMTC
+            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTotal[1][POS_MTC] / CTNX->ZAC_MTC,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
+        Else // lPorPBR
+            AADD(aQtdCTN,{CTNX->ZAC_CTN, Round(aCTNTotal[1][POS_PESOB] / CTNX->ZAC_KG,2), CTNX->ZAC_MTC, CTNX->ZAC_KG})
+        EndIf
+        CTNX->(dbSkip())
+    EndDo
+
+    //agora varrer todo os containe com a quantidade que cabem a carga para pegar o melhor preços
+    If Empty(aQtdCTN)
+        Alert("Não existem containers compativeis cadastrado no sistema, entre em contato com a equipe de Suprimentos")
+        Return
+    EndIf
+
+    For nlx := 1 to len(aQtdCTN)
+        cQuery := " SELECT ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO FROM " + RetSqlName("ZAD")
+        cQuery += " WHERE ZAD_CODCTN = '"+aQtdCTN[nlx][1]+"' "
+        cQuery += " AND ZAD_ATIVO = 'S' "
+        cQuery += " AND D_E_L_E_T_ = '' "
+
+        If Select("VLRC") > 0
+            VLRC->(dbCloseArea())
+        EndIf
+        
+        DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'VLRC', .T., .F.)
+
+        If VLRC->(!EOF())
+            If aQtdCTN[nlx][2] > 1
+                AADD(aCTNVal,{VLRC->ZAD_CODCTN, Int(aQtdCTN[nlx][2]) * VLRC->ZAD_CUSTO, Int(aQtdCTN[nlx][2]), STOD(VLRC->ZAD_DATA), aQtdCTN[nlx][2]-Int(aQtdCTN[nlx][2]), aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
+            Else
+                AADD(aCTNVal,{VLRC->ZAD_CODCTN, VLRC->ZAD_CUSTO, aQtdCTN[nlx][2], STOD(VLRC->ZAD_DATA), 0, aQtdCTN[nlx][3], aQtdCTN[nlx][4]})
+            EndIf
+        EndIf
+    Next
+    
+    If !Empty(aCTNVal)
+        aSort(aCTNVal,,, { |x, y| x[2] < y[2] })
+        
+        If aCTNVal[1][1] == "CTN20DR"
+            aCTNTotal[1][POS_CTN20DR] += aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
+        ElseIf aCTNVal[1][1] == "CTN20RF"
+            aCTNTotal[1][POS_CTN20RF] += aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
+        ElseIf aCTNVal[1][1] == "CTN40DR"
+            aCTNTotal[1][POS_CTN40DR] += aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
+        ElseIf aCTNVal[1][1] == "CTN40RF"
+            aCTNTotal[1][POS_CTN40RF] += aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
+        ElseIf aCTNVal[1][1] == "CTN40HC"
+            aCTNTotal[1][POS_CTN40HC] += aCTNVal[1][3]
+            nResto := aCTNVal[1][5]
+            nMTUso := aCTNVal[1][6]
+            nPBUso := aCTNVal[1][7]
+        EndIf
+    EndIf
+
+    If nResto > 0
+        If aCTNTotal[1][POS_CTN20DR] > 0
+            If lPorMTC
+                nRestoM := (aCTNTotal[1][POS_MTC] - (aCTNTotal[1][POS_CTN20DR] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (aCTNTotal[1][POS_PESOB] - (aCTNTotal[1][POS_CTN20DR] * nPBUso))
+            EndIf
+        ElseIf aCTNTotal[1][POS_CTN20RF] > 0
+            If lPorMTC
+                nRestoM := (aCTNTotal[1][POS_MTC] - (aCTNTotal[1][POS_CTN20RF] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (aCTNTotal[1][POS_PESOB] - (aCTNTotal[1][POS_CTN20RF] * nPBUso))
+            EndIf
+        ElseIf aCTNTotal[1][POS_CTN40DR] > 0
+            If lPorMTC
+                nRestoM := (aCTNTotal[1][POS_MTC] - (aCTNTotal[1][POS_CTN40DR] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (aCTNTotal[1][POS_PESOB] - (aCTNTotal[1][POS_CTN40DR] * nPBUso))
+            EndIf
+        ElseIf aCTNTotal[1][POS_CTN40RF] > 0
+            If lPorMTC
+                nRestoM := (aCTNTotal[1][POS_MTC] - (aCTNTotal[1][POS_CTN40RF] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (aCTNTotal[1][POS_PESOB] - (aCTNTotal[1][POS_CTN40RF] * nPBUso))
+            EndIf
+        ElseIf aCTNTotal[1][POS_CTN40HC] > 0
+            If lPorMTC
+                nRestoM := (aCTNTotal[1][POS_MTC] - (aCTNTotal[1][POS_CTN40HC] * nMTUso))
+            ElseIf lPorPBR
+                nRestoP := (aCTNTotal[1][POS_PESOB] - (aCTNTotal[1][POS_CTN40HC] * nPBUso))
+            EndIf
+        EndIf
+
+        cQuery := " SELECT TOP(1) ZAD_CODCTN, ZAD_DATA, ZAD_VALMTC, ZAD_CUSTO, ZAD_ATIVO "
+        cQuery += " FROM " + RetSqlName("ZAD") + " ZAD "
+        cQuery += " INNER JOIN " + RetSqlName("ZAC") + " ZAC "
+        cQuery += " ON ZAC.ZAC_CTN = ZAD.ZAD_CODCTN "
+        If lPorMTC
+            cQuery += " AND ZAC.ZAC_MTC >= '"+cValtoChar(nRestoM)+"' "
+        ElseIf lPorPBR
+            cQuery += " AND ZAC.ZAC_KG >= '"+cValToChar(nRestoP)+"' "
+        EndIf
+        cQuery += " WHERE ZAD.ZAD_ATIVO = 'S' "
+        cQuery += " AND ZAD.D_E_L_E_T_ = '' "
+        cQuery += " AND ZAC.D_E_L_E_T_ = '' "
+        cQuery += " ORDER BY ZAD_CUSTO "
+
+
+        If Select("RESX") > 0
+            RESX->(dbCloseArea())
+        EndIf
+        
+        DbUseArea(.T., "TOPCONN", TCGenQry(,,cQuery) , 'RESX', .T., .F.)
+
+        If RESX->(!EOF())
+            If RESX->ZAD_CODCTN == "CTN20DR"
+                aCTNTotal[1][POS_CTN20DR] += nResto
+                If lPorMTC
+                    aCTNTotal[1][POS_PARTLOT] := nRestoM
+                ElseIf lPorPBR
+                    aCTNTotal[1][POS_PARTLOT] := nRestoP
+                EndIf
+            ElseIf RESX->ZAD_CODCTN == "CTN20RF"
+                aCTNTotal[1][POS_CTN20RF] += nResto
+                If lPorMTC
+                    aCTNTotal[1][POS_PARTLOT] := nRestoM
+                ElseIf lPorPBR
+                    aCTNTotal[1][POS_PARTLOT] := nRestoP
+                EndIf
+            ElseIf RESX->ZAD_CODCTN == "CTN40DR"
+                aCTNTotal[1][POS_CTN40DR] += nResto
+                If lPorMTC
+                    aCTNTotal[1][POS_PARTLOT] := nRestoM
+                ElseIf lPorPBR
+                    aCTNTotal[1][POS_PARTLOT] := nRestoP
+                EndIf
+            ElseIf RESX->ZAD_CODCTN == "CTN40RF"
+                aCTNTotal[1][POS_CTN40RF] += nResto
+                If lPorMTC
+                    aCTNTotal[1][POS_PARTLOT] := nRestoM
+                ElseIf lPorPBR
+                    aCTNTotal[1][POS_PARTLOT] := nRestoP
+                EndIf
+            ElseIf RESX->ZAD_CODCTN == "CTN40HC"
+                aCTNTotal[1][POS_CTN40HC] += nResto
+                If lPorMTC
+                    aCTNTotal[1][POS_PARTLOT] := nRestoM
+                ElseIf lPorPBR
+                    aCTNTotal[1][POS_PARTLOT] := nRestoP
+                EndIf
+            EndIf
+        EndIf
+    Else
+        If lPorMTC
+                aCTNTotal[1][POS_PARTLOT] := aCTNTotal[1][POS_MTC]
+        ElseIf lPorPBR
+                aCTNTotal[1][POS_PARTLOT] := aCTNTotal[1][POS_PESOB]
+        EndIf
+    EndIf
+
+    nRestoP := 0
+    nRestoM := 0
+    nResto  := 0
+    aCTNVal := {}
+    aQtdCTN := {}
+    lPorMTC := .F.
+    lPorPBR := .F.
+
 Return
