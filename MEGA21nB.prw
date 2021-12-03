@@ -1003,6 +1003,12 @@ Static Function RptDetail()
 				nAtuCub += RetCub( ,nSldAtu)
 				
 				@ _nLin, _nCol PSAY nSldAtu Picture '@E 99,999,999' //5
+
+				If aScan( aMovtos, { |x| Alltrim(x[1]) = Alltrim(SB1->B1_COD) } ) <= 0
+					nDispQtd := nSldAtu
+					nAllDisp += nSldAtu
+				EndIf
+
 				AADD(aDados1,nSldAtu)
 				AADD(aDados1,nEmpQtd)
 				AADD(aDados1,nDispQtd)
@@ -1263,8 +1269,8 @@ Static Function ImpRodape(cProds)
 		@ _nLin,_aTotCom[ x ][ 4 ]-1 PSAY _aTotCom[ x ][ 2 ] Picture '@E 99,999,999'
 	Next x
     
-	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+12 PSAY _qMedTot Picture '@E 99,999,999'
-	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+24 PSAY _nSldTot Picture '@E 99,999,999'
+	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+10 PSAY _qMedTot Picture '@E 99,999,999'
+	@ _nLin,_aTotCom[ Len(_aTotCom) ][ 4 ]+20 PSAY _nSldTot Picture '@E 99,999,999'
 	
 	If MV_par10 == 2 //Imprime Saldo x Previsão? (2 = Sim)
 	
