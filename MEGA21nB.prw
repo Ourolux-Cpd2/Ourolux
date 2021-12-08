@@ -1025,10 +1025,10 @@ Static Function RptDetail()
 				_nCol += 12
 							
 				//@ _nLin, _nCol PSAY NOROUND(nSldAtu / _qMed, 1) Picture '@E 99999.9'
-				@ _nLin, _nCol PSAY NOROUND(nDispQtd / _qMed, 1) Picture '@E 99999.9' //6
-				
+				@ _nLin, _nCol PSAY NOROUND(nDispQtd / _qMed, 2) Picture '@E 99999.9' //6
+
 				//AADD(aDados1,NOROUND(nSldAtu / _qMed,1))
-				AADD(aDados1,NOROUND(nDispQtd / _qMed,1))
+				AADD(aDados1,NOROUND(nDispQtd / _qMed,2))
 					
 				_nCol   += 5
 				
@@ -1079,8 +1079,8 @@ Static Function RptDetail()
 				
 					//@ _nLin, _nCol PSAY NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9'
 					//AADD(aDados1,NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1))
-					@ _nLin, _nCol PSAY NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9' //8
-					AADD(aDados1,NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 1))
+					@ _nLin, _nCol PSAY NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 2) Picture '@E 99999.9' //8
+					AADD(aDados1,NOROUND(( nDispQtd + _nQtdPrv )/_qMed, 2))
 				EndIf
 				
 				_nLin ++
