@@ -23,6 +23,7 @@ User Function OUROR029()
     Private nForMet  := 0
 
     dbSelectArea("SC1")
+    dbSelectArea("SYP")
 
     oReport := ReportDef()
     oReport:PrintDialog() 
@@ -30,7 +31,7 @@ User Function OUROR029()
 Return
 
 /*----------------------------------------------------------|
-| Autor | Rodrigo Dias Nunes              | Data 19/01/2021	| 
+| Autor | Rodrigo Dias Nunes              | Data 19/01/2021	|
 |-----------------------------------------------------------|
 | Funcao: ReportDef											|
 |-----------------------------------------------------------|
@@ -51,26 +52,29 @@ Static Function ReportDef()
     oSection:=TRSection():New(oReport,"OUROR029 - Lead Time Import ",{"SB1"})
     oSection:SetTotalInLine(.T.) 
 
+    TRCell():New(oSection     ,"ORIGEM"    	,,"Nacional/Import."                        ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"NUMSC"     	,,"Sol.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"FAMILIA"   	,,"Família"  	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"NUMPC"     	,,"Ped.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"FORNE"     	,,"Fornecedor"		                        ,		  ,10,,,"LEFT"  ,,"CENTER")//INFORMACOES PRINCIPAIS
+    TRCell():New(oSection     ,"CONDPG"    	,,"Condicao de Pagamento"                   ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"NUMDESEMB" 	,,"Desembaraco" 	                        ,		  ,18,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"NUMNF"     	,,"N.Fiscal"		                        ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"PORDEST"  	,,"Porto Destino"                           ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
     TRCell():New(oSection     ,"FILCD"  	,,"Filial/CD"                               ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    If MV_PAR22 == 2    
+    If MV_PAR20 == 2    
         TRCell():New(oSection ,"DTEMSC"   	,,"Emissao SC"    	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTAPRSC"   	,,"Aprova SC"                               ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTENVAR"   	,,"Envio Arte"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTAPRAR"   	,,"Aprova Arte"                             ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTEMIPO"   	,,"Emissao PO"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTLIMSC"   	,,"Limite Compra SC"                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTLIB01"   	,,"Lib.N1"   	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTLIB02"   	,,"Lib.N2"    	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTSINAL"   	,,"Pgto.Sinal"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-
-        TRCell():New(oSection ,"DTFIMPRD"  	,,"Fim Produção"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS NOVO
-        TRCell():New(oSection ,"DTLIMPRD"  	,,"Lim. Produçao"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS NOVO
-        
+        TRCell():New(oSection ,"DTFIMPRD"  	,,"Fim Produção"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"DTLIMPRD"  	,,"Lim. Produçao"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+        TRCell():New(oSection ,"PSIINI"   	,,"PSI. Inicio"                             ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"PSIREAL"   	,,"PSI. Finalizado"                         ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"PSIAPR"   	,,"PSI. Aprovado"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
         TRCell():New(oSection ,"DTEMBAR"   	,,"Embarque"  	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
@@ -84,13 +88,13 @@ Static Function ReportDef()
     TRCell():New(oSection     ,"EMPCAPSC"  	,,"Aprova SC x Emissao PO"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"ARTEMPC"  	,,"Aprova Arte x Emissao PO"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"PCXLIM" 	,,"Emissao PO x Limite Compra"              ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PCN2" 	    ,,"PO x N2"	   	   	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PCN1" 	    ,,"PO x N1"     	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"N1N2" 	    ,,"N1 x N2"     	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"N2SINAL" 	,,"N2 x Sinal"	   	   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-
-    TRCell():New(oSection     ,"SINXPSIF" 	,,"Sinal x Fim Produção"                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
-    TRCell():New(oSection     ,"LIPXFIMP" 	,,"Limit.Produção(SC) x Fim Produção"       ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
-    TRCell():New(oSection     ,"FIMPXPSF" 	,,"Fim Produção x PSI Finalizado"           ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
-
+    TRCell():New(oSection     ,"SINXPSIF" 	,,"Sinal x Fim Produção"                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"LIPXFIMP" 	,,"Limit.Produção(SC) x Fim Produção"       ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"FIMPPSII" 	,,"Fim Produção x PSI Início"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    TRCell():New(oSection     ,"PSIXPSF" 	,,"PSI Início x PSI Finalizado"             ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"SINPSIR" 	,,"Sinal x PSI Finalizado(PRODUÇÃO)"        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"PSIRPSIA" 	,,"PSI Finalizado x PSI A (QUALIDADE)"      ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
     TRCell():New(oSection     ,"PSIAEMB" 	,,"PSI A x Embarque"	   	   	            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
@@ -128,6 +132,7 @@ Static Function PrintReport(oReport,oSection)
     Local NPSRXPSA   := 0
     Local nPORxNF    := 0
     Local nPSAxEMB   := 0
+    Local dDtLib1    := CTOD("  /  /  ")
     Local dDtLib2    := CTOD("  /  /  ")
     Local dDtDesemb  := CTOD("  /  /  ")
     Local nwDesemb	 := 0
@@ -144,16 +149,20 @@ Static Function PrintReport(oReport,oSection)
     Local Wdt_Emb    := CTOD("  /  /  ")
     Local Wdt_Porto  := CTOD("  /  /  ")
     Local dt_LimPrd  := CTOD("  /  /  ")
+    Local Wdt_PSII   := CTOD("  /  /  ")
     Local n1Compra   := 0
     Local aResDatas  := {}
-    Local nPCxN2     := 0
     Local NN2XNF     := 0
     Local nSCxNF     := 0
     Local aDataNew   := {}
     Local cTexFil    := ""
+    Local cDesembVez := ""
+    Local cTpLinha   := ""
+    Local cTabUso    := ""
 
     //Finalizados
-    cQryFin := " SELECT SD1.D1_FILIAL, "
+    cQryFin := " SELECT 'IMP' AS ORIGEM, "
+    cQryFin += "        SD1.D1_FILIAL, "
     cQryFin += "        SD1.D1_DTDIGIT, "
     cQryFin += "        SD1.D1_EMISSAO, "
     cQryFin += "        SWN.WN_PO_NUM, "
@@ -169,46 +178,53 @@ Static Function PrintReport(oReport,oSection)
     cQryFin += "        SC1.C1_FILIAL, "
     cQryFin += "        SC7.C7_PO_EIC, "
     cQryFin += "        SC7.C7_FORNECE, "
-    cQryFin += "        SC7.C7_XHAWB "
+    cQryFin += "        SC7.C7_XHAWB, "
+    cQryFin += "        SW6.W6_HAWB, "
+    cQryFin += "        SC7.C7_NUM, "
+    cQryFin += "        SC7.C7_FILIAL "
     cQryFin += " FROM " + RetSqlName("SWN") + " SWN "
-    cQryFin += " LEFT JOIN " +RetSqlName("SD1")+ " SD1 ON" 
+    cQryFin += " LEFT JOIN " +RetSqlName("SD1")+ " SD1 ON " 
     cQryFin += "        SWN.WN_PO_NUM = SD1.D1_PEDIDO AND "
     cQryFin += "        SWN.WN_ITEM = SD1.D1_ITEMPC AND "
     cQryFin += "        SWN.WN_FORNECE = SD1.D1_FORNECE AND "
-    cQryFin += "        SWN.WN_LOJA = SD1.D1_LOJA AND"
+    cQryFin += "        SWN.WN_LOJA = SD1.D1_LOJA AND "
     cQryFin += "        SWN.WN_SERIE = SD1.D1_SERIE AND "
     cQryFin += "        SWN.WN_DOC = SD1.D1_DOC AND "
-    cQryFin += "		SWN.WN_TIPO_NF = SD1.D1_TIPO_NF"
-    cQryFin += " LEFT JOIN " +RetSqlName("SC7")+ " SC7 ON" 
+    cQryFin += "		SWN.WN_TIPO_NF = SD1.D1_TIPO_NF "
+    cQryFin += " LEFT JOIN " +RetSqlName("SC7")+ " SC7 ON " 
     cQryFin += "        SWN.WN_PRODUTO = SC7.C7_PRODUTO AND "
     cQryFin += "        SWN.WN_ITEM = SC7.C7_ITEM AND "
     cQryFin += "        SWN.WN_FORNECE = SC7.C7_FORNECE AND "
     cQryFin += "        SWN.WN_LOJA = SC7.C7_LOJA AND "
     cQryFin += "        SWN.WN_PO_NUM = SC7.C7_NUM "
-    cQryFin += " LEFT JOIN " +RetSqlName("SC1")+ " SC1 ON" 
-    cQryFin += "        SC1.C1_NUM = SC7.C7_NUMSC
-    cQryFin += "        AND SC1.C1_FILIAL = SC7.C7_FILIAL"
-    cQryFin += "        AND SC1.C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "'"
+    cQryFin += " LEFT JOIN " + RetSqlName("SW6") + " SW6 "
+	cQryFin += "        ON SW6.W6_PO_NUM = SC7.C7_NUM "
+	cQryFin += "        AND SW6.D_E_L_E_T_ = ''	"
+    cQryFin += " LEFT JOIN " +RetSqlName("SC1")+ " SC1 ON " 
+    cQryFin += "        SC1.C1_NUM = SC7.C7_NUMSC "
+    cQryFin += "        AND SC1.C1_FILIAL = SC7.C7_FILIAL "
+    cQryFin += "        AND SC1.C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "' "
     cQryFin += " WHERE SWN.D_E_L_E_T_ <> '*' AND SD1.D_E_L_E_T_ <> '*' AND SC7.D_E_L_E_T_ <> '*' "
     cQryFin += "        AND SWN.WN_TIPO_NF IN ('1','3','5') " 
-    cQryFin += "        AND SD1.D1_FILIAL BETWEEN '" + MV_PAR01 + "' AND '" + MV_PAR02 + "'"
-    cQryFin += "        AND SC7.C7_NUMSC BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "'"
-    cQryFin += "        AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
-    cQryFin += "        AND SWN.WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "'"
-    cQryFin += "        AND SWN.WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "'"
-    cQryFin += "        AND SWN.WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "'"
-    cQryFin += "        AND SD1.D1_EMISSAO BETWEEN '" + DTOS(MV_PAR13) + "' AND '" + DTOS(MV_PAR14) + "'"
+    cQryFin += "        AND SD1.D1_FILIAL BETWEEN '" + MV_PAR01 + "' AND '" + MV_PAR02 + "' "
+    cQryFin += "        AND SC7.C7_NUMSC BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
+    cQryFin += "        AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' " 
+    cQryFin += "        AND SWN.WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
+    cQryFin += "        AND SWN.WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "' "
+    cQryFin += "        AND SWN.WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "' "
+    cQryFin += "        AND SD1.D1_EMISSAO BETWEEN '" + DTOS(MV_PAR13) + "' AND '" + DTOS(MV_PAR14) + "' "
 
     If !Empty(MV_PAR15) .And. !Empty(MV_PAR17) .And. !Empty(MV_PAR16) .And. !Empty(MV_PAR18)
-        cQryFin += "        AND SWN.WN_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "'"
-        cQryFin += "        AND SWN.WN_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "'
+        cQryFin += "        AND SWN.WN_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "' "
+        cQryFin += "        AND SWN.WN_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "' "
     EndIf 
 
     cQryFin += " GROUP BY SD1.D1_FILIAL, SD1.D1_DTDIGIT, SWN.WN_PO_NUM, SWN.WN_HAWB, SWN.WN_SERIE, SWN.WN_FORNECE, SWN.WN_LOJA, "
-    cQryFin += " SD1.D1_EMISSAO, SC7.C7_EMISSAO, SWN.WN_DOC, SC7.C7_NUMSC,SC1.C1_NUM,SC1.C1_FILIAL, SC7.C7_PO_EIC, SC7.C7_FORNECE, SC7.C7_XHAWB "
+    cQryFin += " SD1.D1_EMISSAO, SC7.C7_EMISSAO, SWN.WN_DOC, SC7.C7_NUMSC,SC1.C1_NUM,SC1.C1_FILIAL, SC7.C7_PO_EIC, SC7.C7_FORNECE, SC7.C7_XHAWB, SW6.W6_HAWB, SC7.C7_NUM, SC7.C7_FILIAL "
 
     //Em abertos
-    cQryAbe := " SELECT SD1.D1_FILIAL, "
+    cQryAbe := " SELECT 'IMP' AS ORIGEM, "
+    cQryAbe += "        SD1.D1_FILIAL, "
     cQryAbe += "        SD1.D1_DTDIGIT, "
     cQryAbe += "        SD1.D1_EMISSAO, "
     cQryAbe += "        SWN.WN_PO_NUM, "
@@ -224,7 +240,10 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += "        SC1.C1_FILIAL, "
     cQryAbe += "        SC7.C7_PO_EIC, "
     cQryAbe += "        SC7.C7_FORNECE, "
-    cQryAbe += "        SC7.C7_XHAWB "
+    cQryAbe += "        SC7.C7_XHAWB, "
+    cQryAbe += "        SW6.W6_HAWB, "
+    cQryAbe += "        SC7.C7_NUM, "
+    cQryAbe += "        SC7.C7_FILIAL "
     cQryAbe += " FROM   (SELECT * "
     cQryAbe += "         FROM  " + RetSqlName("SC1")
     cQryAbe += " 	WHERE C1_NUM BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
@@ -238,6 +257,9 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += "    AND SC7.C7_FILIAL = SC1.C1_FILIAL "
     cQryAbe += "    AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
     cQryAbe += " 	AND SC7.D_E_L_E_T_ = '' "
+    cQryAbe += " LEFT JOIN " + RetSqlName("SW6") + " SW6 "
+    cQryAbe += "    ON SW6.W6_PO_NUM = SC7.C7_NUM "
+    cQryAbe += " 	AND SW6.D_E_L_E_T_ = ''	"
     cQryAbe += " LEFT JOIN " + RetSqlName("SWN") + " SWN "
     cQryAbe += " 	ON SWN.WN_PRODUTO = SC7.C7_PRODUTO "
     cQryAbe += " 	AND SWN.WN_ITEM = SC7.C7_ITEM "
@@ -252,8 +274,8 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += "    AND SWN.D_E_L_E_T_ = '' "
 
     If !Empty(MV_PAR15) .And. !Empty(MV_PAR17) .And. !Empty(MV_PAR16) .And. !Empty(MV_PAR18)
-        cQryAbe += "        AND SC7.C7_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "'"
-        cQryAbe += "        AND SC7.C7_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "'
+        cQryAbe += "        AND SC7.C7_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "' "
+        cQryAbe += "        AND SC7.C7_LOJA  BETWEEN '" + MV_PAR16 + "' AND '" + MV_PAR18 + "' "
     EndIf 
     
     cQryAbe += " LEFT JOIN " + RetSqlName("SD1") + " SD1 "
@@ -281,19 +303,92 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += "           SC1.C1_FILIAL, "
     cQryAbe += "           SC7.C7_PO_EIC, "
     cQryAbe += "           SC7.C7_FORNECE, "
-    cQryAbe += "        SC7.C7_XHAWB "
-
+    cQryAbe += "           SC7.C7_XHAWB, "
+    cQryAbe += "           SW6.W6_HAWB, "
+    cQryAbe += "           SC7.C7_NUM, "
+    cQryAbe += "           SC7.C7_FILIAL "
     
-    If MV_PAR21 == 1
+    //Nacionais
+    cQryNac := " SELECT 'NAC' AS ORIGEM,
+    cQryNac += "        SC7.C7_FILIAL, " 					
+    cQryNac += " 		SD1.D1_DTDIGIT, "				
+    cQryNac += " 		SD1.D1_EMISSAO, "				
+    cQryNac += " 		'' as WN_PO_NUM, "
+    cQryNac += " 		SC7.C7_XHAWB, "   				
+    cQryNac += " 		SD1.D1_DOC, " 				
+    cQryNac += " 		SD1.D1_SERIE, "					
+    cQryNac += " 		Sum(SD1.D1_QUANT) AS D1_QUANT, "
+    cQryNac += " 		SD1.D1_FORNECE, "					
+    cQryNac += " 		SD1.D1_LOJA, "					
+    cQryNac += " 		SC7.C7_EMISSAO, "
+    cQryNac += "        SC7.C7_NUMSC, "				
+    cQryNac += "        SC1.C1_NUM, "						
+    cQryNac += "        SC1.C1_FILIAL, "					
+    cQryNac += "        SC7.C7_PO_EIC, "					
+    cQryNac += "        SC7.C7_FORNECE, "					
+    cQryNac += "        SC7.C7_XHAWB, "					
+    cQryNac += " 		'' as W6_HAWB, "
+    cQryNac += " 		SC7.C7_NUM, "
+    cQryNac += " 		SC7.C7_FILIAL "
+    cQryNac += " FROM   (SELECT * "
+    cQryNac += "         FROM  " + RetSqlName("SC1")
+    cQryNac += "         WHERE  C1_NUM BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
+    cQryNac += "                AND C1_IMPORT = 'N' "
+    cQryNac += "                AND C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "' "
+    cQryNac += "                AND C1_APROV = 'L' "
+    cQryNac += "                AND D_E_L_E_T_ = ' ') SC1 "
+    cQryNac += "        LEFT JOIN " + RetSqlName("SC7") + " SC7 "
+    cQryNac += "               ON SC7.C7_NUMSC = SC1.C1_NUM "
+    cQryNac += "                  AND SC7.C7_FILIAL = SC1.C1_FILIAL "
+    cQryNac += "                  AND SC7.C7_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
+    cQryNac += " 				 AND SC7.C7_PO_EIC = '' "
+    cQryNac += "                  AND SC7.D_E_L_E_T_ = ' ' "
+    cQryNac += "        LEFT JOIN " + RetSqlName("SD1") + " SD1 "
+    cQryNac += "               ON SD1.D1_PEDIDO = SC7.C7_NUM "
+    cQryNac += "                  AND SD1.D1_ITEMPC = SC7.C7_ITEM "
+    cQryNac += "                  AND SD1.D1_FORNECE = SC7.C7_FORNECE "
+    cQryNac += "                  AND SD1.D1_LOJA = SC7.C7_LOJA "
+    cQryNac += "                  AND SD1.D1_FILIAL BETWEEN '" + MV_PAR01 + "' AND '" + MV_PAR02 + "' "
+    cQryNac += "                  AND SD1.D1_EMISSAO BETWEEN '" + DTOS(MV_PAR13) + "' AND '" + DTOS(MV_PAR14) + "' "
+    cQryNac += " 	   INNER JOIN " + RetSqlName("SB1") + " SB1 "
+    cQryNac += " 			  ON SB1.B1_COD = SC7.C7_PRODUTO "
+    cQryNac += " 				 AND SB1.B1_XREVEND = 'S' "
+    cQryNac += " 				 AND SB1.D_E_L_E_T_ = '' "
+    cQryNac += " GROUP  BY SC7.C7_FILIAL, " 				 	
+    cQryNac += " 		SD1.D1_DTDIGIT, "			
+    cQryNac += " 		SD1.D1_EMISSAO, " 				
+    cQryNac += " 		SC7.C7_NUM, "	    				
+    cQryNac += " 		SC7.C7_XHAWB, "   				
+    cQryNac += " 		SD1.D1_DOC, "	    				
+    cQryNac += " 		SD1.D1_SERIE, "					
+    cQryNac += " 		SD1.D1_FORNECE, "					
+    cQryNac += " 		SD1.D1_LOJA, "					
+    cQryNac += " 		SC7.C7_EMISSAO, "					
+    cQryNac += "        SC7.C7_NUMSC, "					
+    cQryNac += "        SC1.C1_NUM, "						
+    cQryNac += "        SC1.C1_FILIAL, "					
+    cQryNac += "        SC7.C7_PO_EIC, "					
+    cQryNac += "        SC7.C7_FORNECE, "					
+    cQryNac += "        SC7.C7_XHAWB, "
+    cQryNac += "        SC7.C7_NUM, "
+    cQryNac += "        SC7.C7_FILIAL "
+    
+    If MV_PAR19 == 1
         cQuery := cQryFin
+        cQuery += "UNION ALL "
+        cQuery += cQryNac
         cQuery += " ORDER BY SD1.D1_FILIAL, SWN.WN_HAWB DESC "
-    ElseIf MV_PAR21 == 2
+    ElseIf MV_PAR19 == 2
         cQuery := cQryAbe
+        cQuery += "UNION ALL "
+        cQuery += cQryNac
         cQuery += " ORDER BY SC1.C1_NUM DESC "
-    ElseIf MV_PAR21 == 3
+    ElseIf MV_PAR19 == 3
         cQuery := cQryFin
-        cQuery += "UNION ALL"
+        cQuery += "UNION ALL "
         cQuery += cQryAbe
+        cQuery += "UNION ALL "
+        cQuery += cQryNac
         cQuery += " ORDER BY SD1.D1_FILIAL, SWN.WN_HAWB DESC "
     EndIf
 
@@ -312,7 +407,78 @@ Static Function PrintReport(oReport,oSection)
     oSection:Init()
 
     While SCPCNF->(!Eof())
-        If MV_PAR21 == 1
+        cQryFam := " SELECT BM_DESC FROM " + RetSqlName("SBM")
+		cQryFam += " WHERE BM_GRUPO IN (SELECT B1_GRUPO FROM " + RetSqlName("SB1")
+		cQryFam += " 				   WHERE B1_COD IN ( "
+        
+        If !Empty(SCPCNF->C7_PO_EIC) 
+            cTabUso := "SC7"
+            cQryFam += " SELECT C7_PRODUTO FROM " + RetSqlName("SC7") + " SC7 "
+            If SCPCNF->ORIGEM == "NAC"
+                cQryFam += " INNER JOIN " + RetSqlName("SB1") + " SB1 "
+                cQryFam += "    ON SB1.D_E_L_E_T_ = '' "
+                cQryFam += "    AND SB1.B1_XREVEND = 'S' "
+                If cTabUso == "SC7"
+                    cQryFam += " AND SB1.B1_COD = SC7.C7_PRODUTO "
+                ElseIf cTabUso == "SC1"
+                    cQryFam += " AND SB1.B1_COD = SC1.C1_PRODUTO "
+                EndIf
+            EndIf
+            cQryFam += " WHERE SC7.C7_FILIAL = '"+SCPCNF->C7_FILIAL +"' "
+            cQryFam += " AND SC7.C7_NUM = '"+SCPCNF->C7_PO_EIC+"' "
+            cQryFam += " AND SC7.D_E_L_E_T_ = '') "
+        ElseIf !Empty(SCPCNF->C7_NUM)
+            cTabUso := "SC7"
+            cQryFam += " SELECT C7_PRODUTO FROM " + RetSqlName("SC7") + " SC7 "
+            If SCPCNF->ORIGEM == "NAC"
+                cQryFam += " INNER JOIN " + RetSqlName("SB1") + " SB1 "
+                cQryFam += "    ON SB1.D_E_L_E_T_ = '' "
+                cQryFam += "    AND SB1.B1_XREVEND = 'S' "
+                If cTabUso == "SC7"
+                    cQryFam += " AND SB1.B1_COD = SC7.C7_PRODUTO "
+                ElseIf cTabUso == "SC1"
+                    cQryFam += " AND SB1.B1_COD = SC1.C1_PRODUTO "
+                EndIf
+            EndIf
+            cQryFam += " WHERE SC7.C7_FILIAL = '"+SCPCNF->C7_FILIAL+"' "
+            cQryFam += " AND SC7.C7_NUM = '"+SCPCNF->C7_NUM+"' "
+            cQryFam += " AND SC7.D_E_L_E_T_ = '') "
+        Else
+            cTabUso := "SC1"
+            cQryFam += " SELECT C1_PRODUTO FROM " + RetSqlName("SC1") + " SC1 "
+            If SCPCNF->ORIGEM == "NAC"
+                cQryFam += " INNER JOIN " + RetSqlName("SB1") + " SB1 "
+                cQryFam += "    ON SB1.D_E_L_E_T_ = '' "
+                cQryFam += "    AND SB1.B1_XREVEND = 'S' "
+                If cTabUso == "SC7"
+                    cQryFam += " AND SB1.B1_COD = SC7.C7_PRODUTO "
+                ElseIf cTabUso == "SC1"
+                    cQryFam += " AND SB1.B1_COD = SC1.C1_PRODUTO "
+                EndIf
+            EndIf
+            cQryFam += " WHERE SC1.C1_FILIAL = '"+SCPCNF->C1_FILIAL+"' "
+            cQryFam += " AND SC1.C1_NUM = '"+SCPCNF->C1_NUM+"' "
+            cQryFam += " AND SC1.D_E_L_E_T_ = '') "
+        EndIf
+		cQryFam += " 					AND D_E_L_E_T_ = '') "
+		cQryFam += " AND D_E_L_E_T_ = '' " 
+
+		If Select("XLIN") > 0
+			XLIN->(dbCloseArea())
+		EndIf   
+
+		DbUseArea(.T., "TOPCONN", TCGenQry(,,cQryFam) , 'XLIN', .T., .F.)
+
+        cTpLinha := ""
+
+		While XLIN->(!EOF())
+			cTpLinha += Alltrim(XLIN->BM_DESC) + ", "
+			XLIN->(dbSkip())
+		EndDo
+
+        cTpLinha := SubStr(Alltrim(cTpLinha), 1, Len(Alltrim(cTpLinha))-1)
+
+        If MV_PAR19 == 1
             If SCPCNF->D1_FILIAL == "01"
                 cTexFil := "GRU"
             ElseIF SCPCNF->D1_FILIAL == "02"
@@ -326,22 +492,23 @@ Static Function PrintReport(oReport,oSection)
             ElseIF SCPCNF->D1_FILIAL == "06"
                 cTexFil := "NAV"
             EndIF
+            
             oSection:Cell("FILCD"):SetValue(cTexFil)
             oSection:Cell("NUMSC"):SetValue(SCPCNF->C7_NUMSC)
             oSection:Cell("NUMPC"):SetValue(SCPCNF->WN_PO_NUM)
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->WN_FORNECE))
         Else
-            If SCPCNF->C1_FILIAL == "01"
+            If SCPCNF->C1_FILIAL == "01" .OR. SCPCNF->C7_FILIAL == "01"
                 cTexFil := "GRU"
-            ElseIF SCPCNF->C1_FILIAL == "02"
+            ElseIF SCPCNF->C1_FILIAL == "02" .OR. SCPCNF->C7_FILIAL == "02"
                 cTexFil := "PARANA"
-            ElseIF SCPCNF->C1_FILIAL == "03"
+            ElseIF SCPCNF->C1_FILIAL == "03" .OR. SCPCNF->C7_FILIAL == "03"
                 cTexFil := "PARAISO"
-            ElseIF SCPCNF->C1_FILIAL == "04"
+            ElseIF SCPCNF->C1_FILIAL == "04" .OR. SCPCNF->C7_FILIAL == "04"
                 cTexFil := "RIO"
-            ElseIF SCPCNF->C1_FILIAL == "05"
+            ElseIF SCPCNF->C1_FILIAL == "05" .OR. SCPCNF->C7_FILIAL == "05"
                 cTexFil := "PERNANBUCO"
-            ElseIF SCPCNF->C1_FILIAL == "06"
+            ElseIF SCPCNF->C1_FILIAL == "06" .OR. SCPCNF->C7_FILIAL == "06"
                 cTexFil := "NAV"
             EndIF
             oSection:Cell("FILCD"):SetValue(cTexFil)
@@ -349,26 +516,102 @@ Static Function PrintReport(oReport,oSection)
             oSection:Cell("NUMPC"):SetValue(SCPCNF->C7_PO_EIC)
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->C7_FORNECE))
         EndIf    
+        
+        oSection:Cell("ORIGEM"):SetValue(SCPCNF->ORIGEM)
+        oSection:Cell("FAMILIA"):SetValue(cTpLinha)
 
-        If !Empty(SCPCNF->C7_XHAWB)
+        If !Empty(SCPCNF->C7_PO_EIC)
+            cCondPG := GetAdvFVal("SW2","W2_COND_PA",xFilial("SW2")+SCPCNF->C7_PO_EIC,1)
+            If !Empty(cCondPG)
+                cCondPG := GetAdvFVal("SY6","Y6_DESC_P",xFilial("SY6")+cCondPG,1)
+                cCondPG := GetAdvFVal("SYP","YP_TEXTO",xFilial("SYP")+cCondPG,1)
+            Else
+                cCondPG := "Nao localizado"
+            EndIf
+        ElseIf !Empty(SCPCNF->C7_NUM)
+            cCondPG := GetAdvFVal("SC7","C7_COND",SCPCNF->C7_FILIAL+SCPCNF->C7_NUM,1)
+            If !Empty(cCondPG)
+                cCondPG := GetAdvFVal("SE4","E4_DESCRI",xFilial("SE4")+cCondPG,1)
+            Else
+                cCondPG := "Nao localizado"
+            EndIf
+        Else
+            cCondPG := ""
+        EndIf
+
+        oSection:Cell("CONDPG"):SetValue(cCondPG)
+
+        If !Empty(SCPCNF->W6_HAWB)
+            oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->W6_HAWB)
+            cDesembVez := SCPCNF->W6_HAWB
+        ElseIf !Empty(SCPCNF->C7_XHAWB)
             oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->C7_XHAWB)
+            cDesembVez := SCPCNF->C7_XHAWB
         Else
             oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->WN_HAWB)
+            cDesembVez := SCPCNF->WN_HAWB
         EndIf
 
         oSection:Cell("NUMNF"):SetValue(SCPCNF->WN_DOC)
         
-        aResDatas:= ConsEtdEta(SCPCNF->WN_HAWB)
+        aResDatas:= ConsEtdEta(cDesembVez)
         
         SCR->(DbSetOrder(1))
-        
-        If MV_PAR21 == 1
-            SCR->(DbSeek(SCPCNF->D1_FILIAL + "PC" + PADR(SCPCNF->WN_PO_NUM,TAMSX3("CR_NUM")[1])+"02") )
+
+        //NIVEL 1        
+        If MV_PAR19 == 1
+            SCR->(DbSeek(SCPCNF->D1_FILIAL + "PC" + PADR(SCPCNF->WN_PO_NUM,TAMSX3("CR_NUM")[1])+"01") )
         Else
-            SCR->(DbSeek(SCPCNF->C1_FILIAL + "PC" + PADR(SCPCNF->C7_PO_EIC,TAMSX3("CR_NUM")[1])+"02") )
+            If !Empty(SCPCNF->C7_NUM)
+                SCR->(DbSeek(SCPCNF->C7_FILIAL + "PC" + PADR(SCPCNF->C7_NUM,TAMSX3("CR_NUM")[1])+"01") )
+            Else
+                SCR->(DbSeek(SCPCNF->C1_FILIAL + "PC" + PADR(SCPCNF->C7_PO_EIC,TAMSX3("CR_NUM")[1])+"01") )
+            EndIf
         EndIf
 
-        If MV_PAR21 == 1
+        If MV_PAR19 == 1
+            While SCR->CR_FILIAL == SCPCNF->D1_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->WN_PO_NUM) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "01"
+                If Empty(SCR->CR_DATALIB)
+                    SCR->(DbSkip())
+                Else
+                    dDtLib1	  := SCR->CR_DATALIB
+                    Exit
+                EndIf
+            End
+        Else
+            If !Empty(SCPCNF->C7_NUM)
+                While SCR->CR_FILIAL == SCPCNF->C7_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->C7_NUM) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "01"
+                    If Empty(SCR->CR_DATALIB)
+                        SCR->(DbSkip())
+                    Else
+                        dDtLib1	  := SCR->CR_DATALIB
+                        Exit
+                    EndIf
+                End
+            Else
+                While SCR->CR_FILIAL == SCPCNF->C1_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->C7_PO_EIC) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "01"
+                    If Empty(SCR->CR_DATALIB)
+                        SCR->(DbSkip())
+                    Else
+                        dDtLib1	  := SCR->CR_DATALIB
+                        Exit
+                    EndIf
+                End
+            EndIf
+        EndIf
+
+        //NIVEL 2
+        If MV_PAR19 == 1
+            SCR->(DbSeek(SCPCNF->D1_FILIAL + "PC" + PADR(SCPCNF->WN_PO_NUM,TAMSX3("CR_NUM")[1])+"02") )
+        Else
+             If !Empty(SCPCNF->C7_NUM)
+                SCR->(DbSeek(SCPCNF->C7_FILIAL + "PC" + PADR(SCPCNF->C7_NUM,TAMSX3("CR_NUM")[1])+"02") )
+            Else
+                SCR->(DbSeek(SCPCNF->C1_FILIAL + "PC" + PADR(SCPCNF->C7_PO_EIC,TAMSX3("CR_NUM")[1])+"02") )
+            EndIf
+        EndIf
+
+        If MV_PAR19 == 1
             While SCR->CR_FILIAL == SCPCNF->D1_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->WN_PO_NUM) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "02"
                 If Empty(SCR->CR_DATALIB)
                     SCR->(DbSkip())
@@ -378,19 +621,30 @@ Static Function PrintReport(oReport,oSection)
                 EndIf
             End
         Else
-            While SCR->CR_FILIAL == SCPCNF->C1_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->C7_PO_EIC) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "02"
-                If Empty(SCR->CR_DATALIB)
-                    SCR->(DbSkip())
-                Else
-                    dDtLib2	  := SCR->CR_DATALIB
-                    Exit
-                EndIf
-            End
+            If !Empty(SCPCNF->C7_NUM)
+                While SCR->CR_FILIAL == SCPCNF->C7_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->C7_NUM) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "02"
+                    If Empty(SCR->CR_DATALIB)
+                        SCR->(DbSkip())
+                    Else
+                        dDtLib2	  := SCR->CR_DATALIB
+                        Exit
+                    EndIf
+                End
+            Else
+                While SCR->CR_FILIAL == SCPCNF->C1_FILIAL .And. AllTrim(SCR->CR_NUM) == AllTrim(SCPCNF->C7_PO_EIC) .And. SCR->CR_TIPO == "PC" .And. SCR->CR_NIVEL == "02"
+                    If Empty(SCR->CR_DATALIB)
+                        SCR->(DbSkip())
+                    Else
+                        dDtLib2	  := SCR->CR_DATALIB
+                        Exit
+                    EndIf
+                End
+            EndIf
         EndIf
 
-        If AllTrim(nDesemb) <> AllTrim(SCPCNF->WN_HAWB) .or. len(Alltrim(nDesemb)) <> len(AllTrim(SCPCNF->WN_HAWB))
-            dDtDesemb 	:= SToD(W6DATE(SCPCNF->WN_HAWB))
-            nwDesemb	:= W6DATE(SCPCNF->WN_HAWB,SCPCNF->D1_EMISSAO)
+        If AllTrim(nDesemb) <> AllTrim(cDesembVez) .or. len(Alltrim(nDesemb)) <> len(AllTrim(cDesembVez))
+            dDtDesemb 	:= SToD(W6DATE(cDesembVez))
+            nwDesemb	:= W6DATE(cDesembVez,SCPCNF->D1_EMISSAO)
             dEtd		:= Substr(aResDatas[1][2],7,2) + "/" + Substr(aResDatas[1][2],5,2) + "/" + Substr(aResDatas[1][2],3,2)
             dEtd2		:= aResDatas[1][2]
             WnMar		:= Val(aResDatas[1][1])
@@ -402,28 +656,31 @@ Static Function PrintReport(oReport,oSection)
             Wdt_PSIR	:= Stod(aResDatas[1][8])
             Wdt_PSIA	:= Stod(aResDatas[1][9])
             Wdt_FIMP	:= Stod(aResDatas[1][10])
+            Wdt_PSII	:= Stod(aResDatas[1][11])
         EndIf
 
-        dt_Sin  := ConsSin(AllTrim(SCPCNF->WN_HAWB))
-        If MV_PAR21 == 2 .OR. MV_PAR21 == 3
+        dt_Sin  := ConsSin(AllTrim(cDesembVez))
+        If MV_PAR19 == 2 .OR. MV_PAR19 == 3
             dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
             dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
         Else
-            dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->D1_FILIAL+SCPCNF->C7_NUMSC,1)
-            dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->D1_FILIAL+SCPCNF->C7_NUMSC,1)
+            dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C7_FILIAL+SCPCNF->C7_NUMSC,1)
+            dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->C7_FILIAL+SCPCNF->C7_NUMSC,1)
         EndIf
 
         aDataNew := BusNewDt()
         
-        If MV_PAR22 == 2
+        If MV_PAR20 == 2
             oSection:Cell("DTEMSC"):SetValue(SubStr(Dtos(dt_EmSC),7,2) + "/" + SubStr(Dtos(dt_EmSC),5,2) + "/" + SubStr(Dtos(dt_EmSC),3,2) )
             oSection:Cell("DTAPRSC"):SetValue(STOD(aDataNew[1][2]))
             oSection:Cell("DTENVAR"):SetValue(STOD(aDataNew[1][5]))
             oSection:Cell("DTAPRAR"):SetValue(STOD(aDataNew[1][6]))
             oSection:Cell("DTEMIPO"):SetValue(STOD(aDataNew[1][1]))
             oSection:Cell("DTLIMSC"):SetValue(STOD(aDataNew[1][4]))
+            oSection:Cell("DTLIB01"):SetValue(SubStr(Dtos(dDtLib1),7,2) + "/" + SubStr(Dtos(dDtLib1),5,2) + "/" + SubStr(Dtos(dDtLib1),3,2) )
             oSection:Cell("DTLIB02"):SetValue(SubStr(Dtos(dDtLib2),7,2) + "/" + SubStr(Dtos(dDtLib2),5,2) + "/" + SubStr(Dtos(dDtLib2),3,2) )
             oSection:Cell("DTSINAL"):SetValue(SubStr(Dtos(dt_Sin),7,2) + "/" + SubStr(Dtos(dt_Sin),5,2) + "/" + SubStr(Dtos(dt_Sin),3,2) )
+            oSection:Cell("PSIINI"):SetValue(SubStr(Dtos(Wdt_PSII),7,2) + "/" + SubStr(Dtos(Wdt_PSII),5,2) + "/" + SubStr(Dtos(Wdt_PSII),3,2) )   
             oSection:Cell("PSIREAL"):SetValue(SubStr(Dtos(Wdt_PSIR),7,2) + "/" + SubStr(Dtos(Wdt_PSIR),5,2) + "/" + SubStr(Dtos(Wdt_PSIR),3,2) )   
             oSection:Cell("DTFIMPRD"):SetValue(SubStr(Dtos(Wdt_FIMP),7,2) + "/" + SubStr(Dtos(Wdt_FIMP),5,2) + "/" + SubStr(Dtos(Wdt_FIMP),3,2) )   
             oSection:Cell("DTLIMPRD"):SetValue(SubStr(Dtos(dt_LimPrd),7,2) + "/" + SubStr(Dtos(dt_LimPrd),5,2) + "/" + SubStr(Dtos(dt_LimPrd),3,2) )   
@@ -446,11 +703,7 @@ Static Function PrintReport(oReport,oSection)
                 EndIf
             EndIf
         EndIf 
-        
-        IF !Empty(dDtLib2)
-            nPCxN2 := DateDiffDay(STOD(SCPCNF->C7_EMISSAO),dDtLib2)
-        EndIf
-
+    
         IF !Empty(dDtLib2) .AND. !Empty(dt_Sin)
             If dt_Sin < dDtLib2
                 nN2xSIN := (DateDiffDay(dDtLib2,dt_Sin) * -1)
@@ -480,7 +733,6 @@ Static Function PrintReport(oReport,oSection)
         EndIf
 
 
-        oSection:Cell("PCN2"):SetValue(nPCxN2)
         oSection:Cell("N2SINAL"):SetValue(nN2xSIN)
         oSection:Cell("SINPSIR"):SetValue(nSINxPSR)
         oSection:Cell("PSIRPSIA"):SetValue(nPSRxPSA)
@@ -501,7 +753,7 @@ Static Function PrintReport(oReport,oSection)
 		nLeadPre := aRetW2[1]
 		cPorto	 := Alltrim(aRetW2[2])
 
-        If MV_PAR21 == 1
+        If MV_PAR19 == 1
             n1Compra := Busca1C(SCPCNF->WN_PO_NUM) 
         Else
             n1Compra := Busca1C(SCPCNF->C7_PO_EIC)
@@ -573,7 +825,19 @@ Static Function PrintReport(oReport,oSection)
             oSection:Cell("PCXLIM"):SetValue(0)
         EndIf
 	
- 	If !Empty(dt_Sin) .AND. !Empty(Wdt_FIMP)
+        If !Empty(aDataNew[1][1]) .AND. !Empty(dDtLib1)
+            oSection:Cell("PCN1"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),dDtLib1))
+        else
+            oSection:Cell("PCN1"):SetValue(0)
+        EndIf
+        
+        If !Empty(dDtLib1) .AND. !Empty(dDtLib2)
+            oSection:Cell("N1N2"):SetValue(DateDiffDay(dDtLib1,dDtLib2))
+        else
+            oSection:Cell("N1N2"):SetValue(0)
+        EndIf
+
+ 	    If !Empty(dt_Sin) .AND. !Empty(Wdt_FIMP)
             If dt_Sin > Wdt_FIMP
                 oSection:Cell("SINXPSIF"):SetValue(DateDiffDay(dt_Sin,Wdt_FIMP) * -1)
             Else
@@ -593,15 +857,26 @@ Static Function PrintReport(oReport,oSection)
             oSection:Cell("LIPXFIMP"):SetValue(0)
         EndIf
 
-        If !Empty(Wdt_PSIR) .AND. !Empty(Wdt_FIMP)
-            If Wdt_FIMP > Wdt_PSIR
-                oSection:Cell("FIMPXPSF"):SetValue(DateDiffDay(Wdt_FIMP,Wdt_PSIR) * -1)
+        If !Empty(Wdt_PSII) .AND. !Empty(Wdt_FIMP)
+            If Wdt_FIMP > Wdt_PSII
+                oSection:Cell("FIMPPSII"):SetValue(DateDiffDay(Wdt_PSII,Wdt_FIMP) * -1)
             Else
-                oSection:Cell("FIMPXPSF"):SetValue(DateDiffDay(Wdt_FIMP,Wdt_PSIR))
+                oSection:Cell("FIMPPSII"):SetValue(DateDiffDay(Wdt_PSII,Wdt_FIMP))
             EndIf
         else
-            oSection:Cell("FIMPXPSF"):SetValue(0)
+            oSection:Cell("FIMPPSII"):SetValue(0)
         EndIf
+
+        If !Empty(Wdt_PSII) .AND. !Empty(Wdt_PSIR)
+            If Wdt_PSII > Wdt_PSIR
+                oSection:Cell("PSIXPSF"):SetValue(DateDiffDay(Wdt_PSII,Wdt_PSIR) * -1)
+            Else
+                oSection:Cell("PSIXPSF"):SetValue(DateDiffDay(Wdt_PSII,Wdt_PSIR))
+            EndIf
+        else
+            oSection:Cell("PSIXPSF"):SetValue(0)
+        EndIf
+
         nTotProc++
 
         If (nN2xNF - nLeadPre) > 0
@@ -611,7 +886,6 @@ Static Function PrintReport(oReport,oSection)
         EndIf
         
         nN2xNF      := 0            
-        nPCxN2      := 0
         nN2xSIN     := 0
         nSINxPSR    := 0
         nPSRxPSA    := 0
@@ -620,9 +894,10 @@ Static Function PrintReport(oReport,oSection)
         n1Compra    := 0
         nEMBxPOR    := 0
         nPORxNF     := 0
+        dDtLib1     := CTOD("  /  /  ")
         dDtLib2     := CTOD("  /  /  ")
 
-        nDesemb:= SCPCNF->WN_HAWB 
+        nDesemb:= cDesembVez
 
         oSection:PrintLine()
             
@@ -713,7 +988,7 @@ Static Function ConsEtdEta(cDesemb)
     Local cAliasQry := GetNextAlias()
                                                                 
 	cQuery := " SELECT SW6.W6_DT_ETD ETD, SW6.W6_DT_ETA ETA, SW6.W6_DT_NF,  SW6.W6_XENTINI, SW6.W6_PRVENTR, " 
-    cQuery += " SW6.W6_DT_EMB, SW6.W6_CHEG, SW6.W6_XPSIR, SW6.W6_XPSIA, SW6.W6_XFIMPRD "
+    cQuery += " SW6.W6_DT_EMB, SW6.W6_CHEG, SW6.W6_XPSIR, SW6.W6_XPSIA, SW6.W6_XFIMPRD, SW6.W6_XPSIINI "
 	cQuery += " FROM " + RetSqlName("SW6") + " SW6"
 	cQuery += " WHERE SW6.W6_HAWB = '" + cDesemb + "'"
 	cQuery += " AND D_E_L_E_T_ <> '*'"
@@ -729,7 +1004,17 @@ Static Function ConsEtdEta(cDesemb)
 
 	cResult := AllTrim(cValToChar(cResult))
 	
-	aAdd(aResult,{ AllTrim(cValToChar(cResult)), (cAliasQry)->ETD, (cAliasQry)->W6_DT_NF, (cAliasQry)->W6_XENTINI, (cAliasQry)->W6_PRVENTR, (cAliasQry)->W6_DT_EMB, (cAliasQry)->W6_CHEG, (cAliasQry)->W6_XPSIR, (cAliasQry)->W6_XPSIA, (cAliasQry)->W6_XFIMPRD})
+	aAdd(aResult,{ AllTrim(cValToChar(cResult)),; 
+                    (cAliasQry)->ETD, ;
+                    (cAliasQry)->W6_DT_NF, ;
+                    (cAliasQry)->W6_XENTINI,; 
+                    (cAliasQry)->W6_PRVENTR, ;
+                    (cAliasQry)->W6_DT_EMB, ;
+                    (cAliasQry)->W6_CHEG, ;
+                    (cAliasQry)->W6_XPSIR, ;
+                    (cAliasQry)->W6_XPSIA, ;
+                    (cAliasQry)->W6_XFIMPRD,; 
+                    (cAliasQry)->W6_XPSIINI})
 
 	(cAliasQry)->(DbCloseArea())
 
