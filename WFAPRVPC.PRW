@@ -160,6 +160,7 @@ User Function APCIniciar(_cNivel,oObjeto)
 						AADD((oProcess:oHtml:ValByName("t1.6"))	, AllTrim(Transform((SC7->C7_QUANT-SC7->C7_QTDACLA-SC7->C7_QUJE)*SC7->C7_PRECO,"@E 999,999,999,999.99")))
 						AADD((oProcess:oHtml:ValByName("t1.7"))	, AllTrim(Posicione("CTT",1,xFilial("CTT") + SC7->C7_CC,"CTT_DESC01")))
 						AADD((oProcess:oHtml:ValByName("t1.8"))	, AllTrim(SC7->C7_OBS))
+						AADD((oProcess:oHtml:ValByName("t1.9"))	, AllTrim(SC7->C7_XHAWB))
 				
 						_nTotal	 += SC7->C7_TOTAL - SC7->C7_VLDESC + SC7->C7_VALFRE + _nImps
 						_nTotLiq += SC7->C7_TOTAL

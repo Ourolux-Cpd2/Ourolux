@@ -350,6 +350,7 @@ while !(cAlias1)->(EOF())
 		cHtml+= Enter + '                                <th class="ajustaitem aligncenter borda1 azul">Total</th>'
 		cHtml+= Enter + '                                <th class="ajustaitem aligncenter borda1 azul">Observação</th>'
 		cHtml+= Enter + '                                <th class="ajustaitem aligncenter borda1 azul">Centro Custo</th>'
+		cHtml+= Enter + '                                <th class="ajustaitem aligncenter borda1 azul">Processo</th>'
 		cHtml+= Enter + '                            </tr>'
 
 		while !(cAlias3)->(EOF())  
@@ -372,6 +373,7 @@ while !(cAlias1)->(EOF())
 			cHtml+= Enter + '                                <td class="alignrigth  borda2">'+AllTrim(Transform(((cAlias3)->C7_QUANT-(cAlias3)->C7_QTDACLA-(cAlias3)->C7_QUJE)*(cAlias3)->C7_PRECO,"@E 999,999,999.99"))+'</td>'
 			cHtml+= Enter + '                                <td class="alignleft   borda2">'+alltrim((cAlias3)->C7_OBS)+'</td>'
 			cHtml+= Enter + '                                <td class="alignleft   borda2">'+alltrim(CC_3Descr)+'</td>'
+			cHtml+= Enter + '                                <td class="alignleft   borda2">'+alltrim((cAlias3)->C7_XHAWB)+'</td>'
 			cHtml+= Enter + '                            </tr>
 
 			cHtml+= Enter + '                            <tr ng-show="main.detalhesitem == '+"'"+(cAlias3)->C7_NUM+(cAlias3)->C7_ITEM+"'"+'">'

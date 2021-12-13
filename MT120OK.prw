@@ -26,10 +26,13 @@ Local _nValTe01 := 0
 Local _nValTe02 := 0
 Local _cMsgGer  := ""
 Local Ur		:= 0
+Local nlx		:= 0
 Local cDespImp	:= SuperGetMV("ES_DESPIMP",.F.,"") //201/202/203/204/205/405/415
 Local cGrpImp   := SuperGetMV("ES_GRPIMP",.F.,"")  //000510
+Local cPrdFrt   := SuperGetMV("ES_FRT102",.F.,"") 
 Local nPosApr   := aScan(aHeader,{|x| AllTrim(x[2])=="C7_APROV"})
 Local nPosPrd   := aScan(aHeader,{|x| AllTrim(x[2])=="C7_PRODUTO"})
+Local nPosPro   := aScan(aHeader,{|x| AllTrim(x[2])=="C7_XHAWB"})
 
 _cHoje := dDataBase
 _cDias := dDataBase - _nAviPc2
@@ -137,6 +140,18 @@ If _lRet
 			aCols[1][nPosApr] := cGrpImp
 		EndIf
 	EndIf
+EndIf
+
+If _lRet .AND. (INCLUI .or. ALTERA)
+	FOR nlx := 1 TO Len(aCols)
+		If !aCols[nlx][LEN(aHeader) + 1]
+			If Alltrim(aCols[nlx][nPosPrd]) $ cPrdFrt .And. Empty(aCols[nlx][nPosPro])
+				ApMsgStop("Por favor informar o processo do produto " +Alltrim(aCols[nlx][nPosPrd])+ " na linha do item" , "MT120OK" )
+				_lRet := .F.
+				Exit	
+			EndIf
+		EndIf
+	NEXT nlx
 EndIf
 
 RestArea(aAreaATU)
