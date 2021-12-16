@@ -22,16 +22,15 @@ User Function A010TOK()
 
 	Local _lRet    	:= .T.
 	Local _cSemVB1 	:= Alltrim(GetMv("FS_SEMVB1"))  // Usuarios que quando incluem / alteram, não bloqueia o produto
-	Local _cB1Aprv 	:= Alltrim(GetMv("FS_APRVSB1")) // Usuarios que tem acesso para desbloquear produtos
+	Local _cB1Aprv 	:= Alltrim(GetMv("FS_APRVSB1")) // Usuarios que tem acesso para desbloquear produtos NÃO REVENDA
+	Local _cB1AprR 	:= Alltrim(GetMv("FS_APRVSBR")) // Usuarios que tem acesso para desbloquear produtos REVENDA
 	Local _cSB1IA0 	:= Alltrim(GetMv("FS_SB1IA0"))  // Usuarios que podem incluir / alterar produtos Nacionais
 	Local _cSB1IA1 	:= Alltrim(GetMv("FS_SB1IA1"))  // Usuarios que podem incluir / alterar produtos Importados
 	Local _cSB1IA2 	:= Alltrim(GetMv("FS_SB1IA2"))  // Usuarios que podem incluir / alterar produtos Importados e nacionais
 	Local _cSubFam	:= ""                           // Validação da utilização de Sub-familia (Elétrico / Eletronico)
 	
 	If !(Upper(Alltrim(cUserName)) $ _cSemVB1)
-				
 		If !(Upper(Alltrim(cUserName)) $ _cSB1IA2)  //14/01/2021 WAR
-		
 			If Upper(Alltrim(cUserName)) $ _cSB1IA0 .AND. !M->B1_ORIGEM $ '0|3|4|5'
 				lRet := .F.
 				ApMsgStop('O seu usuario só tem permissão incluir / alterar produtos Nacionais!','A010TOK')
@@ -44,17 +43,21 @@ User Function A010TOK()
 				_lRet := .F.
 				ApMsgStop('O seu usuario não tem permissão para executar tal operação!','A010TOK')
 			EndIf
-	
 		EndIf //14/01/2021 WAR		
-	
 	EndIf
 		
 	If _lRet
-			
-		If !(Upper(Alltrim(cUserName)) $ _cB1Aprv)
-				M->B1_MSBLQL := "1" // Bloquear cadastro
+		If 	M->B1_XREVEND == "S"
+			If !(Upper(Alltrim(cUserName)) $ _cB1AprR)
+				Alert("O seu usuario não tem permissão para alterar produto de Revenda!")
+				_lRet := .F.
+			EndIf	
+		Else		
+			If !(Upper(Alltrim(cUserName)) $ _cB1Aprv)
+				Alert("O seu usuario não tem permissão para alterar produto que não seja de Revenda!")
+				_lRet := .F.
+			EndIf
 		EndIf
-		
 	EndIf
 	
 	
@@ -63,13 +66,11 @@ User Function A010TOK()
 		_cSubFam := Posicione("SBM",1,xFilial("SBM") + M->B1_GRUPO,"BM_XSUBFAM") 
 
 		If Trim(_cSubFam) == 'S' .and. Empty(Trim(M->B1_BASE3))
-
 			ApMsgStop('O Grupo ao qual esse produto está associado necessita que o campo "Sub-Família" na pasta Cadastrais seja Informado!' +;
 				chr (13) + chr (10) +;
 				chr (13) + chr (10) +;
 				'(A010TOK)' ,'ATENÇÃO!')
 			_lRet := .F. // Bloqueia alteração
-				
 		EndIf
 	EndIf	
 	
@@ -79,40 +80,19 @@ User Function A010TOK()
 	// Trava para obrigar preenchimento do campo "B1_XREVEND" para produtos do tipo "PA".
 	If _lRet
 		If Trim(M->B1_TIPO) == 'PA' .and. Empty(Trim(M->B1_XREVEND))
-
 			ApMsgStop('Para produtos do tipo "PA" torna-se obrigatório informar o campo "Revenda (SN)" na pasta Cadastrais!' +;
 				chr (13) + chr (10) +;
 				chr (13) + chr (10) +;
 				'(A010TOK)' ,'ATENÇÃO!')
 			_lRet := .F. // Bloqueia alteração
-				
 		EndIf
 	EndIf
-	
-	/*
-	
-	If _lRet
-		
-		If (Trim(SB1->B1_LOCALIZ) <> Trim(M->B1_LOCALIZ)) .OR.;
-			(Trim(SB1->B1_RASTRO) <> Trim(M->B1_RASTRO))
-			
-			_lRet := .F.
-			ApMsgStop('Produto tem saldo!','A010TOK')
-		
-		EndIf
-				
-	EndIf
-	*/
 		
 	If _lRet
-		
 		If ( Trim(M->B1_RASTRO) == 'S') 
-						
 			_lRet := .F.
 			ApMsgStop('Operaçao nao permitida!','A010TOK')
-		
 		EndIf
-				
 	EndIf
 		
 Return (_lRet)
@@ -123,7 +103,6 @@ User Function _SldPrd(cProduto)
 Local _cQuery    := ''
 Local _nSaldo    := 0
 Local _aArea1   := GetArea()
-Local lRet		:= .F.
 
 If Select("_Saldo") > 0
 	DbSelectArea("_Saldo")
