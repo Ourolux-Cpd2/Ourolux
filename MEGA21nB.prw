@@ -566,7 +566,7 @@ Static Function RptDetail()
 	_cQry += "        GROUP  BY CODIGO, "
 	_cQry += "                  QTD_OP, "
 	_cQry += "                  PERIODO) MVTO "
-	_cQry += "       INNER JOIN " + RetSqlName("SB2") + " SB2 "
+	_cQry += "       LEFT JOIN " + RetSqlName("SB2") + " SB2 "
 	_cQry += "               ON CODIGO = B2_COD "
 	_cQry += "                  AND B2_LOCAL = '"+MV_PAR05+"' "
 	_cQry += "                  AND B2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
