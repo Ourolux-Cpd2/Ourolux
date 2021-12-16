@@ -10,9 +10,6 @@
 | Relatorio Lead Time Import.         	                    |
 ------------------------------------------------------------*/
 
-
-
-//**************DESCONTINUADO**************** SEGUE OUROR029
 User Function OUROR020()
 
     Local oReport
@@ -28,7 +25,7 @@ User Function OUROR020()
     dbSelectArea("SC1")
 
     oReport := ReportDef()
-    oReport:PrintDialog() 
+    oReport:PrintDialog() // Imprime os dados na Tela(Preview).
 
 Return
 
@@ -42,73 +39,68 @@ Return
 
 Static Function ReportDef()
 
-    Local oReport  
-    Local oSection 
-    Local cPerg      := PADR("MEGA38",10)
+    Local oReport  // Objeto principal do Relatorio TReport
+    Local oSection // Objeto da Secao. 
+    //Local oBreak   // Objeto da Quebra(Sub Total Num SC).
+    Local cPerg      := PADR("MEGA38",10) // Grupo de Perguntas.
 
-    Pergunte(cPerg,.T.) 
+    Pergunte(cPerg,.T.) // Caso o parametro esteja como .T. o sistema ira apresentar a tela de perguntas antes que abrir a tela configuracao do relatorio.
 
-    oReport:=TReport():New("OUROR020","OUROR020 - Lead Time Import ","MEGA38",{|oReport| PrintReport(oReport,oSection)},"Lead Time Import")
+    // Apresenta a tela de impressao para o usuario configurar o relatorio.
+    oReport:=TReport():New("OUROR020","OUROR020 - Lead Time Import ","OUROR020",{|oReport| PrintReport(oReport,oSection,cPerg)},"Lead Time Import")
     
     oReport:SetLandscape(.T.) 
     oSection:=TRSection():New(oReport,"OUROR020 - Lead Time Import ",{"SB1"})
-    oSection:SetTotalInLine(.T.) 
 
-    TRCell():New(oSection     ,"NUMSC"     	,,"Sol.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"NUMPC"     	,,"Ped.Compra"	                            ,		  ,10,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"FORNE"     	,,"Fornecedor"		                        ,		  ,10,,,"LEFT"  ,,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"NUMDESEMB" 	,,"Desembaraco" 	                        ,		  ,18,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"NUMNF"     	,,"N.Fiscal"		                        ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"PORDEST"  	,,"Porto Destino"                           ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    TRCell():New(oSection     ,"FILCD"  	,,"Filial/CD"                               ,		  ,11,,,"CENTER",,"CENTER")//INFORMACOES PRINCIPAIS
-    If MV_PAR22 == 2    
-        TRCell():New(oSection ,"DTEMSC"   	,,"Emissao SC"    	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTAPRSC"   	,,"Aprova SC"                               ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTENVAR"   	,,"Envio Arte"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTAPRAR"   	,,"Aprova Arte"                             ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMIPO"   	,,"Emissao PO"                              ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTLIMSC"   	,,"Limite Compra SC"                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTLIB02"   	,,"Lib.N2"    	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTSINAL"   	,,"Pgto.Sinal"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
+    //Sintetico Fixado
 
-        TRCell():New(oSection ,"DTFIMPRD"  	,,"Fim Produção"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS NOVO
-        TRCell():New(oSection ,"DTLIMPRD"  	,,"Lim. Produçao"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS NOVO
-        
-        TRCell():New(oSection ,"PSIREAL"   	,,"PSI. Finalizado"                         ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"PSIAPR"   	,,"PSI. Aprovado"  	                        ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMBAR"   	,,"Embarque"  	                            ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTPORTO"   	,,"Atracação"                               ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTDESEMB"  	,,"Desembaraco"	                            ,		  ,14,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTEMINF"   	,,"Nota Fiscal"	 	                        ,		  ,19,,,"CENTER",,"CENTER")//DATAS
-        TRCell():New(oSection ,"DTENTSC"   	,,"Entrega (META)"                          ,		  ,11,,,"CENTER",,"CENTER")//DATAS
-    EndIf   
-    TRCell():New(oSection     ,"EMSCAPSC"  	,,"Emissao SC x Aprova SC"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"ENVXAPR"  	,,"Envio Arte x Aprova Arte"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"EMPCAPSC"  	,,"Aprova SC x Emissao PO"                  ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"ARTEMPC"  	,,"Aprova Arte x Emissao PO"                ,"@E 9999",11,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PCXLIM" 	,,"Emissao PO x Limite Compra"              ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PCN2" 	    ,,"PO x N2"	   	   	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"N2SINAL" 	,,"N2 x Sinal"	   	   	                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    oSection:SetTotalInLine(.T.) // Define se os totalizadores da sessao serao impressos em linha ou coluna.
 
-    TRCell():New(oSection     ,"SINXPSIF" 	,,"Sinal x Fim Produção"                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
-    TRCell():New(oSection     ,"LIPXFIMP" 	,,"Limit.Produção(SC) x Fim Produção"       ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
-    TRCell():New(oSection     ,"FIMPXPSF" 	,,"Fim Produção x PSI Finalizado"           ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES NOVO
+    //Grupo Dados Fornecedor
+    TRCell():New(oSection ,"FILIAL"    	,,"Fil"	 	   		    ,		  ,04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"FORNE"     	,,"Fornecedor"		    ,		  ,10,,,"LEFT",,"CENTER")
+    
+    //Grupo Numero de Documentos
+    TRCell():New(oSection ,"NUMSC"     	,,"Sol.Compra"	        ,		  ,10,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"NUMPC"     	,,"Ped.Compra"	        ,		  ,10,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"NUMDESEMB" 	,,"Desembaraco" 	    ,		  ,18,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"NUMNF"     	,,"N.Fiscal"		    ,		  ,11,,,"CENTER",,"CENTER")
 
-    TRCell():New(oSection     ,"SINPSIR" 	,,"Sinal x PSI Finalizado(PRODUÇÃO)"        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PSIRPSIA" 	,,"PSI Finalizado x PSI A (QUALIDADE)"      ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PSIAEMB" 	,,"PSI A x Embarque"	   	   	            ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"MAR"   	   	,,"Embarque x Atracação(Mar)"               ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"DESEMB"    	,,"Atracação x NF(Porto)"                   ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"1COMPRA" 	,,"1ª Compra"   	                        ,"@N"     ,01,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"PREVISTO"  	,,"Previsto OTD"	                        ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"REALIZADO" 	,,"Realizado OTD (N2 x NF)"	                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"DIFERENCA"  ,,"Diferenca OTD"		                    ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"SCNF" 	    ,,"Realizado (SC x NF)"                     ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
-    TRCell():New(oSection     ,"METAXNF" 	,,"Diferenca (META x NF)"	                ,"@E 9999",04,,,"CENTER",,"CENTER")//ANALISES
+    //Grupo Datas de Registros
+    TRCell():New(oSection ,"DTEMSC"   	,,"Dt. Emis.SC"    	    ,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTLIB02"   	,,"Dt. Lib.N2"    	    ,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTDESEMB"  	,,"Dt. Desembaraco"	    ,		  ,14,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTSINAL"   	,,"Dt. Pgto.Sinal"  	,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"PSIREAL"   	,,"Dt. PSI. Realizado"  ,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"PSIAPR"   	,,"Dt. PSI. Aprovado"  	,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTEMBAR"   	,,"Dt. Embarque"  	    ,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTPORTO"   	,,"Dt. Atracao"       ,		  ,11,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DTEMINF"   	,,"Dt. Nota Fiscal"	 	,		  ,19,,,"CENTER",,"CENTER")
+    
+    //Grupo Resultado das Fases (Dias)
+    TRCell():New(oSection ,"PCN2" 	    ,,"PC x N2"	   	   	            ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"N2SINAL" 	,,"N2 x Sinal"	   	   	        ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"SINPSIR" 	,,"Sinal x PSI R (PRODUO)"    ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"PSIRPSIA" 	,,"PSI R x PSI A (QUALIDADE)"   ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"PSIAEMB" 	,,"PSI A x Embarque"	   	   	,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"MAR"   	   	,,"Embarque x Atracao(Mar)"   ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DESEMB"    	,,"Atracao x NF(Porto)"       ,"@E 9999",04,,,"CENTER",,"CENTER")
 
-    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",,"PROCESSOS ELEGIVEIS:"  ,,{|| nTotProc 	},.F.,.T.,.F.)
-    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",,"DENTRO DA META:"		,,{|| nDenMet 	},.F.,.T.,.F.)
-    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",,"FORA DA META:"		    ,,{|| nForMet 	},.F.,.T.,.F.)
+    //Grupo Resultado Final (Dias)
+    TRCell():New(oSection ,"1COMPRA" 	,,"1 Compra"   	        ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"CDENT"  	,,"CD"				        ,""		  ,04,,,"CENTER",,"CENTER")
+	TRCell():New(oSection ,"PREVISTO"  	,,"Previsto"		        ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DIAPROG"  	,,"Programacao"	  	        ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"REALIZADO" 	,,"Realizado (N2xNF) OTD"	,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"DIFERENCA"  ,,"Diferenca"		        ,"@E 9999",04,,,"CENTER",,"CENTER")
+    TRCell():New(oSection ,"SCNF" 	    ,,"SCxNF"   		        ,"@E 9999",04,,,"CENTER",,"CENTER")
+
+    //oBreak:=TRBreak():New(oSection,oSection:Cell("FILIAL"),"MEDIA POR FILIAL",.F.) // Quebra por Filial
+    
+    
+    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",/*oBreak*/,"PROCESSOS ELEGIVEIS:"  ,,{|| nTotProc 	} 	/*uFormula*/,.F./*Total da Seo*/,.T./*Total Geral*/,.F./*Total da Pagina*/)
+    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",/*oBreak*/,"DENTRO DA META:"		  ,,{|| nDenMet 	} 	/*uFormula*/,.F./*Total da Seo*/,.T./*Total Geral*/,.F./*Total da Pagina*/)
+    TRFunction():New(oSection:Cell("DIFERENCA")	    ,NIL,"ONPRINT",/*oBreak*/,"FORA DA META:"		  ,,{|| nForMet 	} 	/*uFormula*/,.F./*Total da Seo*/,.T./*Total Geral*/,.F./*Total da Pagina*/)
 
 Return oReport
 
@@ -141,19 +133,17 @@ Static Function PrintReport(oReport,oSection)
     Local WDt_Nf	 := CTOD("  /  /  ")
     Local WDt_xEnt	 := CTOD("  /  /  ")
     Local Wdt_Prev   := CTOD("  /  /  ")
-    Local Wdt_PSIR   := CTOD("  /  /  ")
-    Local Wdt_PSIA   := CTOD("  /  /  ")
-    Local Wdt_FIMP   := CTOD("  /  /  ")
-    Local Wdt_Emb    := CTOD("  /  /  ")
-    Local Wdt_Porto  := CTOD("  /  /  ")
-    Local dt_LimPrd  := CTOD("  /  /  ")
+    Local cDIPROG	 := ""
     Local n1Compra   := 0
     Local aResDatas  := {}
     Local nPCxN2     := 0
     Local NN2XNF     := 0
     Local nSCxNF     := 0
-    Local aDataNew   := {}
-    Local cTexFil    := ""
+    Local Wdt_Emb    := CTOD("  /  /  ")
+    Local Wdt_Porto  := CTOD("  /  /  ")
+    Local Wdt_PSIR	 := CTOD("  /  /  ")
+    Local Wdt_PSIA	 := CTOD("  /  /  ")
+
 
     //Finalizados
     cQryFin := " SELECT SD1.D1_FILIAL, "
@@ -208,6 +198,7 @@ Static Function PrintReport(oReport,oSection)
     cQryFin += " GROUP BY SD1.D1_FILIAL, SD1.D1_DTDIGIT, SWN.WN_PO_NUM, SWN.WN_HAWB, SWN.WN_SERIE, SWN.WN_FORNECE, SWN.WN_LOJA, "
     cQryFin += " SD1.D1_EMISSAO, SC7.C7_EMISSAO, SWN.WN_DOC, SC7.C7_NUMSC,SC1.C1_NUM,SC1.C1_FILIAL, SC7.C7_PO_EIC, SC7.C7_FORNECE "
 
+
     //Em abertos
     cQryAbe := " SELECT SD1.D1_FILIAL, "
     cQryAbe += "        SD1.D1_DTDIGIT, "
@@ -230,7 +221,6 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += " 	WHERE C1_NUM BETWEEN '" + MV_PAR03 + "' AND '" + MV_PAR04 + "' "
     cQryAbe += " 	AND C1_IMPORT = 'S' "
     cQryAbe += "    AND C1_EMISSAO BETWEEN '" + DTOS(MV_PAR05) + "' AND '" + DTOS(MV_PAR06) + "'"
-    cQryAbe += "    AND C1_APROV = 'L' "
     cQryAbe += " 	AND D_E_L_E_T_ = ''	"
     cQryAbe += " 	) SC1 "
     cQryAbe += " LEFT JOIN " + RetSqlName("SC7") + " SC7 "
@@ -247,8 +237,6 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += " 	AND SWN.WN_PO_NUM BETWEEN '" + MV_PAR07 + "' AND '" + MV_PAR08 + "' "
     cQryAbe += " 	AND SWN.WN_DOC BETWEEN '" + MV_PAR09 + "' AND '" + MV_PAR10 + "' "
     cQryAbe += " 	AND SWN.WN_SERIE BETWEEN '" + MV_PAR11 + "' AND '" + MV_PAR12 + "' " 
-    cQryAbe += " 	AND SWN.WN_DOC = '' "
-    cQryAbe += "    AND SWN.D_E_L_E_T_ = '' "
     
     If !Empty(MV_PAR15) .And. !Empty(MV_PAR17) .And. !Empty(MV_PAR16) .And. !Empty(MV_PAR18)
         cQryAbe += "        AND SWN.WN_FORNECE BETWEEN '" + MV_PAR15 + "' AND '" + MV_PAR17 + "'"
@@ -280,6 +268,7 @@ Static Function PrintReport(oReport,oSection)
     cQryAbe += "           SC1.C1_FILIAL, "
     cQryAbe += "           SC7.C7_PO_EIC, "
     cQryAbe += "           SC7.C7_FORNECE "
+
       
     If MV_PAR21 == 1
         cQuery := cQryFin
@@ -309,39 +298,14 @@ Static Function PrintReport(oReport,oSection)
     oSection:Init()
 
     While SCPCNF->(!Eof())
+        //Grupo Numero de Documentos
         If MV_PAR21 == 1
-            If SCPCNF->D1_FILIAL == "01"
-                cTexFil := "GRU"
-            ElseIF SCPCNF->D1_FILIAL == "02"
-                cTexFil := "PARANA"
-            ElseIF SCPCNF->D1_FILIAL == "03"
-                cTexFil := "PARAISO"
-            ElseIF SCPCNF->D1_FILIAL == "04"
-                cTexFil := "RIO"
-            ElseIF SCPCNF->D1_FILIAL == "05"
-                cTexFil := "PERNANBUCO"
-            ElseIF SCPCNF->D1_FILIAL == "06"
-                cTexFil := "NAV"
-            EndIF
-            oSection:Cell("FILCD"):SetValue(cTexFil)
+            oSection:Cell("FILIAL"):SetValue(SCPCNF->D1_FILIAL)
             oSection:Cell("NUMSC"):SetValue(SCPCNF->C7_NUMSC)
             oSection:Cell("NUMPC"):SetValue(SCPCNF->WN_PO_NUM)
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->WN_FORNECE))
         Else
-            If SCPCNF->C1_FILIAL == "01"
-                cTexFil := "GRU"
-            ElseIF SCPCNF->C1_FILIAL == "02"
-                cTexFil := "PARANA"
-            ElseIF SCPCNF->C1_FILIAL == "03"
-                cTexFil := "PARAISO"
-            ElseIF SCPCNF->C1_FILIAL == "04"
-                cTexFil := "RIO"
-            ElseIF SCPCNF->C1_FILIAL == "05"
-                cTexFil := "PERNANBUCO"
-            ElseIF SCPCNF->C1_FILIAL == "06"
-                cTexFil := "NAV"
-            EndIF
-            oSection:Cell("FILCD"):SetValue(cTexFil)
+            oSection:Cell("FILIAL"):SetValue(SCPCNF->C1_FILIAL)
             oSection:Cell("NUMSC"):SetValue(SCPCNF->C1_NUM)
             oSection:Cell("NUMPC"):SetValue(SCPCNF->C7_PO_EIC)
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->C7_FORNECE))
@@ -350,6 +314,7 @@ Static Function PrintReport(oReport,oSection)
         oSection:Cell("NUMDESEMB"):SetValue(SCPCNF->WN_HAWB)
         oSection:Cell("NUMNF"):SetValue(SCPCNF->WN_DOC)
         
+        //Grupo Datas de Registros
         aResDatas:= ConsEtdEta(SCPCNF->WN_HAWB)
         
         SCR->(DbSetOrder(1))
@@ -393,40 +358,26 @@ Static Function PrintReport(oReport,oSection)
             Wdt_Porto	:= Stod(aResDatas[1][7])
             Wdt_PSIR	:= Stod(aResDatas[1][8])
             Wdt_PSIA	:= Stod(aResDatas[1][9])
-            Wdt_FIMP	:= Stod(aResDatas[1][10])
+            cDIPROG		:= AllTrim(cValToChar(CalcProg(SCPCNF->WN_PO_NUM,dDtLib2)))
         EndIf
 
         dt_Sin  := ConsSin(AllTrim(SCPCNF->WN_HAWB))
         If MV_PAR21 == 2 .OR. MV_PAR21 == 3
-            dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
-            dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
+            dt_EmSC := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->C1_FILIAL+SCPCNF->C1_NUM,1)
         Else
-            dt_EmSC   := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->D1_FILIAL+SCPCNF->C7_NUMSC,1)
-            dt_LimPrd := GetAdvFVal("SC1","C1_XDTLPRD",SCPCNF->D1_FILIAL+SCPCNF->C7_NUMSC,1)
+            dt_EmSC := GetAdvFVal("SC1","C1_EMISSAO",SCPCNF->D1_FILIAL+SCPCNF->C7_NUMSC,1)
         EndIf
+        oSection:Cell("DTEMSC"):SetValue(SubStr(Dtos(dt_EmSC),7,2) + "/" + SubStr(Dtos(dt_EmSC),5,2) + "/" + SubStr(Dtos(dt_EmSC),3,2) )
+        oSection:Cell("DTLIB02"):SetValue(SubStr(Dtos(dDtLib2),7,2) + "/" + SubStr(Dtos(dDtLib2),5,2) + "/" + SubStr(Dtos(dDtLib2),3,2) )
+        oSection:Cell("DTSINAL"):SetValue(SubStr(Dtos(dt_Sin),7,2) + "/" + SubStr(Dtos(dt_Sin),5,2) + "/" + SubStr(Dtos(dt_Sin),3,2) )
+        oSection:Cell("DTDESEMB"):SetValue(SubStr(Dtos(dDtDesemb),7,2) + "/" + SubStr(Dtos(dDtDesemb),5,2) + "/" + SubStr(Dtos(dDtDesemb),3,2) )
+        oSection:Cell("PSIREAL"):SetValue(SubStr(Dtos(Wdt_PSIR),7,2) + "/" + SubStr(Dtos(Wdt_PSIR),5,2) + "/" + SubStr(Dtos(Wdt_PSIR),3,2) )   
+        oSection:Cell("PSIAPR"):SetValue(SubStr(Dtos(Wdt_PSIA),7,2) + "/" + SubStr(Dtos(Wdt_PSIA),5,2) + "/" + SubStr(Dtos(Wdt_PSIA),3,2) )
+        oSection:Cell("DTEMBAR"):SetValue(SubStr(Dtos(Wdt_Emb),7,2) + "/" + SubStr(Dtos(Wdt_Emb),5,2) + "/" + SubStr(Dtos(Wdt_Emb),3,2) )
+        oSection:Cell("DTPORTO"):SetValue(SubStr(Dtos(Wdt_Porto),7,2) + "/" + SubStr(Dtos(Wdt_Porto),5,2) + "/" + SubStr(Dtos(Wdt_Porto),3,2) )
+        oSection:Cell("DTEMINF"):SetValue(Substr(SCPCNF->D1_EMISSAO,7,2) + "/" + Substr(SCPCNF->D1_EMISSAO,5,2) + "/" + Substr(SCPCNF->D1_EMISSAO,3,2)) 
 
-        aDataNew := BusNewDt()
-        
-        If MV_PAR22 == 2
-            oSection:Cell("DTEMSC"):SetValue(SubStr(Dtos(dt_EmSC),7,2) + "/" + SubStr(Dtos(dt_EmSC),5,2) + "/" + SubStr(Dtos(dt_EmSC),3,2) )
-            oSection:Cell("DTAPRSC"):SetValue(STOD(aDataNew[1][2]))
-            oSection:Cell("DTENVAR"):SetValue(STOD(aDataNew[1][5]))
-            oSection:Cell("DTAPRAR"):SetValue(STOD(aDataNew[1][6]))
-            oSection:Cell("DTEMIPO"):SetValue(STOD(aDataNew[1][1]))
-            oSection:Cell("DTLIMSC"):SetValue(STOD(aDataNew[1][4]))
-            oSection:Cell("DTLIB02"):SetValue(SubStr(Dtos(dDtLib2),7,2) + "/" + SubStr(Dtos(dDtLib2),5,2) + "/" + SubStr(Dtos(dDtLib2),3,2) )
-            oSection:Cell("DTSINAL"):SetValue(SubStr(Dtos(dt_Sin),7,2) + "/" + SubStr(Dtos(dt_Sin),5,2) + "/" + SubStr(Dtos(dt_Sin),3,2) )
-            oSection:Cell("PSIREAL"):SetValue(SubStr(Dtos(Wdt_PSIR),7,2) + "/" + SubStr(Dtos(Wdt_PSIR),5,2) + "/" + SubStr(Dtos(Wdt_PSIR),3,2) )   
-            oSection:Cell("DTFIMPRD"):SetValue(SubStr(Dtos(Wdt_FIMP),7,2) + "/" + SubStr(Dtos(Wdt_FIMP),5,2) + "/" + SubStr(Dtos(Wdt_FIMP),3,2) )   
-            oSection:Cell("DTLIMPRD"):SetValue(SubStr(Dtos(dt_LimPrd),7,2) + "/" + SubStr(Dtos(dt_LimPrd),5,2) + "/" + SubStr(Dtos(dt_LimPrd),3,2) )   
-            oSection:Cell("PSIAPR"):SetValue(SubStr(Dtos(Wdt_PSIA),7,2) + "/" + SubStr(Dtos(Wdt_PSIA),5,2) + "/" + SubStr(Dtos(Wdt_PSIA),3,2) )
-            oSection:Cell("DTEMBAR"):SetValue(SubStr(Dtos(Wdt_Emb),7,2) + "/" + SubStr(Dtos(Wdt_Emb),5,2) + "/" + SubStr(Dtos(Wdt_Emb),3,2) )
-            oSection:Cell("DTPORTO"):SetValue(SubStr(Dtos(Wdt_Porto),7,2) + "/" + SubStr(Dtos(Wdt_Porto),5,2) + "/" + SubStr(Dtos(Wdt_Porto),3,2) )
-            oSection:Cell("DTDESEMB"):SetValue(SubStr(Dtos(dDtDesemb),7,2) + "/" + SubStr(Dtos(dDtDesemb),5,2) + "/" + SubStr(Dtos(dDtDesemb),3,2) )
-            oSection:Cell("DTEMINF"):SetValue(Substr(SCPCNF->D1_EMISSAO,7,2) + "/" + Substr(SCPCNF->D1_EMISSAO,5,2) + "/" + Substr(SCPCNF->D1_EMISSAO,3,2)) 
-            oSection:Cell("DTENTSC"):SetValue(STOD(aDataNew[1][3]))
-        EndIf
-
+        //Grupo resultado das fases
         If !Empty(SCPCNF->D1_EMISSAO)
             If !Empty(dDtLib2)
                 nN2xNF := DateDiffDay(dDtLib2,STOD(SCPCNF->D1_EMISSAO))
@@ -444,19 +395,11 @@ Static Function PrintReport(oReport,oSection)
         EndIf
 
         IF !Empty(dDtLib2) .AND. !Empty(dt_Sin)
-            If dt_Sin < dDtLib2
-                nN2xSIN := (DateDiffDay(dDtLib2,dt_Sin) * -1)
-            else
-                nN2xSIN := DateDiffDay(dDtLib2,dt_Sin)
-            EndIf
+            nN2xSIN := DateDiffDay(dDtLib2,dt_Sin)
         EndIf
 
         IF !Empty(dt_Sin) .AND. !Empty(Wdt_PSIR)
-            If dt_Sin > Wdt_PSIR
-                nSINxPSR := (DateDiffDay(dt_Sin,Wdt_PSIR) * -1)
-            else
-                nSINxPSR := DateDiffDay(dt_Sin,Wdt_PSIR)
-            EndIf
+            nSINxPSR := DateDiffDay(dt_Sin,Wdt_PSIR)
         EndIf
 
         IF !Empty(Wdt_PSIR) .AND. !Empty(Wdt_PSIA)
@@ -480,120 +423,44 @@ Static Function PrintReport(oReport,oSection)
         oSection:Cell("MAR"):SetValue(nEMBxPOR)
         oSection:Cell("DESEMB"):SetValue(nPORxNF)
 
+        //Grupo resultado Final
+        
         IF !Empty(dt_EmSC)
             If !Empty(SCPCNF->D1_EMISSAO)
                 nSCxNF := DateDiffDay(dt_EmSC,STOD(SCPCNF->D1_EMISSAO))
             Else
                 nSCxNF := 0
             EndIf
-        EndIf'
+        EndIf
 
-        aRetW2	:= W2LEAD(SCPCNF->WN_PO_NUM,dDtLib2)
+        aRetW2	:= W2LEAD(SCPCNF->WN_PO_NUM,cDIPROG,dDtLib2)
         
 		nLeadPre := aRetW2[1]
 		cPorto	 := Alltrim(aRetW2[2])
 
         If MV_PAR21 == 1
-            n1Compra := Busca1C(SCPCNF->WN_PO_NUM) 
+            n1Compra := Busca1C(SCPCNF->WN_PO_NUM)
         Else
             n1Compra := Busca1C(SCPCNF->C7_PO_EIC)
         EndIf
 
-        If !Empty(aDataNew[1][3]) .AND. !Empty(aDataNew[1][4])
-            nLeadPre := (STOD(aDataNew[1][3]) - (STOD(aDataNew[1][4]) + 5))
-        else
-            nLeadPre := 0
-        EndIf
-
-        oSection:Cell("1COMPRA"):SetValue(Iif(n1Compra == 0,"N","S"))
-		oSection:Cell("PORDEST"):SetValue(cPorto)
-        oSection:Cell("PREVISTO"):SetValue(nLeadPre)
-        oSection:Cell("REALIZADO"):SetValue(nN2xNF)
-        oSection:Cell("DIFERENCA"):SetValue(nN2xNF - nLeadPre)
+        oSection:Cell("1COMPRA"):SetValue(n1Compra)
+		oSection:Cell("CDENT"):SetValue(Iif(cPorto == "SSZ","GRU","NAV"))
+        oSection:Cell("PREVISTO"):SetValue(nLeadPre - Val(cDiprog))
+        oSection:Cell("DIAPROG"):SetValue(cDiprog)
+        oSection:Cell("REALIZADO"):SetValue(nN2xNF - Val(cDiprog))
+        oSection:Cell("DIFERENCA"):SetValue((nN2xNF - Val(cDiprog)) - n1Compra - nLeadPre)
         oSection:Cell("SCNF"):SetValue(nSCxNF)
-        
-        IF !Empty(dt_EmSC) .and. !Empty(aDataNew[1][2])
-            oSection:Cell("EMSCAPSC"):SetValue(DateDiffDay(dt_EmSC,STOD(aDataNew[1][2])))
-        Else
-            oSection:Cell("EMSCAPSC"):SetValue(0)
-        EndIf
-
-        IF !Empty(aDataNew[1][1]) .and. !Empty(aDataNew[1][2])
-            oSection:Cell("EMPCAPSC"):SetValue(DateDiffDay(STOD(aDataNew[1][2]),STOD(aDataNew[1][1])))
-        Else
-            oSection:Cell("EMPCAPSC"):SetValue(0)
-        EndIf
-        
-        If !Empty(aDataNew[1][3]) .AND. !Empty(wdt_NF)
-            If wdt_NF < STOD(aDataNew[1][3])
-                oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF) * -1)
-            else
-                oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF))
-            EndIf
-        else
-            oSection:Cell("METAXNF"):SetValue(0)
-        EndIf
-
-        If !Empty(aDataNew[1][6]) .AND. !Empty(aDataNew[1][1])
-            If STOD(aDatanew[1][6]) > STOD(aDatanew[1][1])
-                oSection:Cell("ARTEMPC"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][6])) * -1)
-            Else
-                oSection:Cell("ARTEMPC"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),STOD(aDatanew[1][6])))
-            EndIf
-        else
-             oSection:Cell("ARTEMPC"):SetValue(0)
-        EndIf
-
-        If !Empty(aDataNew[1][5]) .AND. !Empty(aDataNew[1][6])
-            If STOD(aDatanew[1][5]) > STOD(aDatanew[1][6])
-                oSection:Cell("ENVXAPR"):SetValue(DateDiffDay(STOD(aDatanew[1][5]),STOD(aDatanew[1][6])) * -1)
-            Else
-                oSection:Cell("ENVXAPR"):SetValue(DateDiffDay(STOD(aDatanew[1][5]),STOD(aDatanew[1][6])))
-            EndIf
-        else
-             oSection:Cell("ENVXAPR"):SetValue(0)
-        EndIf
-
-
-        If !Empty(dt_Sin) .AND. !Empty(Wdt_FIMP)
-            If dt_Sin > Wdt_FIMP
-                oSection:Cell("SINXPSIF"):SetValue(DateDiffDay(dt_Sin,Wdt_FIMP) * -1)
-            Else
-                oSection:Cell("SINXPSIF"):SetValue(DateDiffDay(dt_Sin,Wdt_FIMP))
-            EndIf
-        else
-            oSection:Cell("SINXPSIF"):SetValue(0)
-        EndIf
-
-        If !Empty(dt_LimPrd) .AND. !Empty(Wdt_FIMP)
-            If Wdt_FIMP > dt_LimPrd
-                oSection:Cell("LIPXFIMP"):SetValue(DateDiffDay(dt_LimPrd,Wdt_FIMP) * -1)
-            Else
-                oSection:Cell("LIPXFIMP"):SetValue(DateDiffDay(dt_LimPrd,Wdt_FIMP))
-            EndIf
-        else
-            oSection:Cell("LIPXFIMP"):SetValue(0)
-        EndIf
-
-        If !Empty(Wdt_PSIR) .AND. !Empty(Wdt_FIMP)
-            If Wdt_FIMP > Wdt_PSIR
-                oSection:Cell("FIMPXPSF"):SetValue(DateDiffDay(Wdt_FIMP,Wdt_PSIR) * -1)
-            Else
-                oSection:Cell("FIMPXPSF"):SetValue(DateDiffDay(Wdt_FIMP,Wdt_PSIR))
-            EndIf
-        else
-            oSection:Cell("FIMPXPSF"):SetValue(0)
-        EndIf
 
         nTotProc++
 
-        If (nN2xNF - nLeadPre) > 0
+        If ((nN2xNF - Val(cDiprog)) - n1Compra - nLeadPre) > 0
             nForMet++
         Else
             nDenMet++
         EndIf
         
-        nN2xNF      := 0            
+        nN2xNF      := 0        
         nPCxN2      := 0
         nN2xSIN     := 0
         nSINxPSR    := 0
@@ -605,7 +472,7 @@ Static Function PrintReport(oReport,oSection)
         nPORxNF     := 0
         dDtLib2     := CTOD("  /  /  ")
 
-        nDesemb:= SCPCNF->WN_HAWB 
+        nDesemb:= SCPCNF->WN_HAWB //Identificar se numero de desembaraco e o mesmo
 
         oSection:PrintLine()
             
@@ -617,69 +484,6 @@ Static Function PrintReport(oReport,oSection)
     SCPCNF->(DbCloseArea())
 
 Return (Nil)
-/*----------------------------------------------------------|
-| Autor | Rodrigo Dias Nunes              | Data 19/01/2021	| 
-|-----------------------------------------------------------|
-| Funcao: BusNewDt									     	|
-|-----------------------------------------------------------|
-| Relatorio Lead Time Import.         	                    |
-------------------------------------------------------------*/
-
-Static Function BusNewDt()
-    Local nOpQry    := 0
-    Local aResult	:= {}
-    Local cQuery  	:= ""
-    Local cQry  	:= ""
-    
-    If Empty(SCPCNF->C7_PO_EIC)
-        nOpQry := 1
-	    cQuery := " SELECT TOP(1) C1_XDTLIB, C1_DATPRF, C1_XDTPROG "
-	    cQuery += " FROM " + RetSqlName("SC1")
-	    cQuery += " WHERE C1_FILIAL = '"+SCPCNF->C1_FILIAL+"' "
-	    cQuery += " AND C1_NUM = '"+SCPCNF->C1_NUM+"' "
-	    cQuery += " AND D_E_L_E_T_ = '' "
-    Else
-        nOpQry := 2
-	    cQry := " SELECT TOP(1) C1_XDTLIB, C1_DATPRF, C1_XDTPROG "
-	    cQry += " FROM " + RetSqlName("SC1")
-	    cQry += " WHERE C1_FILIAL = '"+SCPCNF->C1_FILIAL+"' "
-	    cQry += " AND C1_NUM = '"+SCPCNF->C1_NUM+"' "
-	    cQry += " AND D_E_L_E_T_ = '' "
-
-        cQuery := " SELECT W2_PO_DT, W2_XENVART, W2_XAPRART FROM " + RetSqlName("SW2")
-        cQuery += " WHERE W2_PO_NUM = '"+Alltrim(SCPCNF->C7_PO_EIC)+"' "
-        cQuery += " AND W2_FORN = '"+SCPCNF->C7_FORNECE+"' "
-        cQuery += " AND D_E_L_E_T_ = '' "
-    EndIf
-
-    If nOpQry == 1
-        If Select("C1DT") > 0
-            C1DT->(dbCloseArea())
-        EndIF
-        
-        DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"C1DT",.F.,.T. )
-    ElseIf nOpQry == 2
-        If Select("C1DT") > 0
-            C1DT->(dbCloseArea())
-        EndIF
-        
-        DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQry),"C1DT",.F.,.T. )
-
-        If Select("W2DT") > 0
-            W2DT->(dbCloseArea())
-        EndIF
-        
-        DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"W2DT",.F.,.T. )
-    EndIF
-    
-    If nOpQry == 1
-        aAdd(aResult,{"", C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, "", ""})
-    ElseIf nOpQry == 2
-        aAdd(aResult,{W2DT->W2_PO_DT, C1DT->C1_XDTLIB, C1DT->C1_DATPRF, C1DT->C1_XDTPROG, W2DT->W2_XENVART, W2DT->W2_XAPRART})
-    EndIf
-
-Return aResult
-
 /*----------------------------------------------------------|
 | Autor | Rodrigo Dias Nunes              | Data 19/01/2021	| 
 |-----------------------------------------------------------|
@@ -696,7 +500,7 @@ Static Function ConsEtdEta(cDesemb)
     Local cAliasQry := GetNextAlias()
                                                                 
 	cQuery := " SELECT SW6.W6_DT_ETD ETD, SW6.W6_DT_ETA ETA, SW6.W6_DT_NF,  SW6.W6_XENTINI, SW6.W6_PRVENTR, " 
-    cQuery += " SW6.W6_DT_EMB, SW6.W6_CHEG, SW6.W6_XPSIR, SW6.W6_XPSIA, SW6.W6_XFIMPRD "
+    cQuery += " SW6.W6_DT_EMB, SW6.W6_CHEG, SW6.W6_XPSIR, SW6.W6_XPSIA "
 	cQuery += " FROM " + RetSqlName("SW6") + " SW6"
 	cQuery += " WHERE SW6.W6_HAWB = '" + cDesemb + "'"
 	cQuery += " AND D_E_L_E_T_ <> '*'"
@@ -712,7 +516,7 @@ Static Function ConsEtdEta(cDesemb)
 
 	cResult := AllTrim(cValToChar(cResult))
 	
-	aAdd(aResult,{ AllTrim(cValToChar(cResult)), (cAliasQry)->ETD, (cAliasQry)->W6_DT_NF, (cAliasQry)->W6_XENTINI, (cAliasQry)->W6_PRVENTR, (cAliasQry)->W6_DT_EMB, (cAliasQry)->W6_CHEG, (cAliasQry)->W6_XPSIR, (cAliasQry)->W6_XPSIA, (cAliasQry)->W6_XFIMPRD})
+	aAdd(aResult,{ AllTrim(cValToChar(cResult)), (cAliasQry)->ETD, (cAliasQry)->W6_DT_NF, (cAliasQry)->W6_XENTINI, (cAliasQry)->W6_PRVENTR, (cAliasQry)->W6_DT_EMB, (cAliasQry)->W6_CHEG, (cAliasQry)->W6_XPSIR, (cAliasQry)->W6_XPSIA})
 
 	(cAliasQry)->(DbCloseArea())
 
@@ -785,6 +589,42 @@ Return cForn
 /*----------------------------------------------------------|
 | Autor | Rodrigo Dias Nunes              | Data 19/01/2021	| 
 |-----------------------------------------------------------|
+| Funcao: CalcProg									    	|
+|-----------------------------------------------------------|
+| Relatorio Lead Time Import.         	                    |
+------------------------------------------------------------*/
+Static Function CalcProg(cDtETD,dtLibN2)
+
+    Local aArea 	:= GetArea()
+    Local nDia		:= 0
+    Local dTemp		
+    Local cQuery    := ""
+    Local cAliasQry := GetNextAlias()
+
+	cQuery := " SELECT W2_XDT_ETD FROM " + RetSqlName("SW2") + " WHERE W2_PO_NUM = '"+Alltrim(cDtETD)+"' AND D_E_L_E_T_ <> '*' " 
+	DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),cAliasQry,.F.,.T. )
+
+	If (cAliasQry)->(!EOF())
+		dTemp := STOD((cAliasQry)->W2_XDT_ETD) - (MV_PAR19 + MV_PAR20)
+		nDia := dTemp - dtLibN2
+	EndIf
+	(cAliasQry)->(DbCloseArea())
+
+	If nDia < 0 
+		nDia := 0
+	EndIf
+	
+    RestArea(aArea)
+
+    If Empty(dtLibN2)
+        nDia := 0
+    EndIf
+
+Return nDia
+
+/*----------------------------------------------------------|
+| Autor | Rodrigo Dias Nunes              | Data 19/01/2021	| 
+|-----------------------------------------------------------|
 | Funcao: W6DATE									    	|
 |-----------------------------------------------------------|
 | Relatorio Lead Time Import.         	                    |
@@ -829,7 +669,7 @@ Return dData
 |-----------------------------------------------------------|
 | Relatorio Lead Time Import.         	                    |
 ------------------------------------------------------------*/
-Static Function W2LEAD(nPonum,dtLibN2)
+Static Function W2LEAD(nPonum,cDiaPrg,dtLibN2)
     Local aArea 	:= GetArea()
     Local nDias		:= 0
     Local dTemp		
@@ -844,15 +684,15 @@ Static Function W2LEAD(nPonum,dtLibN2)
 
 	If SW2LEAD->(!EOF())
 		If SW2LEAD->W2_DEST == "SSZ"
-			dTemp := dtLibN2 + nDiaSSZ
+			dTemp := dtLibN2 + nDiaSSZ + Val(cDiaPrg)
 			nDias := dTemp - dtLibN2
 			cPorto := Alltrim(SW2LEAD->W2_DEST)
 		ElseIf SW2LEAD->W2_DEST == "ITJ"
-			dTemp := dtLibN2 + nDiaITJ
+			dTemp := dtLibN2 + nDiaITJ + Val(cDiaPrg)
 			nDias := dTemp - dtLibN2
 			cPorto := Alltrim(SW2LEAD->W2_DEST)
 		ElseIf SW2LEAD->W2_DEST == "NAV"
-			dTemp := dtLibN2 + nDiaNAV
+			dTemp := dtLibN2 + nDiaNAV + Val(cDiaPrg)
 			nDias := dTemp - dtLibN2
 			cPorto := Alltrim(SW2LEAD->W2_DEST)
 		EndIf
