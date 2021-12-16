@@ -760,7 +760,7 @@ Static Function PrintReport(oReport,oSection)
         EndIf
 
         If !Empty(aDataNew[1][3]) .AND. !Empty(aDataNew[1][4])
-            nLeadPre := (STOD(aDataNew[1][3]) - (STOD(aDataNew[1][4]) + 5))
+            nLeadPre := (STOD(aDataNew[1][3]) - (STOD(aDataNew[1][4]) - 5))
         else
             nLeadPre := 0
         EndIf
