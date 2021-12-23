@@ -533,49 +533,128 @@ Static Function RptDetail()
 
 	PutLog( "Gravando SWNTRB - Fim :" +Time() )
 	
-	_cQry := " SELECT CODIGO, "
-	_cQry += "        QTD_OP, "
-	_cQry += "        QDE, "
-	_cQry += "        B2_QATU           QTD_ATU, "
-	_cQry += "        B2_QEMP           EMPENHO, "
-	_cQry += "        B2_QATU - B2_QEMP DISPONIVEL, "
-	_cQry += "        PERIODO "
-	_cQry += " FROM  (SELECT CODIGO, "
-	_cQry += "               QTD_OP, " 
-	_cQry += "               Sum(D2_QUANT) QDE, "
-	_cQry += "        		 PERIODO "
-	_cQry += "        FROM   (SELECT D3_COD        CODIGO, "
-	_cQry += "                       Sum(D3_QUANT) QTD_OP, "
-	_cQry += "                       SUBSTRING(D3_EMISSAO, 1, 6) PERIODO "
-	_cQry += "                FROM " + RetSqlName("SD3") + " SD3 "
-	_cQry += "                WHERE  D3_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-	_cQry += "                       AND D3_CF = 'RE1' "
-	_cQry += "                       AND SD3.D_E_L_E_T_ = '' "
-	_cQry += "                       AND D3_ESTORNO = '' "
-	_cQry += "                GROUP  BY D3_COD,
-	_cQry += "                			SUBSTRING(D3_EMISSAO, 1, 6)) PRODUCAO " 
-	_cQry += "               LEFT OUTER JOIN " + RetSqlName("SD2") + " SD2 "
-	_cQry += "                            ON CODIGO = D2_COD "
-	_cQry += "							  AND SUBSTRING(D2_EMISSAO, 1, 6)  = PERIODO "
+	_cQry := " 	SELECT TABELA, "
+	_cQry += "        B1_COD                      CODIGO, "
+	_cQry += "        CASE "
+	_cQry += "          WHEN TABELA = 'SD2' THEN Sum(D2_QUANT) "
+	_cQry += "        END                         AS QDE, "
+	_cQry += "        CASE "
+	_cQry += "          WHEN TABELA = 'SD3' THEN Sum(D2_QUANT) "
+	_cQry += "        END                         AS QTD_OP, "
+	_cQry += "        B2_QATU                     QTD_ATU, "
+	_cQry += "        B2_FILIAL, "
+	_cQry += "        B2_QEMP 					  EMPENHO, "
+	_cQry += "        ( B2_QATU - B2_QEMP )       DISPONIVEL, "
+	_cQry += "        Substring(D2_EMISSAO, 1, 6) PERIODO "
+	_cQry += " FROM  (SELECT 'SD2'          TABELA, "
+	_cQry += "               SB1.B1_COD, "
+	_cQry += "               SB1.B1_TIPO, "
+	_cQry += "               SB1.B1_UM, "
+	_cQry += "               SB1.B1_GRUPO, "
+	_cQry += "               SB1.B1_DESC, "
+	_cQry += "               SB1.B1_POSIPI, "
+	_cQry += "               D2_SEQCALC, "
+	_cQry += "               D2_EMISSAO, "
+	_cQry += "               D2_TES, "
+	_cQry += "               D2_CF, "
+	_cQry += "               D2_NUMSEQ, "
+	_cQry += "               D2_DOC, "
+	_cQry += "               D2_SERIE, "
+	_cQry += "               D2_QUANT, "
+	_cQry += "               D2_QTSEGUM, "
+	_cQry += "               D2_LOCAL, "
+	_cQry += "               '' as D3_PROJPMS, "
+	_cQry += "               '' as D3_OP, "
+	_cQry += "               '' as D3_CC, "
+	_cQry += "               D2_CLIENTE, "
+	_cQry += "               D2_LOJA, "
+	_cQry += "               D2_PEDIDO, "
+	_cQry += "               D2_TIPO, "
+	_cQry += "               D2_CUSTO1      CUSTO, "
+	_cQry += "               '' as   D3_TRT, "
+	_cQry += "               D2_LOTECTL, "
+	_cQry += "               SD2.R_E_C_N_O_ SD2RECNO, "
+	_cQry += "               '' as  D3_LOCAL, "
+	_cQry += "               D2_FILIAL "
+	_cQry += "        FROM   " + RetSqlName("SB1") + " SB1, "
+	_cQry += "               " + RetSqlName("SD2") + " SD2, "
+	_cQry += "               " + RetSqlName("SF4") + " SF4 "
+	_cQry += "        WHERE  SB1.B1_COD = SD2.D2_COD "
+	_cQry += "               AND SD2.D2_TES = SF4.F4_CODIGO "
+	_cQry += "               AND SF4.F4_ESTOQUE = 'S' "
+	_cQry += "				 AND SD2.D2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
+	_cQry += "               AND SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
+	_cQry += "               AND SD2.D2_ORIGLAN <> 'LF' "
 	If !Empty(MV_par11)
-		_cQry += "					   	  AND SD2.D2_COD IN (" + cCodiW7 + ") "
+		_cQry += "  	   	 AND SD2.D2_COD IN (" + cCodiW7 + ") "
 	EndIf
 	If Len(cQAdd) > 2
-		_cQry += " 						   AND SD2.D2_CLIENTE NOT IN ('008360','020793') "
+		_cQry += " 			 AND SD2.D2_CLIENTE NOT IN ('008360','020793') "
 	Endif
-	_cQry += "        GROUP  BY CODIGO, "
-	_cQry += "                  QTD_OP, "
-	_cQry += "                  PERIODO) MVTO "
-	_cQry += "       LEFT JOIN " + RetSqlName("SB2") + " SB2 "
-	_cQry += "               ON CODIGO = B2_COD "
+	_cQry += "               AND SD2.D_E_L_E_T_ = '' "
+	_cQry += "               AND SF4.D_E_L_E_T_ = '' "
+	_cQry += "               AND SB1.B1_FILIAL = '' "
+	_cQry += "               AND SB1.B1_TIPO BETWEEN '' AND 'ZZZZZ' "
+	_cQry += "               AND D2_LOCAL = '01' "
+	_cQry += "        UNION "
+	_cQry += "        SELECT 'SD3', "
+	_cQry += "               SB1.B1_COD, "
+	_cQry += "               SB1.B1_TIPO, "
+	_cQry += "               SB1.B1_UM, "
+	_cQry += "               SB1.B1_GRUPO, "
+	_cQry += "               SB1.B1_DESC, "
+	_cQry += "               SB1.B1_POSIPI, "
+	_cQry += "               D3_SEQCALC, "
+	_cQry += "               D3_EMISSAO, "
+	_cQry += "               D3_TM, "
+	_cQry += "               D3_CF, "
+	_cQry += "               D3_NUMSEQ, "
+	_cQry += "               D3_DOC, "
+	_cQry += "               '' as D2_SERIE, "
+	_cQry += "               D3_QUANT, "
+	_cQry += "               D3_QTSEGUM, "
+	_cQry += "               D3_LOCAL, "
+	_cQry += "               D3_PROJPMS, "
+	_cQry += "               D3_OP, "
+	_cQry += "               D3_CC, "
+	_cQry += "               '' as  D2_CLIENTE, "
+	_cQry += "               '' as  D2_LOJA, "
+	_cQry += "               '' as  D2_PEDIDO, "
+	_cQry += "               '' as  D2_TIPO, "
+	_cQry += "               ''             CUSTO, "
+	_cQry += "               D3_TRT, "
+	_cQry += "               D3_LOTECTL, "
+	_cQry += "               SD3.R_E_C_N_O_ SD3RECNO, "
+	_cQry += "               SD3.D3_LOCAL, "
+	_cQry += "               D3_FILIAL "
+	_cQry += "        FROM   " + RetSqlName("SB1") + " SB1, "
+	_cQry += "               " + RetSqlName("SD3") + " SD3 "
+	_cQry += "        WHERE  SB1.B1_COD = SD3.D3_COD "
+	_cQry += "               AND D3_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
+	_cQry += "               AND SD3.D3_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
+	_cQry += "               AND SD3.D3_CF = 'RE1' "
+	_cQry += "               AND B1_TIPO IN ('MP','ME') "
+	_cQry += "               AND SD3.D3_ESTORNO <> 'S' "
+	_cQry += "               AND SD3.D_E_L_E_T_ = '') MOVTO "
+	_cQry += "       INNER JOIN " + RetSqlName("SB2") + " SB2 "
+	_cQry += "               ON B2_COD = B1_COD "
+	_cQry += "      			AND B2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
 	_cQry += "                  AND B2_LOCAL = '"+MV_PAR05+"' "
-	_cQry += "                  AND B2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-	_cQry += "                  AND B2_QATU-B2_QEMP <> 0 "
-	_cQry += " ORDER BY CODIGO, PERIODO " 
+	_cQry += "                  AND D2_FILIAL = B2_FILIAL "
+	_cQry += "                  AND D_E_L_E_T_ = '' "
+	_cQry += " GROUP  BY TABELA, "
+	_cQry += "           B1_COD, "
+	_cQry += "           B2_QATU, "
+	_cQry += "           B2_FILIAL, "
+	_cQry += "           B2_QEMP, "
+	_cQry += "           ( B2_QATU - B2_QEMP ), "
+	_cQry += "           Substring(D2_EMISSAO, 1, 6) "
+	_cQry += " ORDER  BY B1_COD "
 	
 	_cQry := ChangeQuery(_cQry)
 	
 	cLogName   := "MEGA21NB"+STRZERO(DAY(dDATAbASE),2)+STRZERO(MONTH(DDATABASE),2)+STRZERO(YEAR(dDATAbASE),4)+".QRY"
+	MemoWrite("\INTRJ\" + cLogName,_cQry)
 	MemoWrite("\INTRJ\" + cLogName,_cQry)
 
 	PutLog( "Montando Query SM0 - Qry - Inicio :" +Time() +CRLF+_cQry)
@@ -1583,9 +1662,49 @@ Static Function Excmg21n(cTexto,aCabec,aDados,mvpar)
 	EndIf
 
 	If MV_PAR12 == 1
-		nLimExc := 17
+		If Month(MV_PAR03) <= Month(MV_PAR04)
+			IF (Month(MV_PAR04) - Month(MV_PAR03)) <= 7
+				nLimExc := 17
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 8
+				nLimExc := 18
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 9
+				nLimExc := 19
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 10
+				nLimExc := 20
+			EndIf
+		Else
+			IF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) <= 7
+				nLimExc := 17
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 8
+				nLimExc := 18
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 9
+				nLimExc := 19
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 10
+				nLimExc := 20
+			EndIf
+		EndIf
 	else
-		nLimExc := 18
+		If Month(MV_PAR03) <= Month(MV_PAR04)
+			IF (Month(MV_PAR04) - Month(MV_PAR03)) <= 7
+				nLimExc := 18
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 8
+				nLimExc := 19
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 9
+				nLimExc := 20
+			ElseIF (Month(MV_PAR04) - Month(MV_PAR03)) == 10
+				nLimExc := 21
+			EndIf
+		Else
+			IF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) <= 7
+				nLimExc := 18
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 8
+				nLimExc := 19
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 9
+				nLimExc := 20
+			ElseIF (Month(MV_PAR04) + (12 - Month(MV_PAR03))) == 10
+				nLimExc := 21
+			EndIf
+		EndIf
 	EndIf
 
 	For x:= 1 to Len(aCabec)
