@@ -12,9 +12,13 @@ User Function OURO009()
 
     Local dDataLP   := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XDTLPRD'})
     Local dDataLC   := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XDTPROG'})
+    Local dDtETD    := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XETD'})
+    Local dDtETA    := aScan(aHeader,{|x| AllTrim(x[2]) == 'C1_XETA'})
     Local cDeptoSC  := SuperGetMv("FS_VLSCIMP",.F.,"")
     Local cCalLimP  := SuperGetMv("ES_DTLPRD",.F.,"")
     Local cCalLimC  := SuperGetMv("ES_DTENTR",.F.,"")
+    Local cCalETD   := SuperGetMv("ES_PRZETD",.F.,"50")
+    Local cCalETA   := SuperGetMv("ES_PRZETA",.F.,"10")
     Local aCalLP    := StrTokArr(cCalLimP,"/")
     Local aCalLC    := StrTokArr(cCalLimC,"/")
     Local nTotLP    := 0
@@ -32,6 +36,8 @@ User Function OURO009()
             
         aCols[n][dDataLP] := M->C1_DATPRF - nTotLP
         aCols[n][dDataLC] := M->C1_DATPRF - nTotLC
+        aCols[n][dDtETD]  := M->C1_DATPRF - Val(cCalETD)
+        aCols[n][dDtETA]  := M->C1_DATPRF - Val(cCalETA)
     EndIf
 
 Return .T.

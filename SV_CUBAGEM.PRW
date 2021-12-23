@@ -11,9 +11,15 @@ Local __nQtdEmba:= 0
 Local lVldImp	:= .T. 
 Local cDepVldImp:= GetMv("FS_VLSCIMP",,"000000025")
 // ------
+Local dDtETD := CTOD("")
+Local dDtETA := CTOD("")
 
 default __cAlias:= "SC1"
 default _lAjusta:= .t.
+
+If !INCLUI .AND. !ALTERA
+	Return .T.
+EndIf
 
 if __cAlias == "SC1"
 	nPRODUTO  := aScan(aHeader,{|x| AllTrim(x[2])=="C1_PRODUTO"})
@@ -46,20 +52,12 @@ If lVldImp
 	   msginfo("Atenção! Produto " + AllTrim(cProduto) + " não encontrado no cadastro de Produtos")
 	   return .f.
 	endif
-/*	                                         
-	If SB1->B1_IMPORT <> "S"
-	   msginfo("Atenção! Produto " + AllTrim(cProduto) + " não está cadastrado como produto importado")
-	   RETURN .T.
-	endif                  
-*/
-	// Tratamento para não alterar o Campo B1_IMPORT
-	If SB1->B1_XREVEND  <> "S" //.And. !(SB1->B1_ORIGEM $ "1|2")
-	   Msginfo("Atenção! Produto " + AllTrim(cProduto) + " não está cadastrado como produto revenda.")
-	   RETURN .T.
-	ElseIf __cAlias == "SC1"
-    	aCols[n][nPosImp] := "S"
-	endif                  
-
+	
+	If SB1->B1_IMPORT == "S"
+		IF __cAlias == "SC1"
+    		aCols[n][nPosImp] := "S"
+		EndIf
+	EndIf           
 	                  
 	SB5->(DBSETORDER(1))
 	if ! SB5->(dbseek(xfilial("SB5")+cProduto))
@@ -142,15 +140,40 @@ If lVldImp
 		__nCubagem:= __nQtdEmba * (EE5->EE5_CCOM * EE5->EE5_LLARG * EE5->EE5_HALT)
 	EndIf
 	
+	If __cAlias == "SW3" .OR. __cAlias == "WK3"
+		cQuery := " SELECT TOP(1) C1_XETD, C1_XETA "
+		cQuery += " FROM " + RetSqlName("SC1")
+		cQuery += " WHERE C1_NUM = 	(SELECT TOP(1) W0_C1_NUM FROM " + RetSqlName("SW0")
+		cQuery += " 				 WHERE W0__NUM = '"+TSI_NUM+"' "
+		cQuery += " 				 AND D_E_L_E_T_ = '') "
+		cQuery += " AND C1_PRODUTO = '"+cProduto+"' "
+		cQuery += " AND D_E_L_E_T_ = '' "
+
+		If Select("XETDA") > 0
+			XETDA->(dbCloseArea())
+		EndIf
+
+		DbUseArea(.T.,"TOPCONN",TCGenQry(,,cQuery),"XETDA",.F.,.T.)
+		
+		If XETDA->(!EOF())
+			dDtETD := STOD(XETDA->C1_XETD)
+			dDtETA := STOD(XETDA->C1_XETA)
+		EndIf
+	EndIf
+
 	IF __cAlias == "SC1"
 		aCols[n,nQUANT]  := nquantidade
 		aCols[n,nXQTDEM1]:= __nQtdEmba                        
 		aCols[n,nXCUBAGE]:= __nCubagem
 		aCols[n,nPosPB]  := nQuantidade * SB1->B1_PESBRU
 	ELSEIF __cAlias == "SW3"
-	    M->W3_XQTDEM1:= __nQtdEmba    // quantidade de embalagens
-	    M->W3_XCUBAGE:= __nCubagem    // Cubagem do item   
-	    M->W3_XQE1:= SB5->B5_QE1
+	    M->W3_XQTDEM1 := __nQtdEmba    // quantidade de embalagens
+	    M->W3_XCUBAGE := __nCubagem    // Cubagem do item   
+	    M->W3_XQE1	  := SB5->B5_QE1
+		M->W3_DT_EMB  := dDtETD
+		M->W3_DT_ENTR := dDtETA
+		W2_XDT_ETD	  := dDtETD
+		W2_XDT_ETA	  := dDtETA
 	    if lAjustouSW
 	       M->W3_QTDE:= nquantidade
 	    endif
@@ -158,6 +181,10 @@ If lVldImp
 	    Work->W3_XQE1    := SB5->B5_QE1
 	    Work->W3_XQTDEM1 := __nQtdEmba
 	    Work->W3_XCUBAGE := __nCubagem
+		Work->WKDT_EMB   := dDtETD
+		Work->WKDT_ENTR  := dDtETA
+		W2_XDT_ETD	     := dDtETD
+		W2_XDT_ETA	     := dDtETA
 	ELSEIF __cAlias == "SW6"
 	    Work->WK_XQE1    := SB5->B5_QE1
 	    Work->WK_XQTDEM1 := __nQtdEmba
