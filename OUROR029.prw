@@ -42,11 +42,11 @@ Static Function ReportDef()
 
     Local oReport  
     Local oSection 
-    Local cPerg      := PADR("MEGA38",10)
+    Local cPerg      := PADR("OUROR029",10)
 
     Pergunte(cPerg,.T.) 
 
-    oReport:=TReport():New("OUROR029","OUROR029 - Lead Time Import ","MEGA38",{|oReport| PrintReport(oReport,oSection)},"Lead Time Import")
+    oReport:=TReport():New("OUROR029","OUROR029 - Lead Time Import ","OUROR029",{|oReport| PrintReport(oReport,oSection)},"Lead Time Import")
     
     oReport:SetLandscape(.T.) 
     oSection:=TRSection():New(oReport,"OUROR029 - Lead Time Import ",{"SB1"})
@@ -199,6 +199,7 @@ Static Function PrintReport(oReport,oSection)
     cQryFin += "        SWN.WN_PO_NUM = SC7.C7_NUM "
     cQryFin += " LEFT JOIN " + RetSqlName("SW6") + " SW6 "
 	cQryFin += "        ON SW6.W6_PO_NUM = SC7.C7_NUM "
+    cQryFin += "        AND SW6.W6_HAWB = SWN.WN_HAWB "
 	cQryFin += "        AND SW6.D_E_L_E_T_ = ''	"
     cQryFin += " LEFT JOIN " +RetSqlName("SC1")+ " SC1 ON " 
     cQryFin += "        SC1.C1_NUM = SC7.C7_NUMSC "
