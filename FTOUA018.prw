@@ -68,7 +68,12 @@ Private cError      := ""
             
             aRequest := U_ResInteg("000018", cJson, aHeader, , .T., cToken )
 
-            oEmbarque := aRequest[2]:Embarque
+            If aRequest[2]:Status == "ERRO"
+				U_MonitRes("000017", 2, , cIdPZB, aRequest[2]:Mensagem, .F., cValToChar(aRegs[nX]), "", aRequest[3], aRequest[2]:Mensagem, lReprocess, lLote, cIdPZC)
+				Loop
+			EndIf
+
+			oEmbarque := aRequest[2]:Embarque
 
 			aPedidos	:= {}
 			lErro 		:= .F.
