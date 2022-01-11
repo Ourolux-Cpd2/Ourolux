@@ -145,26 +145,39 @@ Private lMsErroAuto 	:= .F.
 				cCst := 0
 			Else
 				cEspecie := "CTE"
-				cCst := oNota:CST
+				
+				If AttIsMemberOf(oNota, "cst")
+					cCst := oNota:CST
+				Else
+					U_MonitRes("000009",2,,cIdPZB,"Documento não é nota fiscal de serviço, mas também não possui a propriedade CST.",.F., StrZero(oNota:NUMERO,9), "", "",StrZero(oNota:NUMERO,9), lReprocess, lLote, cIdPZC)
+					Loop
+				EndIF
+
 			EndIf
 
 			cProdPad	:= ""
 			lIsExec		:= .F.
 
-			cTipo := fRetAtrb(cCst, @cRetTip, @cRetOper, oNota:TIPOCTE, SA2->A2_SIMPNAC, lTrfFil, oNota:tipoConhecimento, @cProdPad, cEspecie, @lIsExec)
+			cTipo	:= fRetAtrb(cCst, @cRetTip, @cRetOper, oNota:TIPOCTE, SA2->A2_SIMPNAC, lTrfFil, oNota:tipoConhecimento, @cProdPad, cEspecie, @lIsExec)
+			cDoc	:= _cFil + StrZero(oNota:NUMERO,9) + Padr(oNota:Serie,3) + SA2->(A2_COD+A2_LOJA)
 			
 			If cEspecie <> "NFS"
-				
-				If "conemb" $ oNota:linkrepositorio
 
-					U_MonitRes("000009",2,,cIdPZB,"Conemb descartado.",.F., cDoc,cJson, aRequest[3],cDoc, lReprocess, lLote, cIdPZC)
-					Loop
+				If AttIsMemberOf(oNota, "linkrepositorio")
+				
+					If "conemb" $ oNota:linkrepositorio
+
+						U_MonitRes("000009",2,,cIdPZB,"Conemb descartado.",.F., cDoc,cJson, aRequest[3],cDoc, lReprocess, lLote, cIdPZC)
+						Loop
+
+					EndIf
 
 				EndIf
 
 			Else
 				cRetTip := "N"
 			EndIf
+
 			/*
 			dbSelectArea("SFM")
 			SFM->(dbSetOrder(1))
@@ -184,9 +197,14 @@ Private lMsErroAuto 	:= .F.
 			*/
 			dDtEmiss := Left(oNota:DATAEMISSAO,10)
 			dDtEmiss := STOD(StrTran(dDtEmiss, "-", ""))
-
-			cDoc	:= _cFil + StrZero(oNota:NUMERO,9) + Padr(oNota:Serie,3) + SA2->(A2_COD+A2_LOJA)
 			aCabec	:= {}
+
+			//Verifica se existe o IBGE
+			If !AttIsMemberOf(oNota, "CodIbgeDestino")
+				U_MonitRes("000009",2,,cIdPZB,"COdigo IBGE do destino não encontrado.",.F., cDoc,cJson, aRequest[3],cDoc, lReprocess, lLote, cIdPZC)
+				Loop
+			EndIf
+			
 			
 			aadd(aCabec,{"F1_FILIAL"  ,	_cFil												, Nil})
 			aadd(aCabec,{"F1_TIPO"    , cRetTip  	            							, Nil})
@@ -247,12 +265,13 @@ Private lMsErroAuto 	:= .F.
 
 							If SBM->(DbSeek(xFilial("SBM") + oNota:centrosCustos[nY]:codigo))
 
-								cPrdFrete := SBM->BM_XPRDFRT
+								cPrdFrete := IIF(Empty(SBM->BM_XPRDFRT),cProdPad,SBM->BM_XPRDFRT)
 								
-								nPosPrd := aScan(aProdutos, {|x| Alltrim(x[1]) == Alltrim(SBM->BM_XPRDFRT)})
+								//nPosPrd := aScan(aProdutos, {|x| Alltrim(x[1]) == Alltrim(SBM->BM_XPRDFRT)})
+								nPosPrd := aScan(aProdutos, {|x| Alltrim(x[1]) == Alltrim(cPrdFrete)})
 
 								If nPosPrd == 0
-									AADD(aProdutos, {Alltrim(SBM->BM_XPRDFRT), oNota:centrosCustos[nY]:VALORFRETEREALIZADO})
+									AADD(aProdutos, {Alltrim(cPrdFrete), oNota:centrosCustos[nY]:VALORFRETEREALIZADO})
 								Else
 									aProdutos[nPosPrd][2] += oNota:centrosCustos[nY]:VALORFRETEREALIZADO
  								EndIf
@@ -280,7 +299,7 @@ Private lMsErroAuto 	:= .F.
 
 				aGrvPR3 := Array(0)
 	                        
-	            RetArrPR3(oCte,@aGrvPR3,oNota:Chave)   
+	            RetArrPR3(oNota,@aGrvPR3,oNota:Chave)   
 	                        	
 				If Len(aGrvPR3) > 0
 					
@@ -324,8 +343,13 @@ Private lMsErroAuto 	:= .F.
 					If cEspecie <> "NFS"
 						
 						If AttIsMemberOf(oNota, "ValorBaseIcms")
-							aadd( aLinha, { "D1_BASEICM", oNota:ValorBaseIcms		, Nil})
-							aadd( aLinha, { "D1_PICM"	, oNota:VALORALIQUOTAICMS	, Nil})
+
+							If oNota:ValorBaseIcms > 0
+								//aadd( aLinha, { "D1_BASEICM", oNota:ValorBaseIcms		, Nil})
+								aadd( aLinha, { "D1_BASEICM", aProdutos[nY][2]			, Nil})
+								aadd( aLinha, { "D1_PICM"	, oNota:VALORALIQUOTAICMS	, Nil})
+							EndIf
+							
 						EndIf
 						
 					EndIf
@@ -396,7 +420,7 @@ Private lMsErroAuto 	:= .F.
 					
 					cHora := Substr(Time(),1,5) 
 					
-					For nX := 1 to len(oNota:Notas)
+					For nY := 1 to len(oNota:Notas)
 						
 						If PR3->(Reclock("PR3",.T.))
 							
@@ -407,7 +431,7 @@ Private lMsErroAuto 	:= .F.
 							PR3->PR3_LOJA   := SF1->F1_LOJA
 							PR3->PR3_CHVCTE := SF1->F1_CHVNFE
 							PR3->PR3_TIPO   := SF1->F1_TIPO
-							PR3->PR3_CHVPAR := oNota:Notas[nX]:chave
+							PR3->PR3_CHVPAR := oNota:Notas[nY]:chave
 							PR3->PR3_HORA   := cHora
 							PR3->PR3_DATA   := DDATABASE 
 							PR3->PR3_RECNOO := SF1->(Recno())
@@ -416,7 +440,7 @@ Private lMsErroAuto 	:= .F.
 								
 						Endif
 
-					Next nX
+					Next nY
 					
 					cMenssagem := "Importação de CTE realizado com sucesso."
 					U_MonitRes("000009",2,,cIdPZB,cMenssagem,.T., cDoc,cJson, aRequest[3],cDoc, lReprocess, lLote, cIdPZC)
@@ -596,18 +620,57 @@ Static Function fRetAtrb(nCst, cRetTip, cRetOper, nTipo, cSimpNac, lTransf, nTpT
 	//Defini o tipo da nota
 	Do Case
 					    
-		Case nTipo == 0
+		Case nTpTransp == 12
 		
-			cRetTip := "N"
+			cRetTip := "I"
 			
-		Case nTipo == 1
+		Case nTpTransp == 16
 		
 			cRetTip := "C" 
 						
 		OtherWise
 		
-			cRetTip := ""
+			cRetTip := "N"
 											
 	EndCase 
 
 Return()
+
+//--------------------------------------------------------------------
+/*/{Protheus.doc} RetArrPR3
+Retorna array com 3 posicoes sendo
+[1] alias
+[2] chave cte
+[3] chave cte ou nfe origem
+Para inclusao na tabela PR3
+@author Caio
+@since 19/02/2020
+@version 1.0 
+/*/
+//--------------------------------------------------------------------
+
+Static Function RetArrPR3(oCte,aGrvPR3,cChave)
+
+Local nX
+
+Default oCte    := Nil
+Default aGrvPR3 := {}
+Default cChave  := ""
+	
+	If ValType(oCte) == "O"
+
+		If oCte:TipoCte == 0
+
+			For nX := 1 to len(oCte:Notas)
+
+				aAdd(aGrvPR3,{"SF1"   ;
+							,cChave  ;
+							,oCte:Notas[nX]:CHAVE})
+
+			Next nX
+
+		EndIf
+
+	EndIf
+	
+Return(aGrvPR3)
