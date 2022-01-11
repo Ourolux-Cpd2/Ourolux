@@ -134,15 +134,12 @@ Default cIdPZC		:= ""
                     cJson += '"numero":"' + oXml:_nfe:_infNFe:_ide:_nNF:text + '",'
                     cJson += '"cnpjUnidade":"'+ oXml:_nfe:_infNFe:_emit:_cnpj:text + '",'
                     cJson += '"serie": "'+ oXml:_nfe:_infNFe:_ide:_serie:text + '",'
-                    //cJson += '"chaveAcesso": "'+ oXml:_protNfe:_infProt:_chnfe:text + '",'
                     cJson += '"chaveAcesso": "'+ (cAlsQry)->F3_CHVNFE + '",'
                     cJson += '"emitente": {
                     cJson += '"cnpj": "'+ oXml:_nfe:_infNFe:_emit:_cnpj:text + '",'
                     cJson += '"nome": "'+ oXml:_nfe:_infNFe:_emit:_xNome:text + '",'
                     cJson += '"fantasia": "'+ oXml:_nfe:_infNFe:_emit:_xFant:text + '",'
                     cJson += '"inscricaoEstadual": "'+ oXml:_nfe:_infNFe:_emit:_ie:text + '",'
-                    //cJson += '    "email": "'+ oXml:_nfe:_infNFe:_emit:_cnpj:text + '",'
-                    //cJson += '    "idEstrangeiro": "'+ oXml:_nfe:_infNFe:_emit:_cnpj:text + '",'
                     cJson += '"logradouro": "'+ oXml:_nfe:_infNFe:_emit:_enderEmit:_xlgr:text + '",'
                     cJson += '"numero": "'+ oXml:_nfe:_infNFe:_emit:_enderEmit:_nro:text + '",'
                     cJson += '"bairro": "'+ oXml:_nfe:_infNFe:_emit:_enderEmit:_xBairro:text + '",'
@@ -151,11 +148,24 @@ Default cIdPZC		:= ""
                     cJson += '"fone": "'+ oXml:_nfe:_infNFe:_emit:_enderEmit:_fone:text + '"'
                     cJson += '},
                     cJson += '"destinatario": {
-                    cJson += '"cnpj": "'+ oXml:_nfe:_infNFe:_dest:_cnpj:text + '",'
+                    
+                    If AttIsMemberOf(oXml:_nfe:_infNFe:_dest,"_cnpj")
+                        cJson += '"cnpj": "'+ oXml:_nfe:_infNFe:_dest:_cnpj:text + '",'
+                        lCnpj := .T.
+                    Else
+                        cJson += '"cnpj": "'+ oXml:_nfe:_infNFe:_dest:_cpf:text + '",'
+                        lCnpj := .F.
+                    EndIf
+                    
                     cJson += '"nome": "'+ oXml:_nfe:_infNFe:_dest:_xNome:text + '",'
-                    //cJson += '    "fantasia": "'+ oXml:_nfe:_infNFe:_dest:_cnpj:text + '",'
-                    cJson += '"inscricaoEstadual": "' + oXml:_nfe:_infNFe:_dest:_ie:text + '",'
-                    cJson += '"email": "'+ oXml:_nfe:_infNFe:_dest:_email:text + '",'
+                    
+                    If lCnpj .and. AttIsMemberOf(oXml:_nfe:_infNFe:_dest,"_ie") == .T.
+                        cJson += '"inscricaoEstadual": "' + oXml:_nfe:_infNFe:_dest:_ie:text + '",'
+                    EndIf
+                    
+                    If AttIsMemberOf(oXml:_nfe:_infNFe:_dest,"_email")
+                        cJson += '"email": "'+ oXml:_nfe:_infNFe:_dest:_email:text + '",'
+                    endif
                     //cJson += '    "idEstrangeiro": "",
                     cJson += '"logradouro": "'+ oXml:_nfe:_infNFe:_dest:_enderDest:_xlgr:text + '",'
                     cJson += '"numero": "'+ oXml:_nfe:_infNFe:_dest:_enderDest:_nro:text + '",'
@@ -298,11 +308,21 @@ Default cIdPZC		:= ""
                     (cAlsGrp)->(dbCloseArea())
 
                     cJson += '"volumes": ' + oXml:_nfe:_infNFe:_TRANSP:_vol:_qVol:text + ','
-                    //cJson += '"pesoCubado": ' + cValToChar(val(oXml:_nfe:_infNFe:_TRANSP:_vol:_pesoB:text) * 300) + ','
-                    cJson += '"pesoLiquido": ' + oXml:_nfe:_infNFe:_TRANSP:_vol:_pesoL:text + ','
+                    
+                    If AttIsMemberOf(oXml:_nfe:_infNFe:_TRANSP:_vol, "_pesoL")
+                        cJson += '"pesoLiquido": ' + oXml:_nfe:_infNFe:_TRANSP:_vol:_pesoL:text + ','
+                    Else
+                        cJson += '"pesoLiquido": 0,'
+                    EndIf                    
+                    
                     cJson += '"valor": ' + oXml:_nfe:_infNFe:_total:_icmstot:_vnf:text + ','
                     cJson += '"valorICMSSt": ' + oXml:_nfe:_infNFe:_total:_icmstot:_vst:text + ','
-                    cJson += '"peso": ' + oXml:_nfe:_infNFe:_TRANSP:_vol:_pesoB:text + ','
+                    
+                    If AttIsMemberOf(oXml:_nfe:_infNFe:_TRANSP:_vol, "_pesoB")
+                        cJson += '"peso": ' + oXml:_nfe:_infNFe:_TRANSP:_vol:_pesoB:text + ','
+                    else
+                        cJson += '"peso": 0,'
+                    endif
                     cJson += '"informacoesContribuinte": ['
 
                     //Estrutura os grupos
