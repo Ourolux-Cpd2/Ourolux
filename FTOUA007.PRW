@@ -228,7 +228,7 @@ Local nTamPed       := TamSX3("C5_NUM")[1]
 	
         cJson	:= '{'
         cJson	+= '"cnpjEmissorPreNotaFiscal":"'+Alltrim(SM0->M0_CGC)+'",'
-        cJson	+= '"numeroPreNotaFiscal":'+Alltrim(SC5->C5_NUM)+','
+        cJson	+= '"numeroPreNotaFiscal":'+cValToChar(Val(SC5->C5_NUM))+','
         cJson	+= '"seriePreNotaFiscal":"2"'
 		cJson	+= '}'
     
@@ -240,7 +240,7 @@ Local nTamPed       := TamSX3("C5_NUM")[1]
         
         cJson	:= '{'
         cJson	+= '"cnpjEmissorPreNotaFiscal":"'+Alltrim(SM0->M0_CGC)+'",'
-        cJson	+= '"numeroPreNotaFiscal":'+Substr(cPedido,nIniPed,nTamPed)+','
+        cJson	+= '"numeroPreNotaFiscal":'+cValToChar(Val(Substr(cPedido,nIniPed,nTamPed)))+','
         cJson	+= '"seriePreNotaFiscal":"2"'
 		cJson	+= '}'
 		
