@@ -111,6 +111,29 @@ Default cIdPZC		:= ""
 		
 				// MONTAGEM DA ESTRUTURA JSON 
 				cJSon	:= fuPedJSon( cCHAVE )
+
+				//Grava tabela integradora
+				PR1->(DbGoTo((cAlsPR1)->RECPR1))
+
+				//Se não achar o pedido o pedido para montar o JSON
+				If Empty(cJson)	
+					
+					PR1->(RecLock("PR1", .F.))
+
+						PR1->PR1_IDEXT := "Deletado da PR1, pois não existe mais o pedido ativo na SC5."
+					
+					PR1->(MsUnlock())
+
+					PR1->(RecLock("PR1", .F.))
+
+						PR1->(DbDelete())
+					
+					PR1->(MsUnlock())
+					
+					(cAlsPR1)->(DbSkip()) 
+					Loop
+
+				EndIf
 					
 				// ENVIO PARA TRANSPOFRETE	
 				aRequest := U_ResInteg("000003", cJson, aHeader, , .T.,cToken )
@@ -161,9 +184,6 @@ Default cIdPZC		:= ""
 		
 							SC5->(MsUnlock())
 		
-							//Grava tabela integradora
-							PR1->(DbGoTo((cAlsPR1)->RECPR1))
-								
 							PR1->(RecLock("PR1",.F.))
 							 
 								If PR1->PR1_ALIAS == "SC5"
