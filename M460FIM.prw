@@ -56,10 +56,26 @@ Uso - Não usado (este campo não precisa estar na tela)
 //-------------------------------------------------------------------------------------
 User Function M460FIM()
 
+	Local cDirBol 		:= GetMV("FS_ELE007")
+	Local nVlrDesc 		:= 0
+	Local cMensagem1	:= ""
+	Local cData     	:= ""
 	Local aArea     	:= ""
+	Local cQuery        := ""
+	Local _nNro			:= 0
+	Local _nHnd			:= 0
+	Local _nVlr			:= 0
+	Local nBanco        := 0
+	Local _cReg			:= ""
+	Local _cAge			:= ""
+	Local _cCNPJ		:= ""
+	Local _cDta			:= ""
 	Local nRecSE1       := 0
 	Local lGeraBol      := !(SC5->C5_BANCO $ 'LIC.CAR') // BANCO LIC/CAR : Nao Gera arquivo texto para a impressao do boleto
 
+	Local cBolCart      := GetMv("FS_BOLCART")	//"02"
+	Local cBolBco       := GetMv("FS_BOLBCO" )	//"237"
+	Local cBolAge       := GetMv("FS_BOLAGEN")	//"3381"
 	Private cCODMsgVO	:= GetMv("ES_M460VO")	//Parametro Mensagem FISCAL para Gerar na REMESSA A ORDEM
 		
 	PesoBru() // Grava o peso bruto no F2_PBRUTO
@@ -137,6 +153,11 @@ User Function M460FIM()
 	                   
 			SE1->( dbSkip( -1 ) )
 		EndDo
+
+		// Apenas imprime neste momento se for Itau
+		If cBolBco == "341"
+			u_BLTITAU(SF2->F2_DOC,SF2->F2_PREFIXO,SF2->F2_CLIENTE,SF2->F2_LOJA)
+		EndIf
 	EndIf
 
 	// Maurício Aureliano - Chamado: I1805-1114 - Comissão - Complemento de ST
@@ -166,6 +187,74 @@ User Function M460FIM()
 	GeraPvRemCtaOrdem()
 
 Return( Nil )
+
+//
+//
+/* Nosso Numero: 11 digits (pos 157 - 167) + 1 digit verif (Pos. 168) 
+
+Static Function NossoNum(cPrefixo,cNumero,cParcela,nBanco)
+	Local nNNum		:= 0
+	Local _nParc	:= 0
+	Local _nDig		:= 0
+	Local _nRst     := 0
+	Local _nMlt     := { 2, 7, 6, 5, 4, 3, 2, 7, 6, 5, 4, 3, 2 }
+
+
+	If MV_PAR26 == 1                // Carteira 02 
+		nNNum := '02'  	    // --- Conta sem o DV  ---
+	ElseIf MV_PAR26 == 2            // Carteira 09 
+		nNNum := '09'
+	EndIf
+
+
+// Carteira
+	nNNum += StrZero( Val( cPrefixo ), 3 )   // Converter um numérico em uma string com zeros a esquerda.
+	nNNum += cNumero
+
+	cParcela := IIf(Empty(cParcela),"A",cParcela)
+
+	If cParcela <> ' '
+		_nParc := Asc( cParcela )
+		_nParc -= 64
+		_nParc := StrZero( _nParc, 2 )
+		nNNum  += _nParc
+	Else
+		nNNum += '00'   // Parcela Unica 
+	EndIf
+
+	nBanco := Substr( nNNum,  3, 9 )
+	nBanco += Substr( nNNum, 13, 1 )
+
+	_nDig := 0
+
+	For n := 1 To 13
+		_nRst := Val( Substr( nNNum, n, 1 ) )
+		_nRst *= _nMlt[ n ]
+		_nDig += _nRst
+	Next
+
+	_nRst := Mod( _nDig, 11 )
+
+	If _nRst <> 0
+		_nDig := 11
+		_nDig -= _nRst
+	
+		If _nDig <> 10
+			_nDig := StrZero( _nDig, 1 )
+		Else
+			_nDig := 'P'
+		EndIf
+	
+	Else
+		_nDig := '0'
+	End
+
+	nNNum += _nDig
+	nNNum := Substr( nNNum, 3 )
+
+Return (nNNum)
+
+*/
 
 // Check to see if Bonificaçao
 User Function IsBonif(cDoc,cSer)
@@ -421,10 +510,7 @@ if found()
 								{"C6_VALOR"  , ROUND(SD2->(D2_PRCVEN * D2_QUANT),2), Nil},;
 								{"C6_TES"    , '958'        , Nil},;
 								{"C6_LOCAL"  , SD2->D2_LOCAL, Nil},;
-								{"C6_ENTREG" , dDATABASE    , Nil},;
-								{"C6_NFORI"  , SD2->D2_DOC  , Nil},;
-								{"C6_SERIORI", SD2->D2_SERIE ,Nil},;
-								{"C6_ITEMORI", SD2->D2_ITEM , Nil};
+								{"C6_ENTREG" , dDATABASE    , Nil};
 					};
 					)
 
