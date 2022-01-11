@@ -168,7 +168,37 @@ Default nOpcMet     := 1
 	                    If DecodeUtf8(cResult) <> Nil
 	                        cResult := DecodeUtf8(cResult)
 	                    EndIf
-						FWJsonDeserialize( cResult ,@oJSon)
+						
+                        If cIdServ == "000021"
+                            nStart  := At("pedidoCompra",cResult)
+
+                            IF nStart > 0
+                                cAux    := Left(cResult,nStart-2)
+                                nStart  := At("]",cResult,nStart)
+                                cAux    += Substr(cResult,nStart+2,len(cResult))
+                                cResult := cAux
+                            EndIf 
+
+                        EndIf 
+
+                        If cIdServ == "000005"
+                            
+                            While At("informacoesContribuinte",cResult) > 0
+
+                                nStart  := At("informacoesContribuinte",cResult)
+
+                                IF nStart > 0
+                                    cAux    := Left(cResult,nStart-2)
+                                    nStart  := At("]",cResult,nStart)
+                                    cAux    += Substr(cResult,nStart+2,len(cResult))
+                                    cResult := cAux
+                                EndIf 
+
+                            End
+
+                        EndIf 
+
+                        FWJsonDeserialize( cResult ,@oJSon)
 					EndIf
                 EndIf
 
