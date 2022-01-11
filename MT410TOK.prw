@@ -39,7 +39,11 @@ Local cXAviso   := ""
 Local i
 Local nOpc         	:= PARAMIXB[1]	// Opcao de manutencao
 
-
+//Henrique Ghidini- Validação para verificar se ja possui embarque
+If nOpc == 4 .And. SC5->C5_XTFEMBQ > 0
+	lRet := .F.
+	Aviso( "MT410TOK", "Pedidos que possuem número de embarque vinculado não podem ser alterados.", {"Ok"} )
+EndIf
 
 // Rotina Automatica SFA
 If Type("L410Auto")!="U" .And. L410Auto
