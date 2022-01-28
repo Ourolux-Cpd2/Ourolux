@@ -13,7 +13,7 @@
 Rotina: MEGA21n
 Descricao: Relatorio de venda mensal por produto
 Autor: Eletromega
-Utilidade: Imprime a Totalizacao das Vendas de um Determinado Produto Durante um Periodo prÈ Estabelecido
+Utilidade: Imprime a Totalizacao das Vendas de um Determinado Produto Durante um Periodo pr? Estabelecido
 Data: 18/10/2002
 Variaveis utilizadas para parametros                         
 	mv_par01             // Produto de?                          
@@ -315,7 +315,7 @@ Static Function RptDetail()
 	cDtIni := Dtos(FIRSTDAY(mv_par03))
 	cDtFim := Dtos(LASTDAY(mv_par04))
 
-	If MV_par10 == 1 //Imprime Saldo x Previsùo? (1 = Nao) -  Chamado: I1711-323 - 06.04.2018
+	If MV_par10 == 1 //Imprime Saldo x Previs?o? (1 = Nao) -  Chamado: I1711-323 - 06.04.2018
 		nMesPrv := 12 - _nMeses // 05.07.2011
 	Else
 		nMesPrv := 11 - _nMeses // We can display a maximum of 13 fields (consumo + previsao) // Alterado por Claudino, 08/04/16 - I1603-1376
@@ -503,7 +503,7 @@ Static Function RptDetail()
 			_cQry += " 		INNER JOIN " + RetSqlName("SF4") +" SF4 "
 			_cQry += " 			ON SF4.F4_CODIGO = SD2.D2_TES "
 			_cQry += " WHERE SD2.D2_EMISSAO BETWEEN '"+cDtIni+"' AND '"+cDtFim+"' "
-			_cQry += " AND SD2.D2_LOCAL = '" + MV_PAR05 + "' "
+			_cQry += " AND SD2.D2_LOCAL IN " + FormatIn(MV_PAR05,",")
 			_cQry += " AND SD2.D_E_L_E_T_ <> '*' "
 			_cQry += " AND SD2.D2_TIPO = 'N' "
 
@@ -606,7 +606,7 @@ Static Function RptDetail()
 	cQrySld := "SELECT B1_COD As Cod,SUM(B2_QATU)As Sld "
 	cQrySld += "FROM "+RetSqlName("SB1")+" SB1 INNER JOIN " + RetSqlName("SB2") +" SB2 ON B1_COD = B2_COD "
 
-	cQrySld += "WHERE B2_LOCAL = '01' "
+	cQrySld += "WHERE B2_LOCAL IN " + FormatIn(MV_PAR05,",")
 			
 	If !Empty(MV_par11)
 		cQrySld += "AND (B1_COD IN (" + cCodiW7 + "))"
@@ -917,7 +917,7 @@ Static Function RptDetail()
 					nTotCubPrev += IIf( aQtdPrv[i][2] > 0, RetCub(,aQtdPrv[i][2]), 0 )
 				Next
 				
-				If MV_par10 == 2 //Imprime Saldo x Previsùo? (2 = Sim)
+				If MV_par10 == 2 //Imprime Saldo x Previs?o? (2 = Sim)
 					_nCol += 6
 				
 					@ _nLin, _nCol PSAY NOROUND(( nSldAtu + _nQtdPrv )/_qMed, 1) Picture '@E 99999.9'
@@ -1449,7 +1449,7 @@ Local aResult	:= {}
 Local nX
 Local nY		:= 1
 
-	cQuery := "Select DC3.DC3_CODNOR NORMA "
+	cQuery := "Select DISTINCT(DC3.DC3_CODNOR) NORMA "
 	cQuery += "From "+RetSqlName("DC3")+ " DC3 "
 	
 	If !Empty(MV_par11)
@@ -1512,7 +1512,7 @@ aAdd(aRegs,{cPerg,"01","Produto de ?                  "	,"","","mv_ch1" ,"C",15,
 aAdd(aRegs,{cPerg,"02","Produto ate ?                 "	,"","","mv_ch2" ,"C",15,0,0,"G","NaoVazio().And.AllTrim(MV_PAR01)<=AllTrim(MV_PAR02)"	,"mv_par02","","","","","","","","","","","","","","","","","","","","","","","","","SB1"	,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"03","Data de ?                     "	,"","","mv_ch3" ,"D", 8,0,0,"G",""														,"mv_par03","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"04","Data ate ?                    "	,"","","mv_ch4" ,"D", 8,0,0,"G","NaoVazio()"											,"mv_par04","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
-aAdd(aRegs,{cPerg,"05","Almoxarifado ?                "	,"","","mv_ch5" ,"C", 2,0,0,"G",""														,"mv_par05","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
+aAdd(aRegs,{cPerg,"05","Almoxarifado ?                "	,"","","mv_ch5" ,"C", 10,0,0,"G",""														,"mv_par05","","","","","","","","","","","","","","","","","","","","","","","","",""		,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"06","Da Filial ?                   "	,"","","mv_ch6" ,"C", 2,0,0,"G",""														,"mv_par06","","","","","","","","","","","","","","","","","","","","","","","","","SM0"	,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"07","Ate a Filial ?                "	,"","","mv_ch7" ,"C", 2,0,0,"G","NaoVazio().And.MV_PAR06<=MV_PAR07"					,"mv_par07","","","","","","","","","","","","","","","","","","","","","","","","","SM0"	,"","","","","","","",""})
 aAdd(aRegs,{cPerg,"08","Exporta p/ Excell ?           "	,"","","mv_ch8" ,"C", 1,0,0,"C",""														,"mv_par08","Nao","Nao","Nao","","","Sim","Sim","Sim","","","","","","","","","","","","","","","","","","","","","","","","",""} )

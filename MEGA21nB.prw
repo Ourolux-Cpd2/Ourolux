@@ -595,7 +595,7 @@ Static Function RptDetail()
 	_cQry += "               AND SF4.D_E_L_E_T_ = '' "
 	_cQry += "               AND SB1.B1_FILIAL = '' "
 	_cQry += "               AND SB1.B1_TIPO BETWEEN '' AND 'ZZZZZ' "
-	_cQry += "               AND D2_LOCAL = '01' "
+	_cQry += "               AND D2_LOCAL IN " + FormatIn(MV_PAR05,",")
 	_cQry += "        UNION "
 	_cQry += "        SELECT 'SD3', "
 	_cQry += "               SB1.B1_COD, "
@@ -639,7 +639,7 @@ Static Function RptDetail()
 	_cQry += "       INNER JOIN " + RetSqlName("SB2") + " SB2 "
 	_cQry += "               ON B2_COD = B1_COD "
 	_cQry += "      			AND B2_FILIAL BETWEEN '" + MV_PAR06 + "' AND '" + MV_PAR07 + "' "
-	_cQry += "                  AND B2_LOCAL = '"+MV_PAR05+"' "
+	_cQry += "                  AND B2_LOCAL IN " + FormatIn(MV_PAR05,",")
 	_cQry += "                  AND D2_FILIAL = B2_FILIAL "
 	_cQry += "                  AND D_E_L_E_T_ = '' "
 	_cQry += " GROUP  BY TABELA, "
@@ -784,7 +784,7 @@ Static Function RptDetail()
 	cQrySld := "SELECT B1_COD As Cod,SUM(B2_QATU)As Sld "
 	cQrySld += "FROM "+RetSqlName("SB1")+" SB1 INNER JOIN " + RetSqlName("SB2") +" SB2 ON B1_COD = B2_COD "
 
-	cQrySld += "WHERE B2_LOCAL = '01' "
+	cQrySld += "WHERE B2_LOCAL IN " + FormatIn(MV_PAR05,",")
 			
 	If !Empty(MV_par11)
 		cQrySld += "AND (B1_COD IN (" + cCodiW7 + "))"
@@ -1542,7 +1542,7 @@ Local aResult	:= {}
 Local nX
 Local nY		:= 1
 
-	cQuery := "Select DC3.DC3_CODNOR NORMA "
+	cQuery := "Select DISTINCT(DC3.DC3_CODNOR) NORMA "
 	cQuery += "From "+RetSqlName("DC3")+ " DC3 "
 	
 	If !Empty(MV_par11)
