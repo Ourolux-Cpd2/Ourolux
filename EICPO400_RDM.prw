@@ -13,6 +13,9 @@ User Function EICPO400
 	Local aItemPO  := {}
 	Local lPriCom  := .F.
 	Local cDeptoSC := SuperGetMV("ES_DEPTOSC",.F.,"000000025")
+	Local cNumSI   := ""
+	Local aSldSI   := {}
+	Local lParcial := .F.
 
 	Begin Sequence    
    		
@@ -150,6 +153,61 @@ User Function EICPO400
 						EndIf
 					EndIf
    				EndIf
+
+				cQuery := " SELECT W0_C1_NUM FROM " + RetSqlName("SW0")
+				cQuery += " WHERE D_E_L_E_T_ = '' "
+				cQuery += " AND W0__NUM = '"+SW1->W1_SI_NUM+"'"
+				
+				If Select("W0SC") > 0
+					W0SC->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"W0SC",.F.,.T. )
+
+				cQuery := " SELECT YT_X_FILIA FROM " + RetSqlName("SYT")
+				cQuery += " WHERE YT_COD_IMP = '"+SW2->W2_IMPORT+"' "
+				cQuery += " AND D_E_L_E_T_ = '' "
+
+				If Select("YTFIL") > 0
+					YTFIL->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"YTFIL",.F.,.T. )
+				
+				U_OURO010("EXCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
+
+				cQuery := " SELECT W1_COD_I, W1_SALDO_Q, W1_QTDE, W1_SI_NUM FROM " + RetSqlName("SW1")
+				cQuery += " WHERE W1_SI_NUM = (SELECT DISTINCT(W3_SI_NUM) FROM " + RetSqlName("SW3")
+				cQuery += " 					WHERE D_E_L_E_T_ = '' "
+				cQuery += " 					AND W3_PO_NUM  = '"+Iif(Empty(TPO_NUM),SC7->C7_PO_EIC,TPO_NUM)+"') "
+				cQuery += " AND D_E_L_E_T_ = '' "
+				cQuery += " AND W1_FABR = '' "
+				cQuery += " AND W1_FORN = '' "
+				
+				If Select("SLDSI") > 0
+					SLDSI->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"SLDSI",.F.,.T. )
+
+				While SLDSI->(!EOF())
+					If SLDSI->W1_SALDO_Q > 0
+						AADD(aSldSI,{SLDSI->W1_COD_I,SLDSI->W1_SALDO_Q,SLDSI->W1_SI_NUM})
+						If (SLDSI->W1_QTDE - SLDSI->W1_SALDO_Q) > 0
+							lParcial := .T.
+						EndIf
+					EndIf
+
+					cNumSI := SLDSI->W1_SI_NUM
+					SLDSI->(dbSkip())
+				EndDo
+
+				If lParcial
+					U_OURO010("INCLUI PR PARCIAL",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
+				Else
+					U_OURO010("INCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
+				EndIf
+
 			Case cParam == "APOS_CONFERENCIAFINAL"
 				cQuery := " SELECT W3_COD_I, W3_SI_NUM FROM " + RetSqlName("SW3")
 				cQuery += " WHERE D_E_L_E_T_ = '' "
@@ -208,6 +266,64 @@ User Function EICPO400
 				RecLock("SW2",.F.)
 				SW2->W2_MT3 := XMT3->CUBAGEM
 				SW2->(MsUnlock())
+
+				cQuery := " SELECT W1_COD_I, W1_SALDO_Q, W1_QTDE, W1_SI_NUM FROM " + RetSqlName("SW1")
+				cQuery += " WHERE W1_SI_NUM = (SELECT DISTINCT(W3_SI_NUM) FROM " + RetSqlName("SW3")
+				cQuery += " 					WHERE D_E_L_E_T_ = '' "
+				cQuery += " 					AND W3_PO_NUM  = '"+SW2->W2_PO_NUM+"') "
+				cQuery += " AND D_E_L_E_T_ = '' "
+				cQuery += " AND W1_FABR = '' "
+				cQuery += " AND W1_FORN = '' "
+				
+				If Select("SLDSI") > 0
+					SLDSI->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"SLDSI",.F.,.T. )
+
+				While SLDSI->(!EOF())
+					If SLDSI->W1_SALDO_Q > 0
+						AADD(aSldSI,{SLDSI->W1_COD_I,SLDSI->W1_SALDO_Q,SLDSI->W1_SI_NUM})
+						If (SLDSI->W1_QTDE - SLDSI->W1_SALDO_Q) > 0
+							lParcial := .T.
+						EndIf
+					EndIf
+
+					cNumSI := SLDSI->W1_SI_NUM
+					SLDSI->(dbSkip())
+				EndDo
+
+				cQuery := " SELECT W0_C1_NUM FROM " + RetSqlName("SW0")
+				cQuery += " WHERE D_E_L_E_T_ = '' "
+				cQuery += " AND W0__NUM = '"+cNumSI+"'"
+				
+				If Select("W0SC") > 0
+					W0SC->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"W0SC",.F.,.T. )
+
+				cQuery := " SELECT YT_X_FILIA FROM " + RetSqlName("SYT")
+				cQuery += " WHERE YT_COD_IMP = '"+SW2->W2_IMPORT+"' "
+				cQuery += " AND D_E_L_E_T_ = '' "
+
+				If Select("YTFIL") > 0
+					YTFIL->(dbCloseArea())
+				EndIf				
+				
+				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"YTFIL",.F.,.T. )
+
+				U_OURO010("EXCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
+				
+				If !Empty(aSldSI)
+					If lParcial
+						U_OURO010("INCLUI PR PARCIAL",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
+					Else
+						U_OURO010("INCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
+					EndIf
+				EndIf
+
+
 				 
 		End Case
 

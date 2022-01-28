@@ -20,24 +20,25 @@ User Function FA050DEL()
 
 	Local _lRet := .T.
 
-	//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
-	//³ Verifica se o titulo a Pagar pode ou nao ser Excluso, caso tenha sido Selecionado pela rotina de COMISSAO.  	  ³
-	//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
-	If !EMPTY( SE2->E2_X_DTANF ) .OR. !EMPTY( SE2->E2_X_NUMNF ) .OR. !EMPTY( SE2->E2_X_SERIE )
-		ALERT( "Este título NÃO PODE ser excluso, favor consultar o DEPARTAMENTO DE INFORMÁTICA. ")
-		_lRet := .F.	// Bloqueia a exclusao do titulo a pagar
+	If !IsBlind()
+		//ÚÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ¿
+		//³ Verifica se o titulo a Pagar pode ou nao ser Excluso, caso tenha sido Selecionado pela rotina de COMISSAO.  	  ³
+		//ÀÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÙ
+		If !EMPTY( SE2->E2_X_DTANF ) .OR. !EMPTY( SE2->E2_X_NUMNF ) .OR. !EMPTY( SE2->E2_X_SERIE )
+			ALERT( "Este título NÃO PODE ser excluso, favor consultar o DEPARTAMENTO DE INFORMÁTICA. ")
+			_lRet := .F.	// Bloqueia a exclusao do titulo a pagar
+		EndIf
+
+		If (FUNNAME() $ 'EICDI502.GFEA070') .And. _lRet 
+			If !(Type("LF050AUTO")!="U" .And. LF050AUTO)
+				_lRet := U_NotexSE2()
+			EndIf
+		Else
+			If _lRet
+				_lRet:=U_NotexSE2()	
+			EndIf
+		Endif 
 	EndIf
-
-	If (FUNNAME() $ 'EICDI502.GFEA070') .And. _lRet 
-		If !(Type("LF050AUTO")!="U" .And. LF050AUTO)
-		     _lRet := U_NotexSE2()
-		EndIf
-	Else
-		If _lRet
-			_lRet:=U_NotexSE2()	
-		EndIf
-	Endif 
-
 Return(_lRet)	
 
 /*

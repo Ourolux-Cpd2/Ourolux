@@ -9,7 +9,8 @@ User Function MT110END()
     Local cQuery 	:= ""
     Local cMailCom  := ""
     Local cNomeCom  := ""
-	
+	Local cQrySE2   := ""
+
 	cQuery := " SELECT TOP(1) Y1_EMAIL, Y1_NOME FROM " + RetSqlName("SY1") + " SY1 "
 	cQuery += " INNER JOIN " + RetSqlName("SC1") + " SC1 "
 	cQuery += " ON SC1.C1_CODCOMP = SY1.Y1_COD "
@@ -56,13 +57,28 @@ User Function MT110END()
 
 		If VERUL->C1_ITEM == SC1->C1_ITEM
         	WFMAIL("APROVADO",Alltrim(SM0->M0_FILIAL),nNumSC,cUsuario,cMailCom,cNomeCom)
-		EndIf
-	//ElseIf nOpca == 2
-    //    WFMAIL("REJEITADO",Alltrim(SM0->M0_FILIAL),nNumSC,cUsuario,cMailCom,cNomeCom)
-    //ElseIf nOpca == 3
-    //    WFMAIL("BLOQUEADO",Alltrim(SM0->M0_FILIAL),nNumSC,cUsuario,cMailCom,cNomeCom)
-    EndIf
 
+			cQrySE2 := " SELECT * FROM " + RetSqlName("SE2")
+			cQrySE2 += " WHERE E2_FILIAL = '"+xFilial("SE2")+"' "
+			cQrySE2 += " AND E2_PREFIXO = 'SC' "
+			cQrySE2 += " AND E2_TIPO = 'PR' "
+			cQrySE2 += " AND E2_NUM = '"+cFilAnt+nNumSC+"' "
+			cQrySE2 += " AND D_E_L_E_T_ = '' "
+
+			If Select("TITSC") > 0
+				TITSC->(dbCloseArea())
+			EndIf
+
+			DbUseArea(.T., "TOPCONN", TCGenQry(,,cQrySE2) , 'TITSC', .T., .F.)
+
+			If TITSC->(!EOF())
+				U_OURO010("EXCLUI PR",cFilAnt,nNumSC)//Altera titulos de PR para Solicitação aprovada
+				U_OURO010("INCLUI PR",cFilAnt,nNumSC)//Geração de PR para Solicitação aprovada
+			Else
+				U_OURO010("INCLUI PR",cFilAnt,nNumSC)//Geração de PR para Solicitação aprovada
+			EndIf
+		EndIf
+    EndIf
 Return
 
 //////////////////////////////////////////////////////////////////////
