@@ -774,19 +774,27 @@ Static Function PrintReport(oReport,oSection)
         oSection:Cell("SCNF"):SetValue(nSCxNF)
         
         IF !Empty(dt_EmSC) .and. !Empty(aDataNew[1][2])
-            oSection:Cell("EMSCAPSC"):SetValue(DateDiffDay(dt_EmSC,STOD(aDataNew[1][2])))
+            If dt_EmSC > STOD(aDataNew[1][2])
+                oSection:Cell("EMSCAPSC"):SetValue(DateDiffDay(dt_EmSC,STOD(aDataNew[1][2])) * -1)
+            Else
+                oSection:Cell("EMSCAPSC"):SetValue(DateDiffDay(dt_EmSC,STOD(aDataNew[1][2])))
+            EndIf
         Else
             oSection:Cell("EMSCAPSC"):SetValue(0)
         EndIf
 
         IF !Empty(aDataNew[1][1]) .and. !Empty(aDataNew[1][2])
-            oSection:Cell("EMPCAPSC"):SetValue(DateDiffDay(STOD(aDataNew[1][2]),STOD(aDataNew[1][1])))
+            If STOD(aDataNew[1][2]) > STOD(aDataNew[1][1])
+                oSection:Cell("EMPCAPSC"):SetValue(DateDiffDay(STOD(aDataNew[1][2]),STOD(aDataNew[1][1])) * -1)
+            Else
+                oSection:Cell("EMPCAPSC"):SetValue(DateDiffDay(STOD(aDataNew[1][2]),STOD(aDataNew[1][1])))
+            EndIF
         Else
             oSection:Cell("EMPCAPSC"):SetValue(0)
         EndIf
         
         If !Empty(aDataNew[1][3]) .AND. !Empty(wdt_NF)
-            If wdt_NF < STOD(aDataNew[1][3])
+            If wdt_NF > STOD(aDataNew[1][3])
                 oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF) * -1)
             else
                 oSection:Cell("METAXNF"):SetValue(DateDiffDay(STOD(aDatanew[1][3]),wdt_NF))
@@ -827,13 +835,21 @@ Static Function PrintReport(oReport,oSection)
         EndIf
 	
         If !Empty(aDataNew[1][1]) .AND. !Empty(dDtLib1)
-            oSection:Cell("PCN1"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),dDtLib1))
+            If dDtLib1 > STOD(aDataNew[1][1])
+                oSection:Cell("PCN1"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),dDtLib1) *-1)
+            else
+                oSection:Cell("PCN1"):SetValue(DateDiffDay(STOD(aDatanew[1][1]),dDtLib1))
+            EndIf
         else
             oSection:Cell("PCN1"):SetValue(0)
         EndIf
         
         If !Empty(dDtLib1) .AND. !Empty(dDtLib2)
-            oSection:Cell("N1N2"):SetValue(DateDiffDay(dDtLib1,dDtLib2))
+            If dDtLib1 > dDtLib2
+                oSection:Cell("N1N2"):SetValue(DateDiffDay(dDtLib1,dDtLib2) * -1)
+            Else
+                oSection:Cell("N1N2"):SetValue(DateDiffDay(dDtLib1,dDtLib2))
+            EndIF
         else
             oSection:Cell("N1N2"):SetValue(0)
         EndIf
