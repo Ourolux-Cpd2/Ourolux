@@ -350,7 +350,7 @@ Static Function OURO08B()
         cQuery := " SELECT SUM(C7_QUANT) AS TOTAL  FROM " + RetSqlName("SC7")
         cQuery += " WHERE C7_FILIAL BETWEEN '" + aParam[POS_FILIAL_DE] + "' AND '" + aParam[POS_FILIAL_ATE] + "' "
         cQuery += " AND C7_PRODUTO = '"+Alltrim(PROD->PRODUTO)+"' "
-        cQuery += " AND C7_EMISSAO BETWEEN '"+DTOS(FirstDate(dDataBase))+"' AND '"+DTOS(LastDate(dDataBase))+"' "
+        cQuery += " AND C7_DATPRF BETWEEN '"+DTOS(FirstDate(dDataBase))+"' AND '"+DTOS(LastDate(dDataBase))+"' "
         cQuery += " AND D_E_L_E_T_ = '' "
 
         If Select("PCX") > 0
