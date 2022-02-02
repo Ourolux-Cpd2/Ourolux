@@ -514,7 +514,7 @@ Static Function PrintReport(oReport,oSection)
             EndIF
             oSection:Cell("FILCD"):SetValue(cTexFil)
             oSection:Cell("NUMSC"):SetValue(SCPCNF->C1_NUM)
-            oSection:Cell("NUMPC"):SetValue(SCPCNF->C7_PO_EIC)
+            oSection:Cell("NUMPC"):SetValue(Iif(!Empty(SCPCNF->C7_PO_EIC),SCPCNF->C7_PO_EIC,SCPCNF->C7_NUM))
             oSection:Cell("FORNE"):SetValue(ConsFor(SCPCNF->C7_FORNECE))
         EndIf    
         
