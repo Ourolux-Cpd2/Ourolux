@@ -122,7 +122,7 @@ Static Function IsGroup(cGrupo)
 Local lRet     := .F. 
 Local aUser    := {}
 Local aGrupo   := {}
-Local nx       := 0
+//Local nx       := 0
 
 PswOrder(2)
 //If (PswSeek(Subs(cUsuario,7,15))) 
@@ -132,16 +132,17 @@ If (PswSeek(cUserName))
 	aGrupo   := aUser[1][10]
 EndIf                
 
-PswOrder(1)        
+//PswOrder(1)        
 
-for nx := 1 to len(aGrupo)
-  If PswSeek( aGrupo[nx], .F. )
-    If (UPPER(AllTrim(cGrupo)) == UPPER(AllTrim(PswRet()[1][1])))  
+//for nx := 1 to len(aGrupo)
+  //If PswSeek( aGrupo[nx], .F. )
+    //If (UPPER(AllTrim(cGrupo)) == UPPER(AllTrim(PswRet()[1][1])))  
+	If aScan(aGrupo,{ |x| AllTrim(x) == cGrupo }) > 0
       lRet := .T.
       Return lRet
     EndIF
-  EndIf
-next                
+// EndIf
+//next                
 
 Return lRet
 
@@ -176,7 +177,7 @@ Local aAreaDA0	:= DA0->(GetArea())
 Local aAreaSA1	:= SA1->(GetArea())
 Local aAreaSB1	:= SB1->(GetArea())
 Local nValDA1	:= 0
-Local nInt		:= TamSx3("UA2_VALMAX")[1]
+//Local nInt		:= TamSx3("UA2_VALMAX")[1]
 Local nDecs		:= TamSx3("UA2_VALMAX")[2]
 Local cQuery
 Local nPrcMin   := 0
@@ -597,7 +598,7 @@ User Function LoadGD(cAlias,aH,aC,aRecnos,nIndChv,cChave)
 
 Local aArea		:=	GetArea()
 Local cIndKey	:=	""
-Local aLinha	:=	{}
+//Local aLinha	:=	{}
 Local nUsado	:=	Len(aH)
 Local nPos		:=	0
 Local nLin 		:=	0
@@ -834,8 +835,8 @@ User Function VLDTAB()
 
 Local aArea		:= GetArea()
 //Local cCampo	:= AllTrim(ReadVar())
-Local cTabCli	:= ""
-Local lPertence	:= .F.
+//Local cTabCli	:= ""
+//Local lPertence	:= .F.
 Local lRet		:= .T.
 Local cCli 		:= ""
 Local cLoj 		:= ""
@@ -1269,6 +1270,7 @@ Local lRet:= .F.
 Local nStart := 1 
 Local aList := {}
 Local lFound := .F.
+Local i      := 0
 
 If Empty(cTabela) .OR. Empty(cLista)
 	Return(.F.)	

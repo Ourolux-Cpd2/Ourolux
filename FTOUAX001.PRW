@@ -172,7 +172,11 @@ Local cData  := ""
 
     RpcSetEnv("01","01")
 
-    cData := MonthSub(dDataBase, 1)
+    //cData := MonthSub(dDataBase, 1)
+    //cData := DTOS(cData)
+
+    //cData := MonthSub(dDataBase, 1)
+    cData := DaySub(dDataBase, 14)
     cData := DTOS(cData)
 
     cQuery := " DELETE P FROM " + RetSqlName("PZD") + " P "
@@ -181,7 +185,9 @@ Local cData  := ""
     cquery += " WHERE PZB_DATA <= '" + cData + "' "
 
     If TcSqlExec(cQuery) < 0
-        cTeste := ""
+        conout("TCSQLError() " + TCSQLError())
+    else
+        conout("PROCESSOU")
     EndIf
 
     cQuery := " DELETE P FROM " + RetSqlName("PZC") + " P "
@@ -190,7 +196,9 @@ Local cData  := ""
     cquery += " WHERE PZB_DATA <= '" + cData + "' "
 
     If TcSqlExec(cQuery) < 0
-        cTeste := ""
+        conout("TCSQLError() " + TCSQLError())
+    else
+        conout("PROCESSOU")
     EndIf
 
     cQuery := " DELETE FROM " + RetSqlName("PZB")
@@ -198,6 +206,9 @@ Local cData  := ""
 
     If TcSqlExec(cQuery) < 0
         cTeste := ""
+        conout("TCSQLError() " + TCSQLError())
+    else
+        conout("PROCESSOU")
     EndIf
 
 Return()
