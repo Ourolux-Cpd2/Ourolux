@@ -84,33 +84,40 @@ Static Function OURO12A(cArquivo)
     For i := 1 To Len(aConteudo)
         IncProc("Excluindo titulos do Sistema...")
         If SE2->(DbSeek("  "+;
-                        SubStr(aConteudo[i][POS_PREF_TIT_PAR],1,TAM_PREF)+;
-                        SubStr(aConteudo[i][POS_PREF_TIT_PAR],5,TAM_NUMERO)+;
-                        SubStr(aConteudo[i][POS_PREF_TIT_PAR],15,TAM_PARCELA)+;
-                        SubStr(aConteudo[i][POS_TIPO],1,TAM_TIPO)+;
-                        SubStr(aConteudo[i][POS_COD_LOJ],1,TAM_COD)+;
-                        SubStr(aConteudo[i][POS_COD_LOJ],8,TAM_LOJA)))
+                        PADR(SubStr(aConteudo[i][POS_PREF_TIT_PAR],1,TAM_PREF),TAM_PREF," ")+;
+                        PADR(SubStr(aConteudo[i][POS_PREF_TIT_PAR],5,TAM_NUMERO),TAM_NUMERO," ")+;
+                        PADR(SubStr(aConteudo[i][POS_PREF_TIT_PAR],15,TAM_PARCELA),TAM_PARCELA," ")+;
+                        PADR(SubStr(aConteudo[i][POS_TIPO],1,TAM_TIPO),TAM_TIPO," ")+;
+                        PADR(SubStr(aConteudo[i][POS_COD_LOJ],1,TAM_COD),TAM_COD," ")+;
+                        PADR(SubStr(aConteudo[i][POS_COD_LOJ],8,TAM_LOJA),TAM_LOJA," ")))
 			
-            Reclock("SE2",.F.)
-			SE2->E2_ORIGEM = ""
-			SE2->(MSUNLOCK())
-			
-            fWrite(nH, "E2_PREFIXO:"+SE2->E2_PREFIXO+" E2_NUM:"+SE2->E2_NUM+" E2_PARCELA:"+SE2->E2_PARCELA+" E2_TIPO:"+SE2->E2_TIPO+" E2_FORNECE:"+SE2->E2_FORNECE+" E2_LOJA:"+SE2->E2_LOJA)
+            If (Alltrim(SE2->E2_TIPO) == "PR" .OR. Alltrim(SE2->E2_TIPO) == "PRE") .AND. Alltrim(SE2->E2_ORIGEM) == "SIGAEIC"
+                Reclock("SE2",.F.)
+                SE2->E2_ORIGEM = ""
+                SE2->(MSUNLOCK())
+                
+                fWrite(nH, "E2_PREFIXO:"+SE2->E2_PREFIXO+" E2_NUM:"+SE2->E2_NUM+" E2_PARCELA:"+SE2->E2_PARCELA+" E2_TIPO:"+SE2->E2_TIPO+" E2_FORNECE:"+SE2->E2_FORNECE+" E2_LOJA:"+SE2->E2_LOJA)
+                
 
-            aArray := { { "E2_PREFIXO"  , SE2->E2_PREFIXO , NIL },;
-                        { "E2_NUM"      , SE2->E2_NUM , NIL },;
-                        { "E2_PARCELA"  , SE2->E2_PARCELA , NIL },;
-                        { "E2_TIPO"     , SE2->E2_TIPO , NIL },;
-                        { "E2_FORNECE"  , SE2->E2_FORNECE , NIL },;
-						{ "E2_LOJA"     , SE2->E2_LOJA     , NIL } }
-			MsExecAuto( { |x,y,z| FINA050(x,y,z)}, aArray,, 5)  // 3 - Inclusao, 4 - Alteração, 5 - Exclusão
-			If lMsErroAuto
-                fWrite(nH," - NAO EXCLUIDO"+ chr(13)+chr(10))
-				MostraErro()
-			Else
-				fWrite(nH," - EXCLUSÃO DO TÍTULO COM SUCESSO!"+ chr(13)+chr(10))
-			Endif
-		EndIf
+                aArray := { { "E2_PREFIXO"  , SE2->E2_PREFIXO , NIL },;
+                            { "E2_NUM"      , SE2->E2_NUM , NIL },;
+                            { "E2_PARCELA"  , SE2->E2_PARCELA , NIL },;
+                            { "E2_TIPO"     , SE2->E2_TIPO , NIL },;
+                            { "E2_FORNECE"  , SE2->E2_FORNECE , NIL },;
+                            { "E2_LOJA"     , SE2->E2_LOJA     , NIL } }
+                MsExecAuto( { |x,y,z| FINA050(x,y,z)}, aArray,, 5)  // 3 - Inclusao, 4 - Alteração, 5 - Exclusão
+                If lMsErroAuto
+                    fWrite(nH," - NAO EXCLUIDO"+ chr(13)+chr(10))
+                    MostraErro()
+                Else
+                    fWrite(nH," - EXCLUSÃO DO TÍTULO COM SUCESSO!"+ chr(13)+chr(10))
+                Endif
+            else
+                fWrite(nH, "E2_PREFIXO:"+SE2->E2_PREFIXO+" E2_NUM:"+SE2->E2_NUM+" E2_PARCELA:"+SE2->E2_PARCELA+" E2_TIPO:"+SE2->E2_TIPO+" E2_FORNECE:"+SE2->E2_FORNECE+" E2_LOJA:"+SE2->E2_LOJA+"-NAO AUTORIZADO A EXCLUSAO, FORA DA REGRA"+ chr(13)+chr(10))
+            EndIf
+		else
+            fWrite(nH, SubStr(aConteudo[i][POS_PREF_TIT_PAR],5,TAM_NUMERO)+"-NAO LOCALIZADO"+ chr(13)+chr(10))
+        EndIf
     Next
 
     fClose(nH) 
