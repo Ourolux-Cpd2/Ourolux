@@ -6769,7 +6769,7 @@ dbGoTop()
 While !SM0->( EOF() )
 
 	If aScan( aVetor, {|x| x[2] == SM0->M0_CODIGO} ) == 0
-		aAdd(  aVetor, { aScan( aMarcadas, {|x| x[1] == SM0->M0_CODIGO .and. x[2] == SM0->M0_CODFIL} ) > 0, SM0->M0_CODIGO, SM0->M0_CODFIL, SM0->M0_NOME, SM0->M0_FILIAL } )
+		aAdd(  aVetor, { aScan( aMarcadas, {|x| x[1] == SM0->M0_CODIGO .and. Alltrim(x[2]) == Alltrim(SM0->M0_CODFIL)} ) > 0, SM0->M0_CODIGO, SM0->M0_CODFIL, SM0->M0_NOME, SM0->M0_FILIAL } )
 	EndIf
 
 	dbSkip()
