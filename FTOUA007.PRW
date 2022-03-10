@@ -42,18 +42,15 @@ RpcSetEnv(cEmpPrep, cFilPrep)
 
 AADD(aHeader, "Content-Type: application/json")
     
-//Requisicao do acesso
-oREST := FTOUA003():New()
-oREST:RESTConn() 
-lReturn := oRest:lRetorno
-cToken  := oREST:cToken
-	
-	If !lReturn
+	//Requisição do acesso
+	cToken := U_ChkToken("1")
+
+	If Empty(cToken)
         
         Conout("Falha na autenticação Transpofrete")
         
     Else
-	
+
 		DBSelectArea("PR1")
 		
 	   	cAlsPR1 := CriaTrab(Nil,.F.)
@@ -205,17 +202,17 @@ Return(Nil)
 Static Function fuPedJSon( cPedido )
 	
 Local cJson	:= ""
-Local nVolume		:= 0
-Local nLargura		:= 0
-Local nAltura		:= 0
-Local nComprimento	:= 0
-Local nPeso			:= 0
-Local nLargEmb		:= 0
-Local nAltEmb		:= 0
-Local nCompEmb		:= 0
-Local nPesoEmb		:= 0
-Local nPesoCub		:= 0
-Local nProd			:= 0
+//Local nVolume		:= 0
+//Local nLargura		:= 0
+//Local nAltura		:= 0
+//Local nComprimento	:= 0
+//Local nPeso			:= 0
+//Local nLargEmb		:= 0
+//Local nAltEmb		:= 0
+//Local nCompEmb		:= 0
+//Local nPesoEmb		:= 0
+//Local nPesoCub		:= 0
+//Local nProd			:= 0
 Local nIniPed       := TamSX3("C5_FILIAL")[1]+1
 Local nTamPed       := TamSX3("C5_NUM")[1]
 	

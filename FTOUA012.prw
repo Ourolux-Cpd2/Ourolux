@@ -40,13 +40,10 @@ Default cPedidos    := ""
   
 	AADD(aHeader, "Content-Type: application/json")                        
 	    
-	//Requisicao do acesso
-	oREST := FTOUA003():New()
-	oREST:RESTConn() 
-	lReturn := oRest:lRetorno
-	cToken  := oREST:cToken	
-	
-	If !lReturn
+	//Requisição do acesso
+	cToken := U_ChkToken("1")
+
+	If Empty(cToken)
         
         Conout("Falha na autenticação Transpofrete")
         

@@ -61,7 +61,7 @@ Local aHeader   := {"Content-Type: application/json"}
             
             //Reaproveita token
             Else
-                cToken := PR6->PR6_TOKEN
+                cToken := Alltrim(PR6->PR6_TOKEN)
             EndIf
 
         //Magento
@@ -126,7 +126,7 @@ Local aHeader   := {"Content-Type: application/json"}
 
             EndIf
 
-        ElseIf cCodSist == "2"
+        ElseIf cCodSist == "2" 
 
             cJson := '{'
             cJson += '"username":"' + cLogMag + '",' 
@@ -172,12 +172,24 @@ Local cData  := ""
 
     RpcSetEnv("01","01")
 
-    //cData := MonthSub(dDataBase, 1)
-    //cData := DTOS(cData)
+    cAlsQry := CriaTrab(Nil,.F.)
+    cData   := MonthSub(dDataBase, 1)
+    cData   := DTOS(cData)
+    nRecIni := 1
 
-    //cData := MonthSub(dDataBase, 1)
-    cData := DaySub(dDataBase, 14)
-    cData := DTOS(cData)
+    
+    cQuery := " SELECT MAX(PZD.R_E_C_N_O_) TOTAL FROM " + RetSqlName("PZD") + " PZD "
+    cQuery += " INNER JOIN " + RetSqlName("PZB") 
+    cQuery += " ON PZB_FILIAL = PZD_FILIAL AND PZB_IDURL = PZD_IDURL AND PZB_ID = PZD_IDPROC "
+    cquery += " WHERE PZB_FILIAL = ' ' AND PZB_DATA <= '" + cData + "' "
+
+    If Select(cAlsQry) > 0; (cAlsQry)->(dbCloseArea()); Endif
+    dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),cAlsQry,.T.,.T.)
+
+    If (cAlsQry)->TOTAL > 0
+        nTotalRpt   := (cAlsQry)->TOTAL / 1000000
+    EndIf
+
 
     cQuery := " DELETE P FROM " + RetSqlName("PZD") + " P "
     cQuery += " INNER JOIN " + RetSqlName("PZB") 
@@ -185,9 +197,7 @@ Local cData  := ""
     cquery += " WHERE PZB_DATA <= '" + cData + "' "
 
     If TcSqlExec(cQuery) < 0
-        conout("TCSQLError() " + TCSQLError())
-    else
-        conout("PROCESSOU")
+        cTeste := ""
     EndIf
 
     cQuery := " DELETE P FROM " + RetSqlName("PZC") + " P "
@@ -196,9 +206,7 @@ Local cData  := ""
     cquery += " WHERE PZB_DATA <= '" + cData + "' "
 
     If TcSqlExec(cQuery) < 0
-        conout("TCSQLError() " + TCSQLError())
-    else
-        conout("PROCESSOU")
+        cTeste := ""
     EndIf
 
     cQuery := " DELETE FROM " + RetSqlName("PZB")
@@ -206,9 +214,6 @@ Local cData  := ""
 
     If TcSqlExec(cQuery) < 0
         cTeste := ""
-        conout("TCSQLError() " + TCSQLError())
-    else
-        conout("PROCESSOU")
     EndIf
 
 Return()

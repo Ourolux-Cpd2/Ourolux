@@ -18,15 +18,15 @@ Return(Nil)
 
 User function FTOUA017(lReprocess, lLote, cIdReg, cIdPZC, cEmpPrep, cFilPrep)
 
-Local aHeader       := {"Content-Type: application/json"}
+//Local aHeader       := {"Content-Type: application/json"}
 Local cToken 		:= ""
 Local cIdPZB    	:= ""
 Local aCriaServ		:= {}
 Local cQuery 		:= ""
-Local aRequest		:= {}
+//Local aRequest		:= {}
 Local cWa		    := ""
 Local cCHAVE		:= ""
-Local oRet			:= Nil  
+//Local oRet			:= Nil  
 Local nQtdReg		:= 0
 Local cDirArq       := ""
 
@@ -40,13 +40,10 @@ Private cError      := ""
 
 	RpcSetEnv(cEmpPrep, cFilPrep)
        
-	//Requisicao do acesso
-	oREST := FTOUA003():New()
-	oREST:RESTConn() 
-	lReturn := oRest:lRetorno
-	cToken  := oREST:cToken	
-	
-	If !lReturn
+	//Requisição do acesso
+	cToken := U_ChkToken("1")
+
+	If Empty(cToken)
         
         Conout("Falha na autenticação Transpofrete")
         

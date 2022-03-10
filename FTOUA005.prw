@@ -58,18 +58,15 @@ Default cFilPrep    := ""
 
 	lIntApr := SuperGetMv("FT_OUA005D",.F.,.F.)
 
-	//Requisicao do acesso
-	oREST := FTOUA003():New()
-	oREST:RESTConn() 
-	lReturn := oRest:lRetorno
-	cToken  := oREST:cToken
-	
-	If !lReturn
+	//Requisição do acesso
+	cToken := U_ChkToken("1")
+
+	If Empty(cToken)
         
         Conout("Falha na autenticacao Transpofrete")
         
     Else
-	 
+
 		DbSelectArea("SA2")
 		SA2->(DbSetOrder(3)) //A2_FILIAL+A2_CGC
 	 

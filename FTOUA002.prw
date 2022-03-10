@@ -43,17 +43,14 @@ Default cIdPZC		:= ""
 	AADD(aHeader, "Content-Type: application/json")
 	    
 	//Requisição do acesso
-	oREST := FTOUA003():New()
-	oREST:RESTConn() 
-	lReturn := oRest:lRetorno
-	cToken  := oREST:cToken
-	
-	If !lReturn
+	cToken := U_ChkToken("1")
+
+	If Empty(cToken)
         
         Conout("Falha na autenticação Transpofrete")
         
     Else
-    
+		    
 		DBSelectArea("PR1")
 		DBSelectArea("SC5")
 		DBSelectArea("SA4")

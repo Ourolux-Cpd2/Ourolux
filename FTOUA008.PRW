@@ -58,18 +58,18 @@ Local lRateiaDev	   := .F.
 Local aLinha		   := {}
 Local aCabec		   := {}
 Local lPreNota	       := .F.
-Local oICMS
-Local oICMSTipo
-Local oICMSNode
-Local nZ		       := 0
+//Local oICMS
+//Local oICMSTipo
+//Local oICMSNode
+//Local nZ		       := 0
 Local nBaseICMS        := 0
 Local nValICMS	       := 0
-Local nAliqICMS	       := 0
-Local lBaseICMS        := .F.
-Local lValICMS	       := .F.
-Local lAliqICMS	       := .F.
-Local oRest		       := Nil
-Local lReturn          := .F.
+//Local nAliqICMS	       := 0
+//Local lBaseICMS        := .F.
+//Local lValICMS	       := .F.
+//Local lAliqICMS	       := .F.
+//Local oRest		       := Nil
+//Local lReturn          := .F.
 Local aArea            := GetArea()
 Local aItens	       := {} 
 Local cArqXML		   := ""
@@ -94,24 +94,20 @@ Default cFilPrep       := ""
     lRateiaDev	:= SuperGetMv("MV_XMLRATD",.F.,.T.)
     lPreNota	:= SuperGetMV("MV_CTECLAS",.F.,.F.)
 
-    //Requisicao do acesso
-    oREST   := FTOUA003():New()
-    oREST:RESTConn() 
-    lReturn := oRest:lRetorno
-    cToken  := oREST:cToken
-    
-    If !ChkFile("PR3")
+    //Requisição do acesso
+	cToken := U_ChkToken("1")
+
+	If !ChkFile("PR3")
         
         Conout("Falha na abertura da tabela PR3")
     
-    //Elseif !lReturn
+    ElseIf Empty(cToken)
         
-      //  Conout("Falha na autenticação Transpofrete")
-    	
+      	Conout("Falha na autenticação Transpofrete")
     
     Else
-    	
-    	cPastaXML := GetMv("FT_OUA008C",,"\TRANSPO\XML\")
+
+		cPastaXML := GetMv("FT_OUA008C",,"\TRANSPO\XML\")
     	cPastaIMP := GetMv("FT_OUA008C",,"\TRANSPO\XML\IMPORTADOS\")   
 
     	dDATABASE := DATE() 
@@ -957,6 +953,7 @@ Para inclusao na tabela PR3
 
 Static Function RetArrPR3(oCte,aGrvPR3,cChave)
 
+Local 	nX		:= 0
 Default oCte    := Nil
 Default aGrvPR3 := {}
 Default cChave  := ""

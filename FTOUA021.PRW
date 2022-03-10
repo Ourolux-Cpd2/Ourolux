@@ -50,15 +50,12 @@ Default cIdPZC		:= ""
     
     If !(cAlsQry)->(Eof())
     
-        //Requisicao do acesso
-        oREST := FTOUA003():New()
-        oREST:RESTConn() 
-        lReturn := oRest:lRetorno
-        cToken  := oREST:cToken	
+        //Requisição do acesso
+	    cToken := U_ChkToken("1")
 
         DbSelectArea("PR1")
         
-        If !lReturn
+        If Empty(cToken)
             
             Conout("Falha na autenticação Transpofrete")
 
