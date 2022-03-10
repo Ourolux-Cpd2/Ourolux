@@ -324,6 +324,12 @@ Local cQuery	:= ""
 Local cAlsCount	:= CriaTrab(Nil,.F.)
 Local lRet		:= .T.
 Local oStruPZA	:= oModelPZA:GetStruct()
+Local lFilDet   := .F.
+Local nQtdMin   := SuperGetMV("ES_MINERRO",.F.,20)
+Local cHora     := ""
+Local cMin		:= ""
+Local cTempo    := ""
+Local cIDIN		:= ""
 
 	//Altera campo de ID par aser somente visualização.
 	oStruPZA:SetProperty( 'PZA_ID', MODEL_FIELD_WHEN, {||.F.} )
@@ -353,7 +359,182 @@ Local oStruPZA	:= oModelPZA:GetStruct()
 	
 		If Pergunte(cPerg,.t.)
 			//Filtra o model inicial
-			cFilter := "PZB_DATA >= '" + DTOS(MV_PAR01) + "' AND PZB_DATA <= '" + DTOS(MV_PAR02) + "' AND PZB_HORA >= '" + MV_PAR03 + "' AND PZB_HORA <= '" + MV_PAR04 + "' "
+			While .T.	
+				If Empty(MV_PAR01) .and. Empty(MV_PAR02) .and. Empty(Replace(MV_PAR03,":","")) .and. Empty(Replace(MV_PAR04,":",""))
+					lFilDet := .F.
+					Exit
+				ElseIf Empty(MV_PAR01) .or. Empty(MV_PAR02) .or. Empty(MV_PAR03) .or. Empty(MV_PAR04)
+					Alert("Para uma visualização detalhada preencha todos os parametros, para ver somente os ultimos erros, deixar todos os parametros em branco.")
+				Else
+					lFilDet := .T.
+					Exit
+				EndIf
+				Pergunte(cPerg,.t.)
+			EndDo
+			
+			If lFilDet
+				cFilter := "PZB_DATA >= '" + DTOS(MV_PAR01) + "' AND PZB_DATA <= '" + DTOS(MV_PAR02) + "' AND PZB_HORA >= '" + MV_PAR03 + "' AND PZB_HORA <= '" + MV_PAR04 + "' "
+			else
+				cHora := SUBSTR(TIME(),1,2)
+				cMin  := SUBSTR(TIME(),4,2)         
+				cMin  := Val(cMin) - nQtdMin
+				
+				If cMin < 0
+					cHora := Val(cHora) - 1
+					cMin  := 60 - (cMin * -1)
+					cTempo := Iif(Len(Alltrim(cValtoChar(cHora))) == 1,"0"+cValtoChar(cHora),cValtoChar(cHora)) + ":" + Iif(Len(Alltrim(cValtoChar(cMin))) == 1,"0"+cValtoChar(cMin),cValtoChar(cMin)) + ":00"
+				Else
+					cTempo := Iif(Len(Alltrim(cValtoChar(cHora))) == 1,"0"+cValtoChar(cHora),cValtoChar(cHora)) + ":" + Iif(Len(Alltrim(cValtoChar(cMin))) == 1,"0"+cValtoChar(cMin),cValtoChar(cMin)) + ":00"
+				EndIf
+				
+				cFilter := "PZB_DATA = '" + DTOS(dDataBase) + "' AND PZB_HORA >= '" + cTempo + "' "
+				
+			EndIf
+
+			If PZA->PZA_ID == "000006" .And. (!Empty(MV_PAR05) .OR. !Empty(MV_PAR06) .OR. !Empty(MV_PAR07) .OR. !Empty(MV_PAR08))
+				Alert("Parametros de CTE, Pedido e NF Saida serão desconsiderados.")
+				cQuery := " SELECT PZC_IDPROC FROM " + RetSqlName("PZC")
+				cQuery += " WHERE PZC_IDURL = '000006' "
+				cQuery += " AND PZC_CHAVE LIKE '%"+Alltrim(MV_PAR05)+"%'
+				cQuery += " AND D_E_L_E_T_ = ''
+				
+				If Select("PZCX") > 0
+					PZCX->(dbCloseArea())			
+				EndIf
+
+				dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),"PZCX",.T.,.T.)
+
+				While PZCX->(!Eof())
+					cIDIN += PZCX->PZC_IDPROC + ","
+					PZCX->(dbSkip())
+				EndDo
+
+				If !Empty(cIDIN)
+					cIDIN := SubStr(cIDIN,1,len(cIDIN)-1)
+
+					cFilter += " AND PZB_ID IN "	+ FormatIn(cIDIN,",")
+				EndIf
+			ElseIf PZA->PZA_ID == "000009" .And. (!Empty(MV_PAR05) .OR. !Empty(MV_PAR06) .OR. !Empty(MV_PAR07) .OR. !Empty(MV_PAR08))
+				Alert("Parametros de Fatura, Pedido e NF Saida serão desconsiderados.")
+				cQuery := " SELECT TOP(30) PZC_IDPROC, PZB_DATA, PZB_HORA FROM " + RetSqlName("PZC") + " PZC "
+				cQuery += " INNER JOIN " + RetSqlName("PZB") + " PZB "
+				cQuery += " ON PZB.PZB_IDURL = PZC.PZC_IDURL "
+				cQuery += " AND PZB.PZB_ID = PZC.PZC_IDPROC "
+				cQuery += " WHERE PZC_IDURL = '000009' "
+				cQuery += " AND PZC_CHAVE LIKE '%"+Alltrim(MV_PAR06)+"%' "
+				If !Empty(MV_PAR01) .AND. !Empty(MV_PAR02)
+					cQuery += " AND PZB.PZB_DATA BETWEEN '"+DTOS(MV_PAR01)+"' AND '"+DTOS(MV_PAR02)+"' "
+				Else
+					cQuery += " AND PZB.PZB_DATA = '"+DTOS(dDataBase)+"' "
+				EndIf
+				If !Empty(Replace(MV_PAR03,":","")) .AND. !Empty(Replace(MV_PAR04,":",""))
+					cQuery += " AND PZB.PZB_HORA >= '"+MV_PAR03+"' "
+					cQuery += " AND PZB.PZB_HORA <= '"+MV_PAR04+"' "
+				Else
+					cQuery += " AND PZB.PZB_HORA >= '"+cTempo+"' "
+				EndIf
+				cQuery += " AND PZC.D_E_L_E_T_ = '' "
+				cQuery += " AND PZB.D_E_L_E_T_ = '' "
+				cQuery += " ORDER BY PZB.PZB_DATA DESC, PZB_HORA DESC "
+				
+				If Select("PZCX") > 0
+					PZCX->(dbCloseArea())			
+				EndIf
+
+				dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),"PZCX",.T.,.T.)
+
+				While PZCX->(!Eof())
+					cIDIN += PZCX->PZC_IDPROC + ","
+					PZCX->(dbSkip())
+				EndDo
+
+				If !Empty(cIDIN)
+					cIDIN := SubStr(cIDIN,1,len(cIDIN)-1)
+
+					cFilter += "AND PZB_ID IN "	+ FormatIn(cIDIN,",")
+				EndIf
+			ElseIf PZA->PZA_ID == "000002" .And. (!Empty(MV_PAR05) .OR. !Empty(MV_PAR06) .OR. !Empty(MV_PAR07) .OR. !Empty(MV_PAR08))
+				Alert("Parametros de Fatura, CTE e NF Saida serão desconsiderados.")
+				cQuery := " SELECT TOP(30) PZC_IDPROC, PZB_DATA, PZB_HORA FROM " + RetSqlName("PZC") + " PZC "
+				cQuery += " INNER JOIN " + RetSqlName("PZB") + " PZB "
+				cQuery += " ON PZB.PZB_IDURL = PZC.PZC_IDURL "
+				cQuery += " AND PZB.PZB_ID = PZC.PZC_IDPROC "
+				cQuery += " WHERE PZC_IDURL = '000002' "
+				cQuery += " AND PZC_CHAVE LIKE '%"+Alltrim(MV_PAR07)+"%' "
+				If !Empty(MV_PAR01) .AND. !Empty(MV_PAR02)
+					cQuery += " AND PZB.PZB_DATA BETWEEN '"+DTOS(MV_PAR01)+"' AND '"+DTOS(MV_PAR02)+"' "
+				Else
+					cQuery += " AND PZB.PZB_DATA = '"+DTOS(dDataBase)+"' "
+				EndIf
+				If !Empty(Replace(MV_PAR03,":","")) .AND. !Empty(Replace(MV_PAR04,":",""))
+					cQuery += " AND PZB.PZB_HORA >= '"+MV_PAR03+"' "
+					cQuery += " AND PZB.PZB_HORA <= '"+MV_PAR04+"' "
+				Else
+					cQuery += " AND PZB.PZB_HORA >= '"+cTempo+"' "
+				EndIf
+				cQuery += " AND PZC.D_E_L_E_T_ = '' "
+				cQuery += " AND PZB.D_E_L_E_T_ = '' "
+				cQuery += " ORDER BY PZB.PZB_DATA DESC, PZB_HORA DESC "
+				
+				If Select("PZCX") > 0
+					PZCX->(dbCloseArea())			
+				EndIf
+
+				dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),"PZCX",.T.,.T.)
+
+				While PZCX->(!Eof())
+					cIDIN += PZCX->PZC_IDPROC + ","
+					PZCX->(dbSkip())
+				EndDo
+
+				If !Empty(cIDIN)
+					cIDIN := SubStr(cIDIN,1,len(cIDIN)-1)
+
+					cFilter += "AND PZB_ID IN "	+ FormatIn(cIDIN,",")
+				EndIf
+			ElseIf PZA->PZA_ID == "000020" .And. (!Empty(MV_PAR05) .OR. !Empty(MV_PAR06) .OR. !Empty(MV_PAR07) .OR. !Empty(MV_PAR08))
+				Alert("Parametros de Fatura, CTE e Pedido serão desconsiderados.")
+				cQuery := " SELECT TOP(30) PZC_IDPROC, PZB_DATA, PZB_HORA FROM " + RetSqlName("PZC") + " PZC "
+				cQuery += " INNER JOIN " + RetSqlName("PZB") + " PZB "
+				cQuery += " ON PZB.PZB_IDURL = PZC.PZC_IDURL "
+				cQuery += " AND PZB.PZB_ID = PZC.PZC_IDPROC "
+				cQuery += " WHERE PZC_IDURL = '000020' "
+				cQuery += " AND PZC_CHAVE LIKE '%"+Alltrim(MV_PAR08)+"%' "
+				If !Empty(MV_PAR01) .AND. !Empty(MV_PAR02)
+					cQuery += " AND PZB.PZB_DATA BETWEEN '"+DTOS(MV_PAR01)+"' AND '"+DTOS(MV_PAR02)+"' "
+				Else
+					cQuery += " AND PZB.PZB_DATA = '"+DTOS(dDataBase)+"' "
+				EndIf
+				If !Empty(Replace(MV_PAR03,":","")) .AND. !Empty(Replace(MV_PAR04,":",""))
+					cQuery += " AND PZB.PZB_HORA >= '"+MV_PAR03+"' "
+					cQuery += " AND PZB.PZB_HORA <= '"+MV_PAR04+"' "
+				Else
+					cQuery += " AND PZB.PZB_HORA >= '"+cTempo+"' "
+				EndIf
+				cQuery += " AND PZC.D_E_L_E_T_ = '' "
+				cQuery += " AND PZB.D_E_L_E_T_ = '' "
+				cQuery += " ORDER BY PZB.PZB_DATA DESC, PZB_HORA DESC "
+				
+				If Select("PZCX") > 0
+					PZCX->(dbCloseArea())			
+				EndIf
+
+				dbUseArea(.T.,"TOPCONN",TcGenQry(,,cQuery),"PZCX",.T.,.T.)
+
+				While PZCX->(!Eof())
+					cIDIN += PZCX->PZC_IDPROC + ","
+					PZCX->(dbSkip())
+				EndDo
+
+				If !Empty(cIDIN)
+					cIDIN := SubStr(cIDIN,1,len(cIDIN)-1)
+
+					cFilter += "AND PZB_ID IN "	+ FormatIn(cIDIN,",")
+				EndIf
+			EndIf
+			
+			cIDIN := ""
+			
 			oModel:GetModel('PZBDETAIL'):SetLoadFilter( , cFilter )
 		Else
 			lRet := .F.
