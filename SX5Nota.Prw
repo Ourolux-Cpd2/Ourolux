@@ -19,25 +19,25 @@ Local cChaveX5 := Substr(SX5->X5_CHAVE, 1, 3)
 
 If FunName() $ "MATA103.MATA140.MATA119"
 	If SM0->M0_CODIGO == '01'  // Empresa also cNumEmp = 0200
-		If cChaveX5     $ '5  ' .And. SM0->M0_CODFIL == '01'
+		If cChaveX5     $ '5  ' .And. Alltrim(SM0->M0_CODFIL) == '01'
 			Return( .T. )
-		ElseIf cChaveX5 $ 'ICP'  .And. SM0->M0_CODFIL == '01' // Serie NF entrada importacao - I1603-1459
+		ElseIf cChaveX5 $ 'ICP'  .And. Alltrim(SM0->M0_CODFIL) == '01' // Serie NF entrada importacao - I1603-1459
 			Return(.T.)
-		ElseIf cChaveX5 $ '4  ' .And. SM0->M0_CODFIL == '02'
+		ElseIf cChaveX5 $ '4  ' .And. Alltrim(SM0->M0_CODFIL) == '02'
 			Return(.T.)
-		ElseIf cChaveX5 $ '6  ' .And. SM0->M0_CODFIL == '03'
+		ElseIf cChaveX5 $ '6  ' .And. Alltrim(SM0->M0_CODFIL) == '03'
 			Return(.T.)
-		ElseIf cChaveX5 $ '7  ' .And. SM0->M0_CODFIL == '04'
+		ElseIf cChaveX5 $ '7  ' .And. Alltrim(SM0->M0_CODFIL) == '04'
 			Return(.T.)
-		ElseIf cChaveX5 $ '8  ' .And. SM0->M0_CODFIL == '05'
+		ElseIf cChaveX5 $ '8  ' .And. Alltrim(SM0->M0_CODFIL) == '05'
 			Return(.T.)
-		ElseIf cChaveX5 $ '9  ' .And. SM0->M0_CODFIL == '06'
+		ElseIf cChaveX5 $ '9  ' .And. Alltrim(SM0->M0_CODFIL) == '06'
 			Return(.T.)
 		Else
 			Return(.F.)
 		EndIf
 	ElseIf SM0->M0_CODIGO == '02'
-		If cChaveX5     $ '1  ' .And. SM0->M0_CODFIL == '00'
+		If cChaveX5     $ '1  ' .And. Alltrim(SM0->M0_CODFIL) == '00'
 			Return( .T. )
 		Else
 			Return( .F. )
@@ -48,17 +48,17 @@ If FunName() $ "MATA103.MATA140.MATA119"
 elseif FunName() $ "EICDI154"
 	
 	If SM0->M0_CODIGO == '01'  // Empresa also cNumEmp = 0200
-		If cChaveX5     $ '555' .And. SM0->M0_CODFIL == '01'
+		If cChaveX5     $ '555' .And. Alltrim(SM0->M0_CODFIL) == '01'
 			Return( .T. )
-		ElseIf cChaveX5 $ '444' .And. SM0->M0_CODFIL == '02'
+		ElseIf cChaveX5 $ '444' .And. Alltrim(SM0->M0_CODFIL) == '02'
 			Return(.T.)
-		ElseIf cChaveX5 $ '666' .And. SM0->M0_CODFIL == '03'
+		ElseIf cChaveX5 $ '666' .And. Alltrim(SM0->M0_CODFIL) == '03'
 			Return(.T.)
-		ElseIf cChaveX5 $ '777' .And. SM0->M0_CODFIL == '04'
+		ElseIf cChaveX5 $ '777' .And. Alltrim(SM0->M0_CODFIL) == '04'
 			Return(.T.)
-		ElseIf cChaveX5 $ '888' .And. SM0->M0_CODFIL == '05'
+		ElseIf cChaveX5 $ '888' .And. Alltrim(SM0->M0_CODFIL) == '05'
 			Return(.T.)
-		ElseIf cChaveX5 $ '099' .And. SM0->M0_CODFIL == '06' // WAR - 06/12/2018
+		ElseIf cChaveX5 $ '099' .And. Alltrim(SM0->M0_CODFIL) == '06' // WAR - 06/12/2018
 			Return(.T.)
 		Else
 			Return(.F.)
@@ -72,25 +72,25 @@ If SC5->C5_NUM <> SC9->C9_PEDIDO
 EndIf
 
 If SM0->M0_CODIGO == '01'
-	If (cChaveX5 $ '5  .NFS') .And. (SM0->M0_CODFIL == '01')
+	If (cChaveX5 $ '5  .NFS') .And. (Alltrim(SM0->M0_CODFIL) == '01')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '4  ') .And. (SM0->M0_CODFIL == '02')
+	ElseIf (cChaveX5 $ '4  ') .And. (Alltrim(SM0->M0_CODFIL) == '02')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '6  ') .And. (SM0->M0_CODFIL == '03')
+	ElseIf (cChaveX5 $ '6  ') .And. (Alltrim(SM0->M0_CODFIL) == '03')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '7  ') .And. (SM0->M0_CODFIL == '04')
+	ElseIf (cChaveX5 $ '7  ') .And. (Alltrim(SM0->M0_CODFIL) == '04')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '8  ') .And. (SM0->M0_CODFIL == '05')
+	ElseIf (cChaveX5 $ '8  ') .And. (Alltrim(SM0->M0_CODFIL) == '05')
 		_lRet := .T. 
-	ElseIf (cChaveX5 $ '9  ') .And. (SM0->M0_CODFIL == '06')
+	ElseIf (cChaveX5 $ '9  ') .And. (Alltrim(SM0->M0_CODFIL) == '06')
 		_lRet := .T.
 	EndIf
 ElseIf SM0->M0_CODIGO == '02'
-	If (cChaveX5 $ '1  ') .And. (SM0->M0_CODFIL == '00')
+	If (cChaveX5 $ '1  ') .And. (Alltrim(SM0->M0_CODFIL) == '00')
 		_lRet := .T.
-	ElseIf (cChaveX5 $ '1  ') .AND. (SM0->M0_CODFIL == '00')
+	ElseIf (cChaveX5 $ '1  ') .AND. (Alltrim(SM0->M0_CODFIL) == '00')
 		_lRet := .T.
-	ElseIf (cChaveX5 == 'ORC') .And. SM0->M0_CODFIL == '00'
+	ElseIf (cChaveX5 == 'ORC') .And. Alltrim(SM0->M0_CODFIL) == '00'
 		_lRet := .T.
 	EndIf
 Else
