@@ -130,6 +130,7 @@ User Function MTA410()
 			cMsgErro += "Cliente sem Segmento."+CRLF
 		EndIf
 		
+		/* comentado por solicitação do wadih no dia 28/10/2021
 		nVendNac := GetAdvFVal("SA3","A3_XVNDNAC",xFilial("SA3")+AllTrim(M->C5_VEND1),1,'N')
 		
 		If nVendNac == "N" .And. !U_IsAdm() 
@@ -142,7 +143,7 @@ User Function MTA410()
 				cMsgErro += "Venda para " + cEstado + " e proibida!"+CRLF
 			EndIf
 		EndIf
-	
+		*/
 		cNumtrf := M->C5_XNUMTRF
 		
 		If !Empty(cNumtrf) .And. cFilAnt == "04"
