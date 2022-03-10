@@ -73,6 +73,7 @@ USER FUNCTION PE01NFESEFAZ()
 	Local nProds		:= 0 // quantidade de itens no array
 
 	Local aAreaD2 		:= Nil
+	Local aAreaF		:= GetArea()
 	// Local aAreaTmp	:= SF2->(GetArea())
 	// Adição de e-mail para recebimento de arquivo XML
 
@@ -119,7 +120,7 @@ USER FUNCTION PE01NFESEFAZ()
 			for nProds  := 1 to Len(aprod)
 				cProds += GetAdvFVal("SF4","F4_ESTOQUE",(XFILIAL('SF4')+aprod[nProds][27]),1) // carrega estoque da TES para a variavel
 			next nProds
-
+/*
 			if 'N' $ cProds
 				// se houver algum produto com N no Estoque nao pode imprimir mensagem 
 				// nenhuma
@@ -175,9 +176,11 @@ USER FUNCTION PE01NFESEFAZ()
 				next nProds 
 
 				cObs += cProds // adiciona as mensagens ao campo padrao de observação
+	
 				cProds := " "
 			endif
-// final 
+// final
+*/ 
 			aAdd(aObs,cObs)
 
 
@@ -283,6 +286,7 @@ USER FUNCTION PE01NFESEFAZ()
 			// MOA - 02/10/2019 - Variaveis para consulta de codigo
 			//                                 da mensagem do portal de venda.
 			//-----------------------------------------------------------------------
+			DbSelectArea("SC5")
 			cCodMsg := Posicione("SC5",1,xFilial("SC5")+cPedMsg,"C5_XCODMNF")
 
 			If !Empty (cCodMsg)
@@ -440,5 +444,7 @@ endIf
 	Alert(cMsg)
 	endif
 	*/
+	
+RestArea(aAreaF)
 
 RETURN aRetorno
