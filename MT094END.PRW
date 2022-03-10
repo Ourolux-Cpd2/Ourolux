@@ -36,7 +36,7 @@ User Function MT094END()
 	Local aFonte	:= {}
 	Local cQuery 	:= ""  
 	Local cDespNFa  := SuperGetMV("ES_DESNFA",.F.,"")
-	Local cDespNNF	:= SuperGetMV("ES_DESNNF",.F.,"402")
+	Local cDespNNF	:= SuperGetMV("ES_DESNNF",.F.,"402/102")
 	Local lAtvEIC   := SuperGetMV("ES_ATVEICD",.T.,.F.)
 	Private cSRC	:= ""
 	PRIVATE lGerPrDI := IF(GetNewPar("MV_EASYFDI","S")="S",.T.,.F.)//ASR - 28/09/2005 - Integração EIC x FIN
@@ -285,6 +285,18 @@ User Function MT094END()
 				conout("MT094END - Query não trouxe resultado NF nao sera gerada")
 				ProcLogAtu("ERRO","MT094END - Query não trouxe resultado NF nao sera gerada", "Filial: " + _cFilDoc + " Pedido: " + _cDocto, "EICDESPESA" )
 			EndIf
+			
+			aFonte := GetSrcArray("NFFRTAUT.PRW")
+			If Empty(aFonte)
+				conout("MT094END - Rotina NFFRTAUT nao compilada")	
+				ProcLogAtu("ERRO","MT094END - Rotina NFFRTAUT nao compilada", "" , "EICDESPESA" )
+				RestArea( aArea )
+				Return
+			EndIf
+
+			conout("MT094END - Chamando rotina NFFRTAUT")
+			U_NFFRTAUT(_cFilDoc,_cDocto)
+			conout("MT094END - Final chamado rotina NFFRTAUT")
 		EndIf
 	EndIf
 

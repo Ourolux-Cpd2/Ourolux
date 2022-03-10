@@ -55,7 +55,7 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 		cQuery    := ""
 		cDespNFa  := SuperGetMV("ES_DESNFA",.F.,"")
 		lAtvEic   := SuperGetMV("ES_ATVEICD",.F.,.F.)
-		cDespNNF  := SuperGetMV("ES_DESNNF",.F.,"402")
+		cDespNNF  := SuperGetMV("ES_DESNNF",.F.,"402/102")
 		lGerPrDI  := IF(GetNewPar("MV_EASYFDI","S")="S",.T.,.F.)//ASR - 28/09/2005 - Integração EIC x FIN
 		cData 	  := dtoc(ddatabase)
 		cHora 	  := TIME()
@@ -342,6 +342,19 @@ WSMETHOD GET WSRECEIVE cCodigo WSSERVICE WSAPRPC
 							If lSemaf
 								UnlockByName(cSemaforo)
 							EndIf
+
+							aFonte := GetSrcArray("NFFRTAUT.PRW")
+							If Empty(aFonte)
+								conout("WSAPRPC - Rotina NFFRTAUT nao compilada")	
+								ProcLogAtu("ERRO","WSAPRPC - Rotina NFFRTAUT nao compilada", "" , "EICDESPESA" )
+								RestArea( aArea )
+								Return
+							EndIf
+
+							conout("WSAPRPC - Chamando rotina NFFRTAUT")
+							U_NFFRTAUT(ws_filial,ws_pedido)
+							conout("WSAPRPC - Final chamado rotina NFFRTAUT")
+
 						EndIf
 					else
 						If ws_nivel == "02"
