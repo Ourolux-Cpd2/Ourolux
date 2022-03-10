@@ -164,17 +164,7 @@ User Function EICPO400
 				
 				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"W0SC",.F.,.T. )
 
-				cQuery := " SELECT YT_X_FILIA FROM " + RetSqlName("SYT")
-				cQuery += " WHERE YT_COD_IMP = '"+SW2->W2_IMPORT+"' "
-				cQuery += " AND D_E_L_E_T_ = '' "
-
-				If Select("YTFIL") > 0
-					YTFIL->(dbCloseArea())
-				EndIf				
-				
-				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"YTFIL",.F.,.T. )
-				
-				U_OURO010("EXCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
+				U_OURO010("EXCLUI PR",SW1->W1_XFILORI,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
 
 				cQuery := " SELECT W1_COD_I, W1_SALDO_Q, W1_QTDE, W1_SI_NUM FROM " + RetSqlName("SW1")
 				cQuery += " WHERE W1_SI_NUM = (SELECT DISTINCT(W3_SI_NUM) FROM " + RetSqlName("SW3")
@@ -203,9 +193,9 @@ User Function EICPO400
 				EndDo
 
 				If lParcial
-					U_OURO010("INCLUI PR PARCIAL",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
+					U_OURO010("INCLUI PR PARCIAL",SW1->W1_XFILORI,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
 				Else
-					U_OURO010("INCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
+					U_OURO010("INCLUI PR",SW1->W1_XFILORI,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
 				EndIf
 
 			Case cParam == "APOS_CONFERENCIAFINAL"
@@ -303,23 +293,13 @@ User Function EICPO400
 				
 				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"W0SC",.F.,.T. )
 
-				cQuery := " SELECT YT_X_FILIA FROM " + RetSqlName("SYT")
-				cQuery += " WHERE YT_COD_IMP = '"+SW2->W2_IMPORT+"' "
-				cQuery += " AND D_E_L_E_T_ = '' "
-
-				If Select("YTFIL") > 0
-					YTFIL->(dbCloseArea())
-				EndIf				
-				
-				DbUseArea( .T.,"TOPCONN",TCGENQRY(,,cQuery),"YTFIL",.F.,.T. )
-
-				U_OURO010("EXCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
+				U_OURO010("EXCLUI PR",SW1->W1_XFILORI,W0SC->W0_C1_NUM)//Excluir titulos de PR para Solicitação aprovada
 				
 				If !Empty(aSldSI)
 					If lParcial
-						U_OURO010("INCLUI PR PARCIAL",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
+						U_OURO010("INCLUI PR PARCIAL",SW1->W1_XFILORI,W0SC->W0_C1_NUM,aSldSI)//Geração de PR para Solicitação aprovada
 					Else
-						U_OURO010("INCLUI PR",YTFIL->YT_X_FILIA,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
+						U_OURO010("INCLUI PR",SW1->W1_XFILORI,W0SC->W0_C1_NUM)//Geração de PR para Solicitação aprovada
 					EndIf
 				EndIf
 
