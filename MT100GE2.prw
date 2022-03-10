@@ -40,6 +40,9 @@ If lAtvEIC
             Else
                 ProcLogAtu("ALERTA","MT100GE2 - Data de Vencimento vazia", "Filial: " +SD1->D1_FILIAL+ " Pedido: " +SD1->D1_PEDIDO , "EICDESPESA" )
             EndIf
+            
+            SE2->E2_HIST := "PROC."+Alltrim(cHawb)
+            
         Endif
     EndIf
 EndIf
