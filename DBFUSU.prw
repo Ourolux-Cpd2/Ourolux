@@ -50,8 +50,24 @@ Static Function RunReport()
 	Local cRelTrb	:= CriaTrab(aCampos,.T.)
 	Local aAcessos  := {}                   
 	Local aModulos  := fModulos()
-	Local aCampos	:= {{"COD","C",6,0},{"ACESSO","C",40,0},{"LOGIN","C",20,0},{"NOME","C",35,0},{"DEPTO","C",30,0},{"CARGO","C",30,0},{"EMAIL","C",35,0}}
-	Local cAceTrb	:= CriaTrab(aCampos,.T.)
+	Local aCampos2	:= {{"COD","C",6,0},{"ACESSO","C",40,0},{"LOGIN","C",20,0},{"NOME","C",35,0},{"DEPTO","C",30,0},{"CARGO","C",30,0},{"EMAIL","C",35,0}}
+	Local cAceTrb	:= CriaTrab(aCampos2,.T.)
+
+	Local cFile  	:= "C:\TEMP\Menus_"+DTOS(dDataBase)+"_"+Replace(Time(),":","-")+".csv" 
+	Local nH     	:= fCreate(cFile) 
+	Local cFile2  	:= "C:\TEMP\Acessos_"+DTOS(dDataBase)+"_"+Replace(Time(),":","-")+".csv" 
+	Local nH2     	:= fCreate(cFile2) 
+	Local s,x,a,b,c,z := 0
+
+	If nH == -1 
+		MsgStop("Falha ao criar arquivo - erro "+str(ferror())) 
+		Return 
+	Endif 
+
+	If nH2 == -1 
+		MsgStop("Falha ao criar arquivo - erro "+str(ferror())) 
+		Return 
+	Endif 
 	
 	AADD(aAcessos,'Excluir Produtos')
 	AADD(aAcessos,'Alterar Produtos')
@@ -292,6 +308,13 @@ Static Function RunReport()
 					TAC->CARGO	:= RTrim(Capital(cCargo))
 					TAC->EMAIL	:= RTrim(lower(cEMail))
 				   TAC->(MsUnlock())
+				   fWrite(nH2,	cCod+";"+;
+								'|[S] '+Rtrim(aAcessos[s])+";"+;
+								cLogin+";"+;
+								RTrim(Capital(cNome))+";"+;
+								RTrim(Capital(cDepto))+";"+;
+								RTrim(Capital(cCargo))+";"+;
+								RTrim(lower(cEMail))+chr(13)+chr(10))
 				Endif
 			Next
 
@@ -392,6 +415,32 @@ Static Function RunReport()
 									TRB->EMAIL	:= RTrim(lower(aMenuAll[z,6]))
 									TRB->COD	:= RTrim(aMenuAll[z,7])
 								MsUnLock()								
+								fWrite(nH,	aMenuAll[z,1]+";"+;
+											RTrim(aFuncoes[c][1][1])+";"+;
+											aFuncoes[c][2]+";"+;
+											cTipo+";"+;
+											Upper(RTrim(aFuncoes[c][3]))+";"+;
+											Upper(aFuncoes[c][5])+";"+;
+											cModulo+";"+;
+											RTrim(cArquivo)+";"+;
+											RTrim(cGrupo)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,1,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,2,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,3,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,4,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,5,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,6,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,7,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,8,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,9,1)+";"+;
+											Substr(Upper(aFuncoes[c][5]) ,10,1)+";"+;
+											RTrim(aMenuAll[z,2])+";"+;
+											RTrim(Capital(aMenuAll[z,3]))+";"+;
+											RTrim(Capital(aMenuAll[z,4]))+";"+;
+											RTrim(Capital(aMenuAll[z,5]))+";"+;
+											RTrim(lower(aMenuAll[z,6]))+";"+;
+											RTrim(aMenuAll[z,7])+;
+								 			chr(13)+chr(10) ) 
 
 							Endif
 						Next
@@ -433,6 +482,32 @@ Static Function RunReport()
 						TRB->EMAIL	:= RTrim(lower(aMenuAll[z,6]))
 						TRB->COD	:= RTrim(aMenuAll[z,7])
  					   MsUnLock()
+						fWrite(nH,	aMenuAll[z,1]+";"+;
+									RTrim(aGrupos[b][1][1])+";"+;
+									RTrim(aGrupos[b][2])+";"+;
+									cTipo+";"+;
+									RTrim(Upper(RTrim(aGrupos[b][3])))+";"+;
+									RTrim(Upper(aGrupos[b][5]))+";"+;
+									cModulo+";"+;
+									RTrim(cArquivo)+";"+;
+									RTrim(cGrupo)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,1,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,2,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,3,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,4,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,5,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,6,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,7,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,8,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,9,1)+";"+;
+									Substr(Upper(aGrupos[b][5]) ,10,1)+";"+;
+									RTrim(aMenuAll[z,2])+";"+;
+									RTrim(Capital(aMenuAll[z,3]))+";"+;
+									RTrim(Capital(aMenuAll[z,4]))+";"+;
+									RTrim(Capital(aMenuAll[z,5]))+";"+;
+									RTrim(lower(aMenuAll[z,6]))+";"+;
+									RTrim(aMenuAll[z,7])+;
+									chr(13)+chr(10) ) 
 				Endif    
 		
 			Next	
@@ -451,6 +526,10 @@ Static Function RunReport()
 	Copy To &cNomeAce
 	DbCloseArea()
 
+	fClose(nH) 
+	fClose(nH2) 
+	Msginfo("Processamento finalizado - Arquivo criado de Menus :" + cFile,"") 
+	Msginfo("Processamento finalizado - Arquivo criado de Acessos :" + cFile2,"") 
 Return
 
 /*
@@ -467,8 +546,9 @@ Return
 
 Static Function ValidPerg( cPerg )
 
-	Local aArea := GetArea()
-	Local aPerg:= {}
+	Local aArea  := GetArea()
+	Local aPerg  := {}
+	Local _nLaco := 0
 
 	aAdd(aPerg,{cPerg,"01","Analisar quais menus ?","mv_ch1","N",01,0,1,"C","","mv_par01","Todos","","","Padrao","","","Especifico","","","","","","","","  ",})
 	aAdd(aPerg,{cPerg,"02","Menu especíico       ?","mv_ch2","C",40,0,0,"G","","mv_par02","","","","","","","","","","","","","","","",})
